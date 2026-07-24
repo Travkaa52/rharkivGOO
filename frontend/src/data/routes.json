@@ -5625,5 +5625,203 @@
     "firstDeparture": "05:30",
     "lastDeparture": "21:30",
     "intervalMinutes": 10
+  },
+  {
+    "id": "route-metro-1",
+    "kind": "metro",
+    "number": "M1",
+    "name": "Метро, лінія 1 (Холодногірсько-Заводська лінія): Холодна Гора => Індустріальна",
+    "color": "#E30613",
+    "headsignForward": "Індустріальна",
+    "headsignBackward": "Холодна Гора",
+    "stopIds": [
+      "stop-metro-holodna-gora",
+      "stop-metro-vokzalna",
+      "stop-metro-tsentralnyi-rynok",
+      "stop-metro-maidan-konstytutsii",
+      "stop-metro-levada",
+      "stop-metro-sportyvna",
+      "stop-metro-zavodska",
+      "stop-metro-turboatom",
+      "stop-metro-palats-sportu",
+      "stop-metro-armiiska",
+      "stop-metro-imeni-o-s-maselskogo",
+      "stop-metro-traktornyi-zavod",
+      "stop-metro-industrialna"
+    ],
+    "schedule": [
+      {
+        "stopId": "stop-metro-holodna-gora",
+        "arrivalOffsetSec": 0
+      },
+      {
+        "stopId": "stop-metro-vokzalna",
+        "arrivalOffsetSec": 205
+      },
+      {
+        "stopId": "stop-metro-tsentralnyi-rynok",
+        "arrivalOffsetSec": 345
+      },
+      {
+        "stopId": "stop-metro-maidan-konstytutsii",
+        "arrivalOffsetSec": 465
+      },
+      {
+        "stopId": "stop-metro-levada",
+        "arrivalOffsetSec": 635
+      },
+      {
+        "stopId": "stop-metro-sportyvna",
+        "arrivalOffsetSec": 790
+      },
+      {
+        "stopId": "stop-metro-zavodska",
+        "arrivalOffsetSec": 969
+      },
+      {
+        "stopId": "stop-metro-turboatom",
+        "arrivalOffsetSec": 1154
+      },
+      {
+        "stopId": "stop-metro-palats-sportu",
+        "arrivalOffsetSec": 1337
+      },
+      {
+        "stopId": "stop-metro-armiiska",
+        "arrivalOffsetSec": 1535
+      },
+      {
+        "stopId": "stop-metro-imeni-o-s-maselskogo",
+        "arrivalOffsetSec": 1690
+      },
+      {
+        "stopId": "stop-metro-traktornyi-zavod",
+        "arrivalOffsetSec": 1863
+      },
+      {
+        "stopId": "stop-metro-industrialna",
+        "arrivalOffsetSec": 2053
+      }
+    ],
+    "firstDeparture": "05:30",
+    "lastDeparture": "22:00",
+    "intervalMinutes": 8
+  },
+  {
+    "id": "route-metro-2",
+    "kind": "metro",
+    "number": "M2",
+    "name": "Метро, лінія 2 (Салтівська лінія): Салтівська => Історичний музей",
+    "color": "#0072BC",
+    "headsignForward": "Історичний музей",
+    "headsignBackward": "Салтівська",
+    "stopIds": [
+      "stop-metro-saltivska",
+      "stop-metro-studentska",
+      "stop-metro-akademika-pavlova",
+      "stop-metro-akademika-barabashova",
+      "stop-metro-kyivska",
+      "stop-metro-iaroslava-mudrogo",
+      "stop-metro-universytet",
+      "stop-metro-istorychnyi-muzei"
+    ],
+    "schedule": [
+      {
+        "stopId": "stop-metro-saltivska",
+        "arrivalOffsetSec": 0
+      },
+      {
+        "stopId": "stop-metro-studentska",
+        "arrivalOffsetSec": 126
+      },
+      {
+        "stopId": "stop-metro-akademika-pavlova",
+        "arrivalOffsetSec": 271
+      },
+      {
+        "stopId": "stop-metro-akademika-barabashova",
+        "arrivalOffsetSec": 437
+      },
+      {
+        "stopId": "stop-metro-kyivska",
+        "arrivalOffsetSec": 702
+      },
+      {
+        "stopId": "stop-metro-iaroslava-mudrogo",
+        "arrivalOffsetSec": 897
+      },
+      {
+        "stopId": "stop-metro-universytet",
+        "arrivalOffsetSec": 1017
+      },
+      {
+        "stopId": "stop-metro-istorychnyi-muzei",
+        "arrivalOffsetSec": 1176
+      }
+    ],
+    "firstDeparture": "05:30",
+    "lastDeparture": "22:00",
+    "intervalMinutes": 8
+  },
+  {
+    "id": "route-metro-3",
+    "kind": "metro",
+    "number": "M3",
+    "name": "Метро, лінія 3 (Олексіївська лінія): Перемога => Метробудівників",
+    "color": "#009444",
+    "headsignForward": "Метробудівників",
+    "headsignBackward": "Перемога",
+    "stopIds": [
+      "stop-metro-peremoga",
+      "stop-metro-oleksiivska",
+      "stop-metro-23-serpnia",
+      "stop-metro-botanichnyi-sad",
+      "stop-metro-naukova",
+      "stop-metro-derzhprom",
+      "stop-metro-arhitektora-beketova",
+      "stop-metro-zahysnykiv-ukrainy",
+      "stop-metro-metrobudivnykiv"
+    ],
+    "schedule": [
+      {
+        "stopId": "stop-metro-peremoga",
+        "arrivalOffsetSec": 0
+      },
+      {
+        "stopId": "stop-metro-oleksiivska",
+        "arrivalOffsetSec": 147
+      },
+      {
+        "stopId": "stop-metro-23-serpnia",
+        "arrivalOffsetSec": 374
+      },
+      {
+        "stopId": "stop-metro-botanichnyi-sad",
+        "arrivalOffsetSec": 486
+      },
+      {
+        "stopId": "stop-metro-naukova",
+        "arrivalOffsetSec": 676
+      },
+      {
+        "stopId": "stop-metro-derzhprom",
+        "arrivalOffsetSec": 788
+      },
+      {
+        "stopId": "stop-metro-arhitektora-beketova",
+        "arrivalOffsetSec": 921
+      },
+      {
+        "stopId": "stop-metro-zahysnykiv-ukrainy",
+        "arrivalOffsetSec": 1160
+      },
+      {
+        "stopId": "stop-metro-metrobudivnykiv",
+        "arrivalOffsetSec": 1301
+      }
+    ],
+    "firstDeparture": "05:30",
+    "lastDeparture": "22:00",
+    "intervalMinutes": 8
   }
 ]

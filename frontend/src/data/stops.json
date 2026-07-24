@@ -23533,5 +23533,455 @@
     "routeIds": [
       "route-trolleybus-7"
     ]
+  },
+  {
+    "id": "stop-metro-holodna-gora",
+    "name": "Станція метро «Холодна Гора»",
+    "position": {
+      "lat": 49.98278,
+      "lng": 36.18278
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-vokzalna",
+    "name": "Станція метро «Вокзальна»",
+    "position": {
+      "lat": 49.98944,
+      "lng": 36.205
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-tsentralnyi-rynok",
+    "name": "Станція метро «Центральний ринок»",
+    "position": {
+      "lat": 49.99278,
+      "lng": 36.21972
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-maidan-konstytutsii",
+    "name": "Станція метро «Майдан Конституції»",
+    "position": {
+      "lat": 49.99139,
+      "lng": 36.2325
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-levada",
+    "name": "Станція метро «Левада»",
+    "position": {
+      "lat": 49.98083,
+      "lng": 36.24333
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-sportyvna",
+    "name": "Станція метро «Спортивна»",
+    "position": {
+      "lat": 49.97944,
+      "lng": 36.26083
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-zavodska",
+    "name": "Станція метро «Заводська»",
+    "position": {
+      "lat": 49.9757278,
+      "lng": 36.2809
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-turboatom",
+    "name": "Станція метро «Турбоатом»",
+    "position": {
+      "lat": 49.97222,
+      "lng": 36.30194
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-palats-sportu",
+    "name": "Станція метро «Палац Спорту»",
+    "position": {
+      "lat": 49.9660667,
+      "lng": 36.3212417
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-armiiska",
+    "name": "Станція метро «Армійська»",
+    "position": {
+      "lat": 49.96139,
+      "lng": 36.34361
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-imeni-o-s-maselskogo",
+    "name": "Станція метро «Імені О. С. Масельського»",
+    "position": {
+      "lat": 49.9580944,
+      "lng": 36.3604972
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-traktornyi-zavod",
+    "name": "Станція метро «Тракторний завод»",
+    "position": {
+      "lat": 49.9529056,
+      "lng": 36.3789944
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-industrialna",
+    "name": "Станція метро «Індустріальна»",
+    "position": {
+      "lat": 49.9462361,
+      "lng": 36.3988111
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-1"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-saltivska",
+    "name": "Станція метро «Салтівська»",
+    "position": {
+      "lat": 50.0246583,
+      "lng": 36.3358528
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-2"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-studentska",
+    "name": "Станція метро «Студентська»",
+    "position": {
+      "lat": 50.0167083,
+      "lng": 36.3299528
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-2"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-akademika-pavlova",
+    "name": "Станція метро «Академіка Павлова»",
+    "position": {
+      "lat": 50.0092694,
+      "lng": 36.3185056
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-2"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-akademika-barabashova",
+    "name": "Станція метро «Академіка Барабашова»",
+    "position": {
+      "lat": 50.0021528,
+      "lng": 36.302861
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-2"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-kyivska",
+    "name": "Станція метро «Київська»",
+    "position": {
+      "lat": 50.0011528,
+      "lng": 36.2702417
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-2"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-iaroslava-mudrogo",
+    "name": "Станція метро «Ярослава Мудрого»",
+    "position": {
+      "lat": 50.0039333,
+      "lng": 36.2475222
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-2"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-universytet",
+    "name": "Станція метро «Університет»",
+    "position": {
+      "lat": 50.0044389,
+      "lng": 36.2346111
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-2"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-istorychnyi-muzei",
+    "name": "Станція метро «Історичний музей»",
+    "position": {
+      "lat": 49.99306,
+      "lng": 36.23028
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-2"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-peremoga",
+    "name": "Станція метро «Перемога»",
+    "position": {
+      "lat": 50.0600861,
+      "lng": 36.2012917
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-oleksiivska",
+    "name": "Станція метро «Олексіївська»",
+    "position": {
+      "lat": 50.05,
+      "lng": 36.20667
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-23-serpnia",
+    "name": "Станція метро «23 Серпня»",
+    "position": {
+      "lat": 50.0346444,
+      "lng": 36.2203583
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-botanichnyi-sad",
+    "name": "Станція метро «Ботанічний сад»",
+    "position": {
+      "lat": 50.02722,
+      "lng": 36.22306
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-naukova",
+    "name": "Станція метро «Наукова»",
+    "position": {
+      "lat": 50.0130417,
+      "lng": 36.2268389
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-derzhprom",
+    "name": "Станція метро «Держпром»",
+    "position": {
+      "lat": 50.005975,
+      "lng": 36.2312139
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-arhitektora-beketova",
+    "name": "Станція метро «Архітектора Бекетова»",
+    "position": {
+      "lat": 49.9984917,
+      "lng": 36.2401306
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-zahysnykiv-ukrainy",
+    "name": "Станція метро «Захисників України»",
+    "position": {
+      "lat": 49.9886139,
+      "lng": 36.264775
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-metro-metrobudivnykiv",
+    "name": "Станція метро «Метробудівників»",
+    "position": {
+      "lat": 49.9786056,
+      "lng": 36.2626722
+    },
+    "kinds": [
+      "metro"
+    ],
+    "routeIds": [
+      "route-metro-3"
+    ],
+    "isAccessible": true
   }
 ]
