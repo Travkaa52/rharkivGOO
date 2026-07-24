@@ -15,12 +15,13 @@ function normalize(text: string): string {
   return text.trim().toLowerCase();
 }
 
-function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+/** Розрахунок відстані між двома точками [lat, lng] у метрах */
+function haversineMeters(aLat: number, aLng: number, bLat: number, bLng: number): number {
   const R = 6371000;
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
-  const lat1 = (a.lat * Math.PI) / 180;
-  const lat2 = (b.lat * Math.PI) / 180;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const lat1 = (aLat * Math.PI) / 180;
+  const lat2 = (bLat * Math.PI) / 180;
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
@@ -47,7 +48,10 @@ export const localStops = {
     return STOPS.find((s) => s.id === id);
   },
   getNearby(lat: number, lng: number, radiusM = 700): Stop[] {
-    return STOPS.map((s) => ({ stop: s, dist: haversineMeters({ lat, lng }, s.position) }))
+    return STOPS.map((s) => ({
+      stop: s,
+      dist: haversineMeters(lat, lng, s.position[0], s.position[1])
+    }))
       .filter((x) => x.dist <= radiusM)
       .sort((a, b) => a.dist - b.dist)
       .map((x) => x.stop);
@@ -90,7 +94,7 @@ export const localRoutes = {
    * не входить у поточну статичну збірку.
    */
   buildTrip(fromLat: number, fromLng: number, toLat: number, toLng: number) {
-    const distanceM = haversineMeters({ lat: fromLat, lng: fromLng }, { lat: toLat, lng: toLng });
+    const distanceM = haversineMeters(fromLat, fromLng, toLat, toLng);
     const walkSpeedMS = 1.35; // ~4.8 км/год
     const durationSec = Math.round(distanceM / walkSpeedMS);
     return Promise.resolve({
