@@ -1,0 +1,82 @@
+[
+  {
+    "id": "stop-freedom-square",
+    "name": "Площа Свободи",
+    "position": { "lat": 50.0028, "lng": 36.2312 },
+    "kinds": ["metro", "tram", "trolleybus", "bus"],
+    "routeIds": ["route-tram-3", "route-trolley-5", "route-bus-271u"],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-derzhprom",
+    "name": "Держпром",
+    "position": { "lat": 49.9958, "lng": 36.2304 },
+    "kinds": ["tram", "trolleybus"],
+    "routeIds": ["route-tram-3", "route-trolley-5"],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-south-station",
+    "name": "Південний вокзал",
+    "position": { "lat": 49.9905, "lng": 36.2231 },
+    "kinds": ["tram", "bus"],
+    "routeIds": ["route-tram-3", "route-bus-5"],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-barabashovo",
+    "name": "Барабашово",
+    "position": { "lat": 50.0453, "lng": 36.2879 },
+    "kinds": ["bus"],
+    "routeIds": ["route-bus-271u"],
+    "isAccessible": false
+  },
+  {
+    "id": "stop-saltivka",
+    "name": "Салтівка (Тракторобудівників)",
+    "position": { "lat": 50.0453, "lng": 36.3212 },
+    "kinds": ["trolleybus", "bus"],
+    "routeIds": ["route-trolley-5", "route-bus-271u"],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-kholodna-hora",
+    "name": "Холодна Гора",
+    "position": { "lat": 49.9838, "lng": 36.2131 },
+    "kinds": ["metro"],
+    "routeIds": ["route-m1"],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-istorychnyi-muzei",
+    "name": "Історичний музей",
+    "position": { "lat": 50.0022, "lng": 36.228 },
+    "kinds": ["metro"],
+    "routeIds": ["route-m1"],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-universytet",
+    "name": "Університет",
+    "position": { "lat": 50.0067, "lng": 36.2325 },
+    "kinds": ["metro"],
+    "routeIds": ["route-m1"],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-naukova",
+    "name": "Наукова",
+    "position": { "lat": 50.0126, "lng": 36.2415 },
+    "kinds": ["metro", "tram"],
+    "routeIds": ["route-m1", "route-tram-3"],
+    "isAccessible": true
+  },
+  {
+    "id": "stop-pushkinska",
+    "name": "Пушкінська",
+    "position": { "lat": 49.9986, "lng": 36.2415 },
+    "kinds": ["bus"],
+    "routeIds": ["route-bus-5"],
+    "isAccessible": false
+  }
+]

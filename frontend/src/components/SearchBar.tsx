@@ -1,0 +1,59 @@
+import { useState } from 'react';
+import clsx from 'clsx';
+
+interface SearchBarProps {
+  placeholder?: string;
+  onSubmit: (query: string) => void;
+  onFocus?: () => void;
+  autoFocus?: boolean;
+}
+
+export function SearchBar({ placeholder = 'Пошук зупинок, маршрутів, адрес…', onSubmit, onFocus, autoFocus }: SearchBarProps) {
+  const [value, setValue] = useState('');
+  const [focused, setFocused] = useState(false);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = value.trim();
+    if (trimmed) onSubmit(trimmed);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="w-full">
+      <div
+        className={clsx(
+          'flex items-center gap-3 rounded-xl2 border border-white/40 bg-white/80 px-4 py-3',
+          'shadow-glass backdrop-blur-xs transition-shadow',
+          focused && 'shadow-glass-lg ring-2 ring-gold/50'
+        )}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0 text-graphite/50">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+          <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+        <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onFocus={() => {
+            setFocused(true);
+            onFocus?.();
+          }}
+          onBlur={() => setFocused(false)}
+          autoFocus={autoFocus}
+          placeholder={placeholder}
+          className="w-full bg-transparent font-body text-sm text-graphite placeholder:text-graphite/40 focus:outline-none"
+        />
+        {value && (
+          <button
+            type="button"
+            onClick={() => setValue('')}
+            aria-label="Очистити пошук"
+            className="shrink-0 text-graphite/40 hover:text-graphite"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+    </form>
+  );
+}

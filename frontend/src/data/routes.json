@@ -1,0 +1,93 @@
+[
+  {
+    "id": "route-m1",
+    "kind": "metro",
+    "number": "М1",
+    "name": "Холодногірсько-заводська лінія",
+    "color": "#C9A24B",
+    "headsignForward": "Холодна Гора",
+    "headsignBackward": "Наукова",
+    "stopIds": ["stop-kholodna-hora", "stop-istorychnyi-muzei", "stop-universytet", "stop-naukova"],
+    "schedule": [
+      { "stopId": "stop-kholodna-hora", "arrivalOffsetSec": 0 },
+      { "stopId": "stop-istorychnyi-muzei", "arrivalOffsetSec": 240 },
+      { "stopId": "stop-universytet", "arrivalOffsetSec": 420 },
+      { "stopId": "stop-naukova", "arrivalOffsetSec": 660 }
+    ],
+    "firstDeparture": "05:30",
+    "lastDeparture": "23:40",
+    "intervalMinutes": 4
+  },
+  {
+    "id": "route-tram-3",
+    "kind": "tram",
+    "number": "3",
+    "name": "Південний вокзал — Наукова",
+    "color": "#0B3D2E",
+    "headsignForward": "Наукова",
+    "headsignBackward": "Південний вокзал",
+    "stopIds": ["stop-south-station", "stop-derzhprom", "stop-freedom-square", "stop-naukova"],
+    "schedule": [
+      { "stopId": "stop-south-station", "arrivalOffsetSec": 0 },
+      { "stopId": "stop-derzhprom", "arrivalOffsetSec": 300 },
+      { "stopId": "stop-freedom-square", "arrivalOffsetSec": 540 },
+      { "stopId": "stop-naukova", "arrivalOffsetSec": 840 }
+    ],
+    "firstDeparture": "05:20",
+    "lastDeparture": "23:30",
+    "intervalMinutes": 8
+  },
+  {
+    "id": "route-trolley-5",
+    "kind": "trolleybus",
+    "number": "5",
+    "name": "Салтівка — Держпром",
+    "color": "#12513D",
+    "headsignForward": "Держпром",
+    "headsignBackward": "Салтівка",
+    "stopIds": ["stop-saltivka", "stop-freedom-square", "stop-derzhprom"],
+    "schedule": [
+      { "stopId": "stop-saltivka", "arrivalOffsetSec": 0 },
+      { "stopId": "stop-freedom-square", "arrivalOffsetSec": 720 },
+      { "stopId": "stop-derzhprom", "arrivalOffsetSec": 900 }
+    ],
+    "firstDeparture": "05:40",
+    "lastDeparture": "23:10",
+    "intervalMinutes": 10
+  },
+  {
+    "id": "route-bus-271u",
+    "kind": "bus",
+    "number": "271у",
+    "name": "Барабашово — Площа Свободи",
+    "color": "#A8D5BA",
+    "headsignForward": "Площа Свободи",
+    "headsignBackward": "ТЦ Барабашово",
+    "stopIds": ["stop-barabashovo", "stop-saltivka", "stop-freedom-square"],
+    "schedule": [
+      { "stopId": "stop-barabashovo", "arrivalOffsetSec": 0 },
+      { "stopId": "stop-saltivka", "arrivalOffsetSec": 360 },
+      { "stopId": "stop-freedom-square", "arrivalOffsetSec": 1080 }
+    ],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:30",
+    "intervalMinutes": 12
+  },
+  {
+    "id": "route-bus-5",
+    "kind": "bus",
+    "number": "5",
+    "name": "Південний вокзал — Пушкінська",
+    "color": "#A8D5BA",
+    "headsignForward": "Пушкінська",
+    "headsignBackward": "Південний вокзал",
+    "stopIds": ["stop-south-station", "stop-pushkinska"],
+    "schedule": [
+      { "stopId": "stop-south-station", "arrivalOffsetSec": 0 },
+      { "stopId": "stop-pushkinska", "arrivalOffsetSec": 480 }
+    ],
+    "firstDeparture": "05:45",
+    "lastDeparture": "23:00",
+    "intervalMinutes": 15
+  }
+]
