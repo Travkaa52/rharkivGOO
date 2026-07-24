@@ -6,17 +6,22 @@ import { useSettingsStore } from '@/store/useSettingsStore';
 import { useVehicleAnimation } from '@/hooks/useVehicleAnimation';
 import { TransportSprite } from '@/components/TransportSprite';
 import { buildRouteLinesGeoJson, buildStopsGeoJson } from '@/lib/mapLayers';
-import type { Vehicle } from '@/types/transport';
+import type { TransportKind, Vehicle } from '@/types/transport';
 
 const ROUTES_SOURCE_ID = 'khgo-routes';
 const ROUTES_LAYER_ID = 'khgo-routes-lines';
 const STOPS_SOURCE_ID = 'khgo-stops';
 const STOPS_LAYER_ID = 'khgo-stops-circles';
 
-/** Додає статичні шари маршрутів (лінії) і зупинок (точки) — без анімації руху. */
-function addStaticTransitLayers(map: MapLibreMap) {
+/**
+ * Додає статичні шари маршрутів (лінії) і зупинок (точки) — без анімації руху.
+ * `visibleKinds`/`showStops` керуються панеллю <TransportLayersPanel /> —
+ * дані з локальної бази (routes.json / stops.json) відфільтровуються ще
+ * ДО потрапляння в GeoJSON-джерело, тож карта не малює зайвого.
+ */
+function addStaticTransitLayers(map: MapLibreMap, visibleKinds: TransportKind[], showStops: boolean) {
   if (!map.getSource(ROUTES_SOURCE_ID)) {
-    map.addSource(ROUTES_SOURCE_ID, { type: 'geojson', data: buildRouteLinesGeoJson() });
+    map.addSource(ROUTES_SOURCE_ID, { type: 'geojson', data: buildRouteLinesGeoJson(visibleKinds) });
     map.addLayer({
       id: ROUTES_LAYER_ID,
       type: 'line',
@@ -31,12 +36,13 @@ function addStaticTransitLayers(map: MapLibreMap) {
   }
 
   if (!map.getSource(STOPS_SOURCE_ID)) {
-    map.addSource(STOPS_SOURCE_ID, { type: 'geojson', data: buildStopsGeoJson() });
+    map.addSource(STOPS_SOURCE_ID, { type: 'geojson', data: buildStopsGeoJson(visibleKinds) });
     map.addLayer({
       id: STOPS_LAYER_ID,
       type: 'circle',
       source: STOPS_SOURCE_ID,
       minzoom: 12,
+      layout: { visibility: showStops ? 'visible' : 'none' },
       paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 12, 2.5, 17, 6],
         'circle-color': '#FFFFFF',
@@ -47,6 +53,19 @@ function addStaticTransitLayers(map: MapLibreMap) {
   }
 }
 
+/** Оновлює вже додані шари маршрутів/зупинок під нові фільтри панелі керування — без перестворення джерел. */
+function updateStaticTransitLayers(map: MapLibreMap, visibleKinds: TransportKind[], showStops: boolean) {
+  const routesSource = map.getSource(ROUTES_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+  routesSource?.setData(buildRouteLinesGeoJson(visibleKinds));
+
+  const stopsSource = map.getSource(STOPS_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+  stopsSource?.setData(buildStopsGeoJson(visibleKinds));
+
+  if (map.getLayer(STOPS_LAYER_ID)) {
+    map.setLayoutProperty(STOPS_LAYER_ID, 'visibility', showStops ? 'visible' : 'none');
+  }
+}
+
 interface MapViewProps {
   vehicles: Vehicle[];
   userPosition?: { lat: number; lng: number } | null;
@@ -54,6 +73,10 @@ interface MapViewProps {
   selectedVehicleId?: string | null;
   show3DBuildings?: boolean;
   onStopSelect?: (stopId: string) => void;
+  /** Які види транспорту показувати (лінії маршрутів на карті) — керується панеллю керування шарами. */
+  visibleKinds?: TransportKind[];
+  /** Показувати шар зупинок з локальної бази. */
+  showStops?: boolean;
 }
 
 interface ScreenVehicle {
@@ -68,7 +91,9 @@ export function MapView({
   onVehicleSelect,
   selectedVehicleId,
   show3DBuildings = true,
-  onStopSelect
+  onStopSelect,
+  visibleKinds = ['metro', 'tram', 'trolleybus', 'bus'],
+  showStops = true
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -114,7 +139,7 @@ export function MapView({
           }
         });
       }
-      addStaticTransitLayers(map);
+      addStaticTransitLayers(map, visibleKinds, showStops);
       map.on('click', STOPS_LAYER_ID, (e) => {
         const stopId = e.features?.[0]?.properties?.stopId as string | undefined;
         if (stopId) onStopSelectRef.current?.(stopId);
@@ -144,8 +169,16 @@ export function MapView({
     const map = mapRef.current;
     if (!map) return;
     map.setStyle(MAP_STYLES[mapStyle]);
-    map.once('styledata', () => addStaticTransitLayers(map));
+    map.once('styledata', () => addStaticTransitLayers(map, visibleKinds, showStops));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapStyle]);
+
+  // Панель керування шарами: перефільтровуємо лінії маршрутів і зупинки без перестворення карти.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    updateStaticTransitLayers(map, visibleKinds, showStops);
+  }, [visibleKinds, showStops, mapReady]);
 
   // Маркер користувача
   useEffect(() => {

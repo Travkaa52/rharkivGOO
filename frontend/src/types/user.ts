@@ -20,4 +20,8 @@ export interface AppSettings {
   units: 'metric';
   pushNotificationsEnabled: boolean;
   language: 'uk' | 'ru' | 'en';
+  /** Які види транспорту показувати на карті (лінії маршрутів + рух метро). */
+  visibleTransportKinds: import('./transport').TransportKind[];
+  /** Показувати шар зупинок на карті. */
+  showStopsOnMap: boolean;
 }

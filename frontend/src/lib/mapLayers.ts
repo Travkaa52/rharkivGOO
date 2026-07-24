@@ -1,6 +1,7 @@
 import { localRoutes, localStops } from '@/data/localData';
 import { TRANSPORT_COLORS } from '@/config/map';
 import type { FeatureCollection, LineString, Point } from 'geojson';
+import type { TransportKind } from '@/types/transport';
 
 /**
  * Статичні шари маршрутів і зупинок для наземного транспорту (трамвай,
@@ -9,8 +10,8 @@ import type { FeatureCollection, LineString, Point } from 'geojson';
  * вимагає специфікація: без достовірних GPS-даних наземний транспорт
  * не симулюється, показуються лише маршрут, зупинки та розклад.
  */
-export function buildRouteLinesGeoJson(): FeatureCollection<LineString> {
-  const routes = localRoutes.all();
+export function buildRouteLinesGeoJson(visibleKinds?: TransportKind[]): FeatureCollection<LineString> {
+  const routes = localRoutes.all().filter((r) => !visibleKinds || visibleKinds.includes(r.kind));
   return {
     type: 'FeatureCollection',
     features: routes
@@ -30,8 +31,8 @@ export function buildRouteLinesGeoJson(): FeatureCollection<LineString> {
   };
 }
 
-export function buildStopsGeoJson(): FeatureCollection<Point> {
-  const stops = localStops.all();
+export function buildStopsGeoJson(visibleKinds?: TransportKind[]): FeatureCollection<Point> {
+  const stops = localStops.all().filter((s) => !visibleKinds || s.kinds.some((k) => visibleKinds.includes(k)));
   return {
     type: 'FeatureCollection',
     features: stops.map((stop) => ({

@@ -1,7 +1,6 @@
 import { useFavoritesStore } from '@/store/useFavoritesStore';
+import { TransportKindIcon } from '@/components/TransportKindIcon';
 import type { Stop } from '@/types/transport';
-
-const KIND_LABELS: Record<string, string> = { metro: 'М', tram: 'Тр', trolleybus: 'Тб', bus: 'А' };
 
 export function StopCard({ stop, etaMinutes, onClick }: { stop: Stop; etaMinutes?: number; onClick?: () => void }) {
   const isFavorite = useFavoritesStore((s) => s.isStopFavorite(stop.id));
@@ -13,8 +12,12 @@ export function StopCard({ stop, etaMinutes, onClick }: { stop: Stop; etaMinutes
       onClick={onClick}
       className="flex w-full items-center gap-3 rounded-xl2 border border-white/60 bg-white/90 p-3 text-left shadow-glass transition hover:shadow-glass-lg active:scale-[0.99]"
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint/40 font-display text-xs font-bold text-forest">
-        {stop.kinds.map((k) => KIND_LABELS[k]).join('')}
+      {/* Іконки видів транспорту, що обслуговують зупинку — щоб одразу було
+          видно метро/трамвай/тролейбус/автобус, а не тільки буквений код. */}
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center gap-0.5 rounded-full bg-mint/40 p-1">
+        {stop.kinds.slice(0, 2).map((k) => (
+          <TransportKindIcon key={k} kind={k} size={stop.kinds.length > 1 ? 15 : 22} />
+        ))}
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate font-body text-sm font-semibold text-graphite">{stop.name}</p>

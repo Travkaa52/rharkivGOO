@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { routesApi } from '@/api/routes';
 import { localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
+import { TransportKindIcon, KIND_LABELS_UK } from '@/components/TransportKindIcon';
 import type { TransportRoute } from '@/types/transport';
 
 export function RouteDetailPage() {
@@ -52,13 +53,19 @@ export function RouteDetailPage() {
     <div className="min-h-dvh bg-surface-soft pb-20">
       <div className="px-4 pt-[max(1rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-display text-base font-bold text-white shadow-glass"
-            style={{ backgroundColor: route.color }}
-          >
-            {route.number}
+          <div className="relative shrink-0">
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-full font-display text-base font-bold text-white shadow-glass"
+              style={{ backgroundColor: route.color }}
+            >
+              {route.number}
+            </div>
+            <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-white shadow-glass">
+              <TransportKindIcon kind={route.kind} size={15} />
+            </div>
           </div>
           <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-graphite/40">{KIND_LABELS_UK[route.kind]}</p>
             <h1 className="truncate font-display text-lg font-extrabold text-graphite">{route.name}</h1>
             <p className="truncate text-sm text-graphite/50">
               {route.headsignForward} ↔ {route.headsignBackward}

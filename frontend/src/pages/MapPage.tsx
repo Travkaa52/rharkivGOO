@@ -4,21 +4,31 @@ import { MapView } from '@/components/MapView';
 import { SearchBar } from '@/components/SearchBar';
 import { GpsButton } from '@/components/GpsButton';
 import { StopCard } from '@/components/StopCard';
+import { TransportLayersPanel } from '@/components/TransportLayersPanel';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useMetroPositions } from '@/hooks/useMetroPositions';
 import { localStops } from '@/data/localData';
+import { useSettingsStore } from '@/store/useSettingsStore';
 
 export function MapPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') ?? '';
   const { position, isLocating, error, locate } = useGeolocation();
+  const visibleKinds = useSettingsStore((s) => s.visibleTransportKinds);
+  const showStops = useSettingsStore((s) => s.showStopsOnMap);
 
   // Рухаються на карті ТІЛЬКИ поїзди метро — їхня позиція розрахована
   // математично за офіційним розкладом (без GPS). Трамваї, тролейбуси
   // й автобуси не мають достовірного джерела координат, тому на карті
   // показані лише як статичні лінії маршрутів і зупинки (MapView сам
   // додає ці шари) — без симуляції руху.
-  const metroVehicles = useMetroPositions();
+  const allMetroVehicles = useMetroPositions();
+  // Панель керування шарами може вимкнути метро окремо — тоді потяги
+  // не рендеряться, хоча математична симуляція розкладу все одно рахується.
+  const metroVehicles = useMemo(
+    () => (visibleKinds.includes('metro') ? allMetroVehicles : []),
+    [allMetroVehicles, visibleKinds]
+  );
 
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
@@ -46,7 +56,11 @@ export function MapPage() {
           setSelectedVehicleId(id);
         }}
         onStopSelect={handleStopSelect}
+        visibleKinds={visibleKinds}
+        showStops={showStops}
       />
+
+      <TransportLayersPanel />
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="pointer-events-auto flex-1">
           <SearchBar onSubmit={handleSearch} placeholder={initialQuery || 'Куди їдемо?'} autoFocus={!initialQuery} />
