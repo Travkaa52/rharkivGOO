@@ -1,82 +1,42 @@
 [
-  {
-    "id": "stop-freedom-square",
-    "name": "Площа Свободи",
-    "position": { "lat": 50.0028, "lng": 36.2312 },
-    "kinds": ["metro", "tram", "trolleybus", "bus"],
-    "routeIds": ["route-tram-3", "route-trolley-5", "route-bus-271u"],
-    "isAccessible": true
-  },
-  {
-    "id": "stop-derzhprom",
-    "name": "Держпром",
-    "position": { "lat": 49.9958, "lng": 36.2304 },
-    "kinds": ["tram", "trolleybus"],
-    "routeIds": ["route-tram-3", "route-trolley-5"],
-    "isAccessible": true
-  },
-  {
-    "id": "stop-south-station",
-    "name": "Південний вокзал",
-    "position": { "lat": 49.9905, "lng": 36.2231 },
-    "kinds": ["tram", "bus"],
-    "routeIds": ["route-tram-3", "route-bus-5"],
-    "isAccessible": true
-  },
-  {
-    "id": "stop-barabashovo",
-    "name": "Барабашово",
-    "position": { "lat": 50.0453, "lng": 36.2879 },
-    "kinds": ["bus"],
-    "routeIds": ["route-bus-271u"],
-    "isAccessible": false
-  },
-  {
-    "id": "stop-saltivka",
-    "name": "Салтівка (Тракторобудівників)",
-    "position": { "lat": 50.0453, "lng": 36.3212 },
-    "kinds": ["trolleybus", "bus"],
-    "routeIds": ["route-trolley-5", "route-bus-271u"],
-    "isAccessible": true
-  },
-  {
-    "id": "stop-kholodna-hora",
-    "name": "Холодна Гора",
-    "position": { "lat": 49.9838, "lng": 36.2131 },
-    "kinds": ["metro"],
-    "routeIds": ["route-m1"],
-    "isAccessible": true
-  },
-  {
-    "id": "stop-istorychnyi-muzei",
-    "name": "Історичний музей",
-    "position": { "lat": 50.0022, "lng": 36.228 },
-    "kinds": ["metro"],
-    "routeIds": ["route-m1"],
-    "isAccessible": true
-  },
-  {
-    "id": "stop-universytet",
-    "name": "Університет",
-    "position": { "lat": 50.0067, "lng": 36.2325 },
-    "kinds": ["metro"],
-    "routeIds": ["route-m1"],
-    "isAccessible": true
-  },
-  {
-    "id": "stop-naukova",
-    "name": "Наукова",
-    "position": { "lat": 50.0126, "lng": 36.2415 },
-    "kinds": ["metro", "tram"],
-    "routeIds": ["route-m1", "route-tram-3"],
-    "isAccessible": true
-  },
-  {
-    "id": "stop-pushkinska",
-    "name": "Пушкінська",
-    "position": { "lat": 49.9986, "lng": 36.2415 },
-    "kinds": ["bus"],
-    "routeIds": ["route-bus-5"],
-    "isAccessible": false
-  }
+  /* ================= М1: ХОЛОДНОГІРСЬКО-ЗАВОДСЬКА ЛІНІЯ ================= */
+  { "id": "stop-m1-01", "name": "ст. м. Холодна Гора", "coordinates": [49.9808, 36.1772], "type": "metro" },
+  { "id": "stop-m1-02", "name": "ст. м. Південний вокзал", "coordinates": [49.9888, 36.2045], "type": "metro" },
+  { "id": "stop-m1-03", "name": "ст. м. Центральний ринок", "coordinates": [49.9912, 36.2201], "type": "metro" },
+  { "id": "stop-m1-04", "name": "ст. м. Майдан Конституції", "coordinates": [49.9894, 36.2322], "type": "metro" },
+  { "id": "stop-m1-05", "name": "ст. м. Левада", "coordinates": [49.9800, 36.2435], "type": "metro" },
+  { "id": "stop-m1-06", "name": "ст. м. Спортивна", "coordinates": [49.9798, 36.2588], "type": "metro" },
+  { "id": "stop-m1-07", "name": "ст. м. Завод Малишева", "coordinates": [49.9782, 36.2730], "type": "metro" },
+  { "id": "stop-m1-08", "name": "ст. м. Турбоатом", "coordinates": [49.9721, 36.2872], "type": "metro" },
+  { "id": "stop-m1-09", "name": "ст. м. Палац Спорту", "coordinates": [49.9678, 36.3031], "type": "metro" },
+  { "id": "stop-m1-10", "name": "ст. м. Армійська", "coordinates": [49.9634, 36.3195], "type": "metro" },
+  { "id": "stop-m1-11", "name": "ст. м. імені О.С. Масельського", "coordinates": [49.9575, 36.3382], "type": "metro" },
+  { "id": "stop-m1-12", "name": "ст. м. Тракторний завод", "coordinates": [49.9515, 36.3575], "type": "metro" },
+  { "id": "stop-m1-13", "name": "ст. м. Індустріальна", "coordinates": [49.9452, 36.3770], "type": "metro" },
+
+  /* ================= М2: САЛТІВСЬКА ЛІНІЯ ================= */
+  { "id": "stop-m2-01", "name": "ст. м. Історичний музей", "coordinates": [49.9902, 36.2325], "type": "metro" },
+  { "id": "stop-m2-02", "name": "ст. м. Університет", "coordinates": [50.0044, 36.2343], "type": "metro" },
+  { "id": "stop-m2-03", "name": "ст. м. Ярослава Мудрого", "coordinates": [50.0039, 36.2482], "type": "metro" },
+  { "id": "stop-m2-04", "name": "ст. м. Академіка Барабашова", "coordinates": [50.0152, 36.2974], "type": "metro" },
+  { "id": "stop-m2-05", "name": "ст. м. Академіка Павлова", "coordinates": [50.0221, 36.3120], "type": "metro" },
+  { "id": "stop-m2-06", "name": "ст. м. Студентська", "coordinates": [50.0264, 36.3262], "type": "metro" },
+  { "id": "stop-m2-07", "name": "ст. м. Салтівська", "coordinates": [50.0264, 36.3361], "type": "metro" },
+
+  /* ================= М3: ОЛЕКСІЇВСЬКА ЛІНІЯ ================= */
+  { "id": "stop-m3-01", "name": "ст. м. Метробудівників", "coordinates": [49.9792, 36.2592], "type": "metro" },
+  { "id": "stop-m3-02", "name": "ст. м. Захисників України", "coordinates": [49.9922, 36.2595], "type": "metro" },
+  { "id": "stop-m3-03", "name": "ст. м. Архітектора Бекетова", "coordinates": [49.9961, 36.2388], "type": "metro" },
+  { "id": "stop-m3-04", "name": "ст. м. Держпром", "coordinates": [50.0051, 36.2282], "type": "metro" },
+  { "id": "stop-m3-05", "name": "ст. м. Наукова", "coordinates": [50.0143, 36.2268], "type": "metro" },
+  { "id": "stop-m3-06", "name": "ст. м. Ботанічний сад", "coordinates": [50.0255, 36.2265], "type": "metro" },
+  { "id": "stop-m3-07", "name": "ст. м. 23 Серпня", "coordinates": [50.0350, 36.2215], "type": "metro" },
+  { "id": "stop-m3-08", "name": "ст. м. Олексіївська", "coordinates": [50.0515, 36.2085], "type": "metro" },
+  { "id": "stop-m3-09", "name": "ст. м. Перемога", "coordinates": [50.0630, 36.2045], "type": "metro" },
+
+  /* ================= КЛЮЧОВІ НАЗЕМНІ ЗУПИНКИ ================= */
+  { "id": "stop-surface-peremoha-ring", "name": "просп. Перемоги (розворотне коло)", "coordinates": [50.0658, 36.2042], "type": "trolleybus" },
+  { "id": "stop-surface-zhukovskoho", "name": "просп. Жуковського", "coordinates": [50.0521, 36.2862], "type": "trolleybus" },
+  { "id": "stop-surface-novozhanove", "name": "Новожанове", "coordinates": [49.9481, 36.2162], "type": "tram" },
+  { "id": "stop-surface-602-micro", "name": "602-й мікрорайон", "coordinates": [50.0011, 36.3485], "type": "trolleybus" }
 ]
