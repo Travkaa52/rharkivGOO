@@ -5,28 +5,20 @@ import type { Stop, TransportKind, TransportRoute } from '@/types/transport';
 const STOPS = stopsJson as Stop[];
 const ROUTES = routesJson as TransportRoute[];
 
-/**
- * Проєкт працює повністю без бекенду: усі зупинки/маршрути — статичний JSON
- * (frontend/src/data/*.json), який можна доповнювати чи замінювати на реальний
- * GTFS-експорт без зміни коду сторінок.
- */
-
 function normalize(text: string): string {
   return text.trim().toLowerCase();
 }
 
-/** Розрахунок відстані між двома точками [lat, lng] у метрах */
-function haversineMeters(aLat: number, aLng: number, bLat: number, bLng: number): number {
+function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const R = 6371000;
-  const dLat = ((bLat - aLat) * Math.PI) / 180;
-  const dLng = ((bLng - aLng) * Math.PI) / 180;
-  const lat1 = (aLat * Math.PI) / 180;
-  const lat2 = (bLat * Math.PI) / 180;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const lat1 = (a.lat * Math.PI) / 180;
+  const lat2 = (b.lat * Math.PI) / 180;
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-/** Стабільний псевдовипадковий "шум" 0..1 з рядка-ключа (щоб ETA не стрибав на кожен рендер). */
 function seededFraction(key: string): number {
   let hash = 0;
   for (let i = 0; i < key.length; i++) {
@@ -50,17 +42,12 @@ export const localStops = {
   getNearby(lat: number, lng: number, radiusM = 700): Stop[] {
     return STOPS.map((s) => ({
       stop: s,
-      dist: haversineMeters(lat, lng, s.position[0], s.position[1])
+      dist: haversineMeters({ lat, lng }, s.position)
     }))
       .filter((x) => x.dist <= radiusM)
       .sort((a, b) => a.dist - b.dist)
       .map((x) => x.stop);
   },
-  /**
-   * Наближений час прибуття. Реальних GPS-даних немає (проєкт без бекенду),
-   * тож ETA рахується детерміновано з інтервалу руху маршруту + поточної хвилини,
-   * щоб виглядало правдоподібно та не "стрибало" щосекунди.
-   */
   getArrivals(stopId: string): { routeId: string; etaMinutes: number; vehicleId: string }[] {
     const routes = ROUTES.filter((r) => r.stopIds.includes(stopId));
     const minuteBucket = Math.floor(Date.now() / 60000);
@@ -87,14 +74,8 @@ export const localRoutes = {
   getByKind(kind: TransportKind): TransportRoute[] {
     return ROUTES.filter((r) => r.kind === kind);
   },
-  /**
-   * Спрощена побудова маршруту без сервера: пряма пішохідна відстань між
-   * точками. Повноцінний мультимодальний роутинг (пересадки, граф зупинок)
-   * потребує або офлайн-графа побудованого з GTFS, або зовнішнього routing API —
-   * не входить у поточну статичну збірку.
-   */
   buildTrip(fromLat: number, fromLng: number, toLat: number, toLng: number) {
-    const distanceM = haversineMeters(fromLat, fromLng, toLat, toLng);
+    const distanceM = haversineMeters({ lat: fromLat, lng: fromLng }, { lat: toLat, lng: toLng });
     const walkSpeedMS = 1.35; // ~4.8 км/год
     const durationSec = Math.round(distanceM / walkSpeedMS);
     return Promise.resolve({
