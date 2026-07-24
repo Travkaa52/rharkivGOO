@@ -1,5 +1,4 @@
 [
-  /* ================= М1: ХОЛОДНОГІРСЬКО-ЗАВОДСЬКА ЛІНІЯ ================= */
   {
     "id": "stop-m1-01",
     "name": "ст. м. Холодна Гора",
@@ -26,12 +25,12 @@
     "name": "ст. м. Майдан Конституції",
     "position": { "lat": 49.9894, "lng": 36.2322 },
     "kinds": ["metro"],
-    "routeIds": ["route-m1"]
+    "routeIds": ["route-m1", "route-m2"]
   },
   {
     "id": "stop-m1-05",
     "name": "ст. м. Левада",
-    "position": { "lat": 49.9800, "lng": 36.2435 },
+    "position": { "lat": 49.98, "lng": 36.2435 },
     "kinds": ["metro"],
     "routeIds": ["route-m1"]
   },
@@ -40,12 +39,12 @@
     "name": "ст. м. Спортивна",
     "position": { "lat": 49.9798, "lng": 36.2588 },
     "kinds": ["metro"],
-    "routeIds": ["route-m1"]
+    "routeIds": ["route-m1", "route-m3"]
   },
   {
     "id": "stop-m1-07",
     "name": "ст. м. Завод Малишева",
-    "position": { "lat": 49.9782, "lng": 36.2730 },
+    "position": { "lat": 49.9782, "lng": 36.273 },
     "kinds": ["metro"],
     "routeIds": ["route-m1"]
   },
@@ -87,25 +86,23 @@
   {
     "id": "stop-m1-13",
     "name": "ст. м. Індустріальна",
-    "position": { "lat": 49.9452, "lng": 36.3770 },
+    "position": { "lat": 49.9452, "lng": 36.377 },
     "kinds": ["metro"],
     "routeIds": ["route-m1"]
   },
-
-  /* ================= М2: САЛТІВСЬКА ЛІНІЯ ================= */
   {
     "id": "stop-m2-01",
     "name": "ст. м. Історичний музей",
     "position": { "lat": 49.9902, "lng": 36.2325 },
     "kinds": ["metro"],
-    "routeIds": ["route-m2"]
+    "routeIds": ["route-m2", "route-m1"]
   },
   {
     "id": "stop-m2-02",
     "name": "ст. м. Університет",
     "position": { "lat": 50.0044, "lng": 36.2343 },
     "kinds": ["metro"],
-    "routeIds": ["route-m2"]
+    "routeIds": ["route-m2", "route-m3"]
   },
   {
     "id": "stop-m2-03",
@@ -124,7 +121,7 @@
   {
     "id": "stop-m2-05",
     "name": "ст. м. Академіка Павлова",
-    "position": { "lat": 50.0221, "lng": 36.3120 },
+    "position": { "lat": 50.0221, "lng": 36.312 },
     "kinds": ["metro"],
     "routeIds": ["route-m2"]
   },
@@ -142,14 +139,12 @@
     "kinds": ["metro"],
     "routeIds": ["route-m2"]
   },
-
-  /* ================= М3: ОЛЕКСІЇВСЬКА ЛІНІЯ ================= */
   {
     "id": "stop-m3-01",
     "name": "ст. м. Метробудівників",
     "position": { "lat": 49.9792, "lng": 36.2592 },
     "kinds": ["metro"],
-    "routeIds": ["route-m3"]
+    "routeIds": ["route-m3", "route-m1"]
   },
   {
     "id": "stop-m3-02",
@@ -170,7 +165,7 @@
     "name": "ст. м. Держпром",
     "position": { "lat": 50.0051, "lng": 36.2282 },
     "kinds": ["metro"],
-    "routeIds": ["route-m3"]
+    "routeIds": ["route-m3", "route-m2"]
   },
   {
     "id": "stop-m3-05",
@@ -189,7 +184,7 @@
   {
     "id": "stop-m3-07",
     "name": "ст. м. 23 Серпня",
-    "position": { "lat": 50.0350, "lng": 36.2215 },
+    "position": { "lat": 50.035, "lng": 36.2215 },
     "kinds": ["metro"],
     "routeIds": ["route-m3"]
   },
@@ -203,7 +198,7 @@
   {
     "id": "stop-m3-09",
     "name": "ст. м. Перемога",
-    "position": { "lat": 50.0630, "lng": 36.2045 },
+    "position": { "lat": 50.063, "lng": 36.2045 },
     "kinds": ["metro"],
     "routeIds": ["route-m3"]
   }
