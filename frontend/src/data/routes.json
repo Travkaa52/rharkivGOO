@@ -1,6 +1,6 @@
 [
   {
-    "id": "route-trolleybus-24",
+    "id": "route-trolleybus-24-fwd",
     "kind": "trolleybus",
     "number": "24",
     "name": "Тролейбус №24: 602 мікрорайон => станція метро \"Академіка Барабашова\"",
@@ -40,7 +40,7 @@
     "intervalMinutes": 27
   },
   {
-    "id": "route-tram-23",
+    "id": "route-tram-23-fwd",
     "kind": "tram",
     "number": "23",
     "name": "Трамвай №23: Свистуна => Салтівська",
@@ -80,7 +80,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-23",
+    "id": "route-tram-23-bwd",
     "kind": "tram",
     "number": "23",
     "name": "Трамвай №23: Салтівська => Свистуна",
@@ -120,7 +120,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-3",
+    "id": "route-tram-3-fwd",
     "kind": "tram",
     "number": "3",
     "name": "Трамвай №3: Новожанове => Залютіно",
@@ -160,7 +160,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-26",
+    "id": "route-tram-26-fwd",
     "kind": "tram",
     "number": "26",
     "name": "Трамвай №26: Парк ім. Горького => Південно-Східна",
@@ -216,7 +216,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-26",
+    "id": "route-tram-26-bwd",
     "kind": "tram",
     "number": "26",
     "name": "Трамвай №26: Південно-Східна => Парк ім. Горького",
@@ -271,7 +271,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-3",
+    "id": "route-tram-3-bwd",
     "kind": "tram",
     "number": "3",
     "name": "Трамвай №3: Залютіно => Новожанове",
@@ -311,7 +311,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-6",
+    "id": "route-tram-6-fwd",
     "kind": "tram",
     "number": "6",
     "name": "Трамвай №6: 602 мікрорайон => Південний вокзал",
@@ -347,7 +347,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-6",
+    "id": "route-tram-6-bwd",
     "kind": "tram",
     "number": "6",
     "name": "Трамвай №6: Південний вокзал => 602 мікрорайон",
@@ -383,7 +383,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-8",
+    "id": "route-tram-8-fwd",
     "kind": "tram",
     "number": "8",
     "name": "Трамвай №8: Салтівська => проспект Гагаріна",
@@ -429,7 +429,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-8",
+    "id": "route-tram-8-bwd",
     "kind": "tram",
     "number": "8",
     "name": "Трамвай №8: проспект Гагаріна => Салтівська",
@@ -476,7 +476,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-27",
+    "id": "route-tram-27-fwd",
     "kind": "tram",
     "number": "27",
     "name": "Трамвай №27: Новожанове => Салтівська",
@@ -525,7 +525,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-27",
+    "id": "route-tram-27-bwd",
     "kind": "tram",
     "number": "27",
     "name": "Трамвай №27: Салтівська => Новожанове",
@@ -573,7 +573,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-5",
+    "id": "route-tram-5-fwd",
     "kind": "tram",
     "number": "5",
     "name": "Трамвай №5: парк Машинобудівників => проспект Гагаріна",
@@ -606,7 +606,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-5",
+    "id": "route-tram-5-bwd",
     "kind": "tram",
     "number": "5",
     "name": "Трамвай №5: проспект Гагаріна => парк Машинобудівників",
@@ -640,7 +640,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-1",
+    "id": "route-tram-1-fwd",
     "kind": "tram",
     "number": "1",
     "name": "Трамвай №1: Іванівка => Південний вокзал",
@@ -659,7 +659,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-1",
+    "id": "route-tram-1-bwd",
     "kind": "tram",
     "number": "1",
     "name": "Трамвай №1: Південний вокзал => Іванівка",
@@ -680,7 +680,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-12",
+    "id": "route-tram-12-fwd",
     "kind": "tram",
     "number": "12",
     "name": "Трамвай №12: Центральний Парк => Південний вокзал",
@@ -712,7 +712,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-12",
+    "id": "route-tram-12-bwd",
     "kind": "tram",
     "number": "12",
     "name": "Трамвай №12: Південний вокзал => Лісопарк",
@@ -742,7 +742,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-7",
+    "id": "route-tram-7-fwd",
     "kind": "tram",
     "number": "7",
     "name": "Трамвай №7: Новоселівка => Південний вокзал",
@@ -770,7 +770,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-7",
+    "id": "route-tram-7-bwd",
     "kind": "tram",
     "number": "7",
     "name": "Трамвай №7: Південний вокзал => Новоселівка",
@@ -800,7 +800,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-20",
+    "id": "route-tram-20-fwd",
     "kind": "tram",
     "number": "20",
     "name": "Трамвай №20: Південний вокзал => проспект Перемоги",
@@ -838,7 +838,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-20",
+    "id": "route-tram-20-bwd",
     "kind": "tram",
     "number": "20",
     "name": "Трамвай №20: проспект Перемоги => Південний вокзал",
@@ -979,7 +979,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-trolleybus-19",
+    "id": "route-trolleybus-19-fwd",
     "kind": "trolleybus",
     "number": "19",
     "name": "Тролейбус №19 вулиця Одеська => 602 мікрорайон",
@@ -1013,7 +1013,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-19",
+    "id": "route-trolleybus-19-bwd",
     "kind": "trolleybus",
     "number": "19",
     "name": "Тролейбус №19: 602 мікрорайон => вулиця Одеська",
@@ -1046,7 +1046,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-24",
+    "id": "route-trolleybus-24-bwd",
     "kind": "trolleybus",
     "number": "24",
     "name": "Тролейбус №24: станція метро \"Академіка Барабашова\" -- 602 мікрорайон",
@@ -1070,7 +1070,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-42",
+    "id": "route-trolleybus-42-fwd",
     "kind": "trolleybus",
     "number": "42",
     "name": "Тролейбус №42: Наталії Ужвії - Героїв праці",
@@ -1111,7 +1111,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-31",
+    "id": "route-trolleybus-31-fwd",
     "kind": "trolleybus",
     "number": "31",
     "name": "Тролейбус №31: СТ. М. ТУРБОАТОМ - ПІВНІЧНА САЛТІВКА",
@@ -1269,7 +1269,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-33е",
+    "id": "route-bus-33е-fwd",
     "kind": "bus",
     "number": "33е",
     "name": "Автобус 33е: Астрономічна вулиця - Держпром",
@@ -1452,7 +1452,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-2",
+    "id": "route-trolleybus-2-fwd",
     "kind": "trolleybus",
     "number": "2",
     "name": "Тролейбус №2: Проспект Жуковського -> пр. Перемоги",
@@ -1652,7 +1652,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-54е",
+    "id": "route-bus-54е-fwd",
     "kind": "bus",
     "number": "54е",
     "name": "Автобус 54е: Героїв праці — Дружби народів",
@@ -1678,7 +1678,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-54е",
+    "id": "route-bus-54е-bwd",
     "kind": "bus",
     "number": "54е",
     "name": "Автобус 54е: Дружби народів — Героїв праці",
@@ -1753,7 +1753,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-10е",
+    "id": "route-bus-10е-fwd",
     "kind": "bus",
     "number": "10е",
     "name": "Автобус 10е: Академіка Барабашова - Амосова",
@@ -1779,7 +1779,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-10е",
+    "id": "route-bus-10е-bwd",
     "kind": "bus",
     "number": "10е",
     "name": "Автобус 10е: Амосова - Академіка Барабашова",
@@ -1805,7 +1805,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-281е",
+    "id": "route-bus-281е-fwd",
     "kind": "bus",
     "number": "281е",
     "name": "Автобус 281е: 626-й мікрорайон - метро Академіка Барабашова",
@@ -1833,7 +1833,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-281е",
+    "id": "route-bus-281е-bwd",
     "kind": "bus",
     "number": "281е",
     "name": "Автобус 281е: метро Академіка Барабашова - 626-й мікрорайон",
@@ -1859,7 +1859,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-206е",
+    "id": "route-bus-206е-fwd",
     "kind": "bus",
     "number": "206е",
     "name": "Автобус 206е: Академіка Барабашова - Наталії Ужвій",
@@ -1891,7 +1891,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-206е",
+    "id": "route-bus-206е-bwd",
     "kind": "bus",
     "number": "206е",
     "name": "Автобус 206е: Наталії Ужвій - Академіка Барабашова",
@@ -1927,7 +1927,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-65е",
+    "id": "route-bus-65е-fwd",
     "kind": "bus",
     "number": "65е",
     "name": "Автобус 65е: Ст. м. \"Університет\" (пр. Правди) - Селище. Жуковского",
@@ -1997,7 +1997,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-211е",
+    "id": "route-bus-211е-fwd",
     "kind": "bus",
     "number": "211е",
     "name": "Автобус 211е: Власенко вул. => 602-й мікрорайон (Медкомплекс)",
@@ -2037,7 +2037,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-211е",
+    "id": "route-bus-211е-bwd",
     "kind": "bus",
     "number": "211е",
     "name": "Автобус 211е: 602-й мікрорайон (Медкомплекс) => Власенко вул.",
@@ -2078,7 +2078,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-55е",
+    "id": "route-bus-55е-fwd",
     "kind": "bus",
     "number": "55е",
     "name": "Автобус 55е: Наталії Ужвій - Проспект перемоги",
@@ -2160,7 +2160,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-55е",
+    "id": "route-bus-55е-bwd",
     "kind": "bus",
     "number": "55е",
     "name": "Автобус 55е: Проспект перемоги - Наталії Ужвій",
@@ -2234,7 +2234,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-266е",
+    "id": "route-bus-266е-fwd",
     "kind": "bus",
     "number": "266е",
     "name": "Автобус 266е: Героїв праці - Командарма Уборевіча вулиця (Льва Толстого)",
@@ -2255,7 +2255,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-266е",
+    "id": "route-bus-266е-bwd",
     "kind": "bus",
     "number": "266е",
     "name": "Автобус 266е: Командарма Уборевіча вулиця (Льва Толстого) - Героїв праці",
@@ -2277,7 +2277,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-294е",
+    "id": "route-bus-294е-fwd",
     "kind": "bus",
     "number": "294е",
     "name": "Автобус 294e: Московський проспект - Наталії Ужвій",
@@ -2314,7 +2314,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-294е",
+    "id": "route-bus-294е-bwd",
     "kind": "bus",
     "number": "294е",
     "name": "Автобус 294e: Наталії Ужвій - Московський проспект",
@@ -2352,7 +2352,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-34",
+    "id": "route-trolleybus-34-fwd",
     "kind": "trolleybus",
     "number": "34",
     "name": "Тролейбус №34: Героїв праці - Східна Салтівка",
@@ -2375,7 +2375,7 @@
     "intervalMinutes": 15
   },
   {
-    "id": "route-trolleybus-34",
+    "id": "route-trolleybus-34-bwd",
     "kind": "trolleybus",
     "number": "34",
     "name": "Тролейбус №34: Східна Салтівка - Героїв праці",
@@ -2422,7 +2422,7 @@
     "intervalMinutes": 15
   },
   {
-    "id": "route-bus-212е",
+    "id": "route-bus-212е-fwd",
     "kind": "bus",
     "number": "212е",
     "name": "Автобус 212е: Героїв праці - Командарма Уборевіча",
@@ -2444,7 +2444,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-212е",
+    "id": "route-bus-212е-bwd",
     "kind": "bus",
     "number": "212е",
     "name": "Автобус 212е: Командарма Уборевіча - Героїв праці",
@@ -2467,7 +2467,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-259е",
+    "id": "route-bus-259е-fwd",
     "kind": "bus",
     "number": "259е",
     "name": "Автобус 259е: Дружби народів — Одеська",
@@ -2513,7 +2513,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-259е",
+    "id": "route-bus-259е-bwd",
     "kind": "bus",
     "number": "259е",
     "name": "Автобус 259е: Одеська - Дружби народів",
@@ -2558,7 +2558,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-163",
+    "id": "route-bus-163-fwd",
     "kind": "bus",
     "number": "163",
     "name": "Автобус 163: Героїв праці - с. Липці",
@@ -2598,7 +2598,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-163",
+    "id": "route-bus-163-bwd",
     "kind": "bus",
     "number": "163",
     "name": "Автобус 163: с. Липці- Героїв праці",
@@ -2635,7 +2635,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-659",
+    "id": "route-bus-659-fwd",
     "kind": "bus",
     "number": "659",
     "name": "Автобус 659: Героїв праці - с. Липці Травянське водосховище",
@@ -2675,7 +2675,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-659",
+    "id": "route-bus-659-bwd",
     "kind": "bus",
     "number": "659",
     "name": "Автобус 659: с. Липці Травянське водосховище - Героїв праці",
@@ -2714,7 +2714,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-192",
+    "id": "route-bus-192-fwd",
     "kind": "bus",
     "number": "192",
     "name": "Автобус 192: Героїв праці - с. Стрілеча",
@@ -2756,7 +2756,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-192",
+    "id": "route-bus-192-bwd",
     "kind": "bus",
     "number": "192",
     "name": "Автобус 192: с. Стрілеча - Героїв праці",
@@ -2795,7 +2795,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-204е",
+    "id": "route-bus-204е-fwd",
     "kind": "bus",
     "number": "204е",
     "name": "Автобус 204е: Ужвій - Індустріальна",
@@ -2833,7 +2833,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-204е",
+    "id": "route-bus-204е-bwd",
     "kind": "bus",
     "number": "204е",
     "name": "Автобус 204е: Індустріальна - Ужвій",
@@ -2871,7 +2871,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-71е",
+    "id": "route-bus-71е-fwd",
     "kind": "bus",
     "number": "71е",
     "name": "Автобус 71е: Зубрева - Пролетарська",
@@ -2895,7 +2895,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-71е",
+    "id": "route-bus-71е-bwd",
     "kind": "bus",
     "number": "71е",
     "name": "Автобус 71е: Пролетарська - Зубрева",
@@ -2918,7 +2918,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-38е",
+    "id": "route-bus-38е-fwd",
     "kind": "bus",
     "number": "38е",
     "name": "Автобус 38е: Академіка Барабашова - пос. Кулінічі",
@@ -2945,7 +2945,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-38е",
+    "id": "route-bus-38е-bwd",
     "kind": "bus",
     "number": "38е",
     "name": "Автобус 38е: пос. Кулінічі - Академіка Барабашова",
@@ -3012,7 +3012,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-228е",
+    "id": "route-bus-228е-fwd",
     "kind": "bus",
     "number": "228е",
     "name": "Автобус 228: ст метро Масельського - 626 мікрорайон",
@@ -3039,7 +3039,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-228е",
+    "id": "route-bus-228е-bwd",
     "kind": "bus",
     "number": "228е",
     "name": "Автобус 228е: 626 мікрорайон - ст метро Масельського",
@@ -3149,7 +3149,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-17е",
+    "id": "route-bus-17е-fwd",
     "kind": "bus",
     "number": "17е",
     "name": "Автобус 17е: 4 Відділення невідкладної хірургії - Світла вулиця",
@@ -3196,7 +3196,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-17е",
+    "id": "route-bus-17е-bwd",
     "kind": "bus",
     "number": "17е",
     "name": "Автобус 17е: Світла вулиця - 4 Відділення невідкладної хірургії",
@@ -3238,7 +3238,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-250е",
+    "id": "route-bus-250е-fwd",
     "kind": "bus",
     "number": "250е",
     "name": "Автобус 250е \"Південний вокзал-Сортіровка\"",
@@ -3267,7 +3267,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-250е",
+    "id": "route-bus-250е-bwd",
     "kind": "bus",
     "number": "250е",
     "name": "Автобус 250е \"Сортіровка-Південний вокзал\"",
@@ -3296,7 +3296,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-97е",
+    "id": "route-bus-97е-fwd",
     "kind": "bus",
     "number": "97е",
     "name": "Автобус 97е \"Держпром-Сортіровка\"",
@@ -3326,7 +3326,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-97е",
+    "id": "route-bus-97е-bwd",
     "kind": "bus",
     "number": "97е",
     "name": "Автобус 97е \"Сортіровка-Держпром\"",
@@ -3370,7 +3370,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-270е",
+    "id": "route-bus-270е-fwd",
     "kind": "bus",
     "number": "270е",
     "name": "Автобус 270е \"Слави проспект-станція метро Держпром\"",
@@ -3403,7 +3403,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-270е",
+    "id": "route-bus-270е-bwd",
     "kind": "bus",
     "number": "270е",
     "name": "Автобус 270е \"Слави проспект-станція метро Держпром\"",
@@ -3461,7 +3461,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-13",
+    "id": "route-trolleybus-13-fwd",
     "kind": "trolleybus",
     "number": "13",
     "name": "Тролейбус №13 Парк \"Зустріч\" - ст. м. Захисникiв України",
@@ -3497,7 +3497,7 @@
     "intervalMinutes": 12
   },
   {
-    "id": "route-trolleybus-1",
+    "id": "route-trolleybus-1-fwd",
     "kind": "trolleybus",
     "number": "1",
     "name": "Тролейбус №1 ст. м. Палац Спорту - 28-й мікрорайон",
@@ -3524,7 +3524,7 @@
     "intervalMinutes": 7
   },
   {
-    "id": "route-trolleybus-7",
+    "id": "route-trolleybus-7-fwd",
     "kind": "trolleybus",
     "number": "7",
     "name": "Тролейбус №7",
@@ -3655,7 +3655,7 @@
     "intervalMinutes": 34
   },
   {
-    "id": "route-trolleybus-40",
+    "id": "route-trolleybus-40-fwd",
     "kind": "trolleybus",
     "number": "40",
     "name": "Тролейбус 40: Парк ім. Горького - пр. Перемоги",
@@ -3697,7 +3697,7 @@
     "intervalMinutes": 26
   },
   {
-    "id": "route-trolleybus-3",
+    "id": "route-trolleybus-3-fwd",
     "kind": "trolleybus",
     "number": "3",
     "name": "Тролейбус 3: Вул. 12 Квітня - вул. Університетська",
@@ -3737,7 +3737,7 @@
     "intervalMinutes": 13
   },
   {
-    "id": "route-trolleybus-3",
+    "id": "route-trolleybus-3-bwd",
     "kind": "trolleybus",
     "number": "3",
     "name": "Тролейбус 3: вул. Університетська - вул. 12 квітня",
@@ -3859,7 +3859,7 @@
     "intervalMinutes": 29
   },
   {
-    "id": "route-trolleybus-11",
+    "id": "route-trolleybus-11-fwd",
     "kind": "trolleybus",
     "number": "11",
     "name": "Тролейбус 11: Новобаварський пр. - пл. Конституції",
@@ -3881,7 +3881,7 @@
     "intervalMinutes": 23
   },
   {
-    "id": "route-trolleybus-11",
+    "id": "route-trolleybus-11-bwd",
     "kind": "trolleybus",
     "number": "11",
     "name": "Тролейбус 11: пл. Конституції - Новобаварський пр.",
@@ -3918,7 +3918,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-1628",
+    "id": "route-bus-1628-fwd",
     "kind": "bus",
     "number": "1628",
     "name": "Автобус 1628: Героїв праці - Циркуни",
@@ -3938,7 +3938,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-1628",
+    "id": "route-bus-1628-bwd",
     "kind": "bus",
     "number": "1628",
     "name": "Автобус 628: Циркуни - Героїв праці",
@@ -3959,7 +3959,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-36",
+    "id": "route-trolleybus-36-fwd",
     "kind": "trolleybus",
     "number": "36",
     "name": "Тролейбус 36: вул. 12 квітня - метро Армійська",
@@ -4014,7 +4014,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-36",
+    "id": "route-trolleybus-36-bwd",
     "kind": "trolleybus",
     "number": "36",
     "name": "Тролейбус 36: метро Армійська - вул. 12 квітня",
@@ -4045,7 +4045,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-2",
+    "id": "route-trolleybus-2-bwd",
     "kind": "trolleybus",
     "number": "2",
     "name": "Троллейбус №2: пр. Перемоги -> Проспект Жуковського",
@@ -4107,7 +4107,7 @@
     "intervalMinutes": 22
   },
   {
-    "id": "route-bus-1193",
+    "id": "route-bus-1193-fwd",
     "kind": "bus",
     "number": "1193",
     "name": "№1193 Харків - Буди",
@@ -4141,7 +4141,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-1193",
+    "id": "route-bus-1193-bwd",
     "kind": "bus",
     "number": "1193",
     "name": "№1193 Буди - Харків",
@@ -4175,7 +4175,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-1607",
+    "id": "route-bus-1607-fwd",
     "kind": "bus",
     "number": "1607",
     "name": "Автобус №1607 Харків(Холодна гора) - Пісочин(вул. Спортивна)",
@@ -4211,7 +4211,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-1607",
+    "id": "route-bus-1607-bwd",
     "kind": "bus",
     "number": "1607",
     "name": "Автобус №1607 Пісочин(вул. Спортивна) - Харків(Холодна гора)",
@@ -4247,7 +4247,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-1176",
+    "id": "route-bus-1176-fwd",
     "kind": "bus",
     "number": "1176",
     "name": "Автобус №1176 Південне - Харків(Холодна гора)",
@@ -4298,7 +4298,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-1176",
+    "id": "route-bus-1176-bwd",
     "kind": "bus",
     "number": "1176",
     "name": "Автобус №1176 Харків(Холодна гора) - Південне",
@@ -4347,7 +4347,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-2",
+    "id": "route-bus-2-fwd",
     "kind": "bus",
     "number": "2",
     "name": "Автобус №2є СТ. М. ХОЛОДНА ГОРА - МІСЬКЕ КЛАДОВИЩЕ №8",
@@ -4381,7 +4381,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-2",
+    "id": "route-bus-2-bwd",
     "kind": "bus",
     "number": "2",
     "name": "Автобус №2є МІСЬКЕ КЛАДОВИЩЕ №8 - СТ. М. ХОЛОДНА ГОРА",
@@ -4413,7 +4413,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-5е",
+    "id": "route-bus-5е-fwd",
     "kind": "bus",
     "number": "5е",
     "name": "Автобус №5е ст. м. Проспект Гагаріна - вул. Мира",
@@ -4473,7 +4473,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-5е",
+    "id": "route-bus-5е-bwd",
     "kind": "bus",
     "number": "5е",
     "name": "Автобус №5е вул. Мира - ст. м. Проспект Гагаріна",
@@ -4617,7 +4617,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-42",
+    "id": "route-trolleybus-42-bwd",
     "kind": "trolleybus",
     "number": "42",
     "name": "Тролейбус №42: Героїв праці - Наталії Ужвії",
@@ -4657,7 +4657,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-20е",
+    "id": "route-bus-20е-fwd",
     "kind": "bus",
     "number": "20е",
     "name": "Автобус 20е: майдан Конституції - Лікарня швидкої допомоги",
@@ -4689,7 +4689,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-20е",
+    "id": "route-bus-20е-bwd",
     "kind": "bus",
     "number": "20е",
     "name": "Автобус 20е: Лікарня швидкої допомоги- майдан Конституції",
@@ -4721,7 +4721,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-1",
+    "id": "route-trolleybus-1-bwd",
     "kind": "trolleybus",
     "number": "1",
     "name": "Тролейбус №1 28-й мікрорайон - ст. м. Палац Спорту",
@@ -4745,7 +4745,7 @@
     "intervalMinutes": 7
   },
   {
-    "id": "route-trolleybus-13",
+    "id": "route-trolleybus-13-bwd",
     "kind": "trolleybus",
     "number": "13",
     "name": "Тролейбус №13 ст. м. Захисникiв України - Парк \"Зустріч\"",
@@ -4781,7 +4781,7 @@
     "intervalMinutes": 12
   },
   {
-    "id": "route-trolleybus-47",
+    "id": "route-trolleybus-47-fwd",
     "kind": "trolleybus",
     "number": "47",
     "name": "Тролейбус №47 Північна Салтівка ст. м. Героїв Праці",
@@ -4807,7 +4807,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-47",
+    "id": "route-trolleybus-47-bwd",
     "kind": "trolleybus",
     "number": "47",
     "name": "Тролейбус №47 ст. м. Салтівська - Північна Салтівка",
@@ -4833,7 +4833,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-33е",
+    "id": "route-bus-33е-bwd",
     "kind": "bus",
     "number": "33е",
     "name": "Автобус 33е: Держпром - Астрономічна вулиця",
@@ -4951,7 +4951,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-65е",
+    "id": "route-bus-65е-bwd",
     "kind": "bus",
     "number": "65е",
     "name": "Автобус 65е: Жуковського селище - станція метро \"Університет\"",
@@ -4992,7 +4992,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-40",
+    "id": "route-trolleybus-40-bwd",
     "kind": "trolleybus",
     "number": "40",
     "name": "Тролейбус 40: пр. Перемоги - Парк ім. Горького",
@@ -5032,7 +5032,7 @@
     "intervalMinutes": 26
   },
   {
-    "id": "route-trolleybus-48",
+    "id": "route-trolleybus-48-fwd",
     "kind": "trolleybus",
     "number": "48",
     "name": "Тролейбус №48 \"ст.м. Салтівська - Північна Салтівка-5\"",
@@ -5051,7 +5051,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-48",
+    "id": "route-trolleybus-48-bwd",
     "kind": "trolleybus",
     "number": "48",
     "name": "Тролейбус №48 \"Північна Салтівка-5 - ст.м. Героїв Праці\"",
@@ -5071,7 +5071,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-49",
+    "id": "route-trolleybus-49-fwd",
     "kind": "trolleybus",
     "number": "49",
     "name": "Тролейбус №49: Університетська - Жихор",
@@ -5119,7 +5119,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-49",
+    "id": "route-trolleybus-49-bwd",
     "kind": "trolleybus",
     "number": "49",
     "name": "Тролейбус №49: Жихор - вул. Університетська",
@@ -5167,7 +5167,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-50",
+    "id": "route-trolleybus-50-fwd",
     "kind": "trolleybus",
     "number": "50",
     "name": "Троллейбус №50 Майдан Конституції - Мікрорайон П'ятихатки",
@@ -5194,7 +5194,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-55",
+    "id": "route-trolleybus-55-fwd",
     "kind": "trolleybus",
     "number": "55",
     "name": "Троллейбус №55 Майдан Конституції - сел. Жуковського",
@@ -5218,7 +5218,7 @@
     "intervalMinutes": 26
   },
   {
-    "id": "route-trolleybus-55",
+    "id": "route-trolleybus-55-bwd",
     "kind": "trolleybus",
     "number": "55",
     "name": "Тролейбус №55 сел. Жуковського - Майдан Конституції",
@@ -5249,7 +5249,7 @@
     "intervalMinutes": 26
   },
   {
-    "id": "route-trolleybus-50",
+    "id": "route-trolleybus-50-bwd",
     "kind": "trolleybus",
     "number": "50",
     "name": "Тролейбус №50 Мікрорайон П'ятихатки - Майдан Конституції",
@@ -5280,7 +5280,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-53",
+    "id": "route-trolleybus-53-fwd",
     "kind": "trolleybus",
     "number": "53",
     "name": "Тролейбусний маршрут №53 вул. 12 Квітня - мікрорайон Горизон",
@@ -5296,7 +5296,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-53",
+    "id": "route-trolleybus-53-bwd",
     "kind": "trolleybus",
     "number": "53",
     "name": "Тролейбусний маршрут №53 Мікрорайон Горизонт - вул. 12 Квітня",
@@ -5313,7 +5313,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-54",
+    "id": "route-trolleybus-54-fwd",
     "kind": "trolleybus",
     "number": "54",
     "name": "Тролейбусний маршрут №54 Вул. 12 Квітня - Залізнична станція Рогань (не працює)",
@@ -5336,7 +5336,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-54",
+    "id": "route-trolleybus-54-bwd",
     "kind": "trolleybus",
     "number": "54",
     "name": "Тролейбусний маршрут №54 Залізнична станція Рогань - вул. 12 Квітня",
@@ -5360,7 +5360,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-tram-26лісопарк",
+    "id": "route-tram-26лісопарк-fwd",
     "kind": "tram",
     "number": "26 (лісопарк)",
     "name": "Трамвай №26 (лісопарк): Південно-Східна => Лісопарк",
@@ -5415,7 +5415,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-tram-26лісопарк",
+    "id": "route-tram-26лісопарк-bwd",
     "kind": "tram",
     "number": "26 (лісопарк)",
     "name": "Трамвай №26 (лісопарк): Лісопарк => Південно-Східна",
@@ -5471,7 +5471,7 @@
     "intervalMinutes": 8
   },
   {
-    "id": "route-trolleybus-31",
+    "id": "route-trolleybus-31-bwd",
     "kind": "trolleybus",
     "number": "31",
     "name": "Тролейбус №31: ПІВНІЧНА САЛТІВКА - СТ. М. ТУРБОАТОМ",
@@ -5582,7 +5582,7 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-trolleybus-7",
+    "id": "route-trolleybus-7-bwd",
     "kind": "trolleybus",
     "number": "7",
     "name": "Тролейбус №7",
@@ -5599,7 +5599,7 @@
     "intervalMinutes": 31
   },
   {
-    "id": "route-trolleybus-7",
+    "id": "route-trolleybus-7-c",
     "kind": "trolleybus",
     "number": "7",
     "name": "Тролейбус №7",

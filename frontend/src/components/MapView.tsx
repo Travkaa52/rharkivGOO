@@ -1,27 +1,66 @@
 import { useEffect, useRef, useState } from 'react';
 import maplibregl, { Map as MapLibreMap } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { DEFAULT_ZOOM, KHARKIV_CENTER, MAP_STYLES, MAX_ZOOM, MIN_ZOOM } from '@/config/map';
+import { DEFAULT_ZOOM, KHARKIV_CENTER, MAP_STYLES, MAX_ZOOM, MIN_ZOOM, TRANSPORT_COLORS } from '@/config/map';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useVehicleAnimation } from '@/hooks/useVehicleAnimation';
 import { TransportSprite } from '@/components/TransportSprite';
 import { buildRouteLinesGeoJson, buildStopsGeoJson } from '@/lib/mapLayers';
+import { localRoutes } from '@/data/localData';
 import type { TransportKind, Vehicle } from '@/types/transport';
 
 const ROUTES_SOURCE_ID = 'khgo-routes';
 const ROUTES_LAYER_ID = 'khgo-routes-lines';
+const ROUTES_CASING_LAYER_ID = 'khgo-routes-casing';
 const STOPS_SOURCE_ID = 'khgo-stops';
 const STOPS_LAYER_ID = 'khgo-stops-circles';
+const STOPS_HALO_LAYER_ID = 'khgo-stops-halo';
+const STOP_HIGHLIGHT_LAYER_ID = 'khgo-stops-highlight';
+
+const STOP_COLOR_MATCH: maplibregl.ExpressionSpecification = [
+  'match',
+  ['get', 'dominantKind'],
+  'metro',
+  TRANSPORT_COLORS.metro,
+  'tram',
+  TRANSPORT_COLORS.tram,
+  'trolleybus',
+  TRANSPORT_COLORS.trolleybus,
+  TRANSPORT_COLORS.bus
+];
 
 /**
  * Додає статичні шари маршрутів (лінії) і зупинок (точки) — без анімації руху.
  * `visibleKinds`/`showStops` керуються панеллю <TransportLayersPanel /> —
  * дані з локальної бази (routes.json / stops.json) відфільтровуються ще
  * ДО потрапляння в GeoJSON-джерело, тож карта не малює зайвого.
+ *
+ * Лінії маршрутів мають "casing" (темна підкладка під кольоровою лінією) для
+ * контрасту на світлих/темних тайлах, а обраний маршрут — товстіший і
+ * непрозорий, решта — притлумлені (властивості selected/dimmed рахуються в
+ * buildRouteLinesGeoJson і оновлюються без перестворення джерела/шару).
  */
-function addStaticTransitLayers(map: MapLibreMap, visibleKinds: TransportKind[], showStops: boolean) {
+function addStaticTransitLayers(
+  map: MapLibreMap,
+  visibleKinds: TransportKind[],
+  showStops: boolean,
+  selectedRouteId?: string | null
+) {
   if (!map.getSource(ROUTES_SOURCE_ID)) {
-    map.addSource(ROUTES_SOURCE_ID, { type: 'geojson', data: buildRouteLinesGeoJson(visibleKinds) });
+    map.addSource(ROUTES_SOURCE_ID, { type: 'geojson', data: buildRouteLinesGeoJson(visibleKinds, selectedRouteId) });
+
+    map.addLayer({
+      id: ROUTES_CASING_LAYER_ID,
+      type: 'line',
+      source: ROUTES_SOURCE_ID,
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#0A0F0D',
+        'line-width': ['case', ['get', 'selected'], ['interpolate', ['linear'], ['zoom'], 11, 4, 17, 8], 0],
+        'line-opacity': ['case', ['get', 'dimmed'], 0, 0.35]
+      }
+    });
+
     map.addLayer({
       id: ROUTES_LAYER_ID,
       type: 'line',
@@ -29,14 +68,43 @@ function addStaticTransitLayers(map: MapLibreMap, visibleKinds: TransportKind[],
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint: {
         'line-color': ['coalesce', ['get', 'color'], '#0B3D2E'],
-        'line-width': ['interpolate', ['linear'], ['zoom'], 11, 1.5, 16, 4],
-        'line-opacity': 0.75
+        'line-width': [
+          'case',
+          ['get', 'selected'],
+          ['interpolate', ['linear'], ['zoom'], 11, 3, 17, 6.5],
+          ['interpolate', ['linear'], ['zoom'], 11, 1.4, 17, 3.5]
+        ],
+        'line-opacity': ['case', ['get', 'dimmed'], 0.12, 0.9]
       }
     });
   }
 
   if (!map.getSource(STOPS_SOURCE_ID)) {
     map.addSource(STOPS_SOURCE_ID, { type: 'geojson', data: buildStopsGeoJson(visibleKinds) });
+
+    // Тонкий світлий ореол під кожною зупинкою — робить кольорові кола
+    // читабельними і на світлій, і на темній підкладці карти.
+    map.addLayer({
+      id: STOPS_HALO_LAYER_ID,
+      type: 'circle',
+      source: STOPS_SOURCE_ID,
+      minzoom: 12,
+      layout: { visibility: showStops ? 'visible' : 'none' },
+      paint: {
+        'circle-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          12,
+          ['case', ['get', 'isHub'], 4.5, 3.5],
+          17,
+          ['case', ['get', 'isHub'], 11, 8.5]
+        ],
+        'circle-color': '#FFFFFF',
+        'circle-opacity': 0.9
+      }
+    });
+
     map.addLayer({
       id: STOPS_LAYER_ID,
       type: 'circle',
@@ -44,13 +112,44 @@ function addStaticTransitLayers(map: MapLibreMap, visibleKinds: TransportKind[],
       minzoom: 12,
       layout: { visibility: showStops ? 'visible' : 'none' },
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 12, 2.5, 17, 6],
-        'circle-color': '#FFFFFF',
-        'circle-stroke-color': '#0B3D2E',
-        'circle-stroke-width': 2
+        'circle-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          12,
+          ['case', ['get', 'isHub'], 3.2, 2.2],
+          17,
+          ['case', ['get', 'isHub'], 8, 5.5]
+        ],
+        'circle-color': STOP_COLOR_MATCH,
+        'circle-stroke-color': '#FFFFFF',
+        'circle-stroke-width': ['case', ['get', 'isHub'], 2, 1.4]
+      }
+    });
+
+    // Позначка зупинок обраного маршруту — золоте кільце навколо звичайного
+    // маркера. Фільтр порожній за замовчуванням, оновлюється разом з вибором маршруту.
+    map.addLayer({
+      id: STOP_HIGHLIGHT_LAYER_ID,
+      type: 'circle',
+      source: STOPS_SOURCE_ID,
+      minzoom: 11,
+      filter: ['in', ['get', 'stopId'], ['literal', []]],
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 6, 17, 13],
+        'circle-color': 'transparent',
+        'circle-stroke-color': '#C6A552',
+        'circle-stroke-width': 2.5
       }
     });
   }
+}
+
+/** Оновлює лише фільтр шару підсвітки зупинок обраного маршруту. */
+function updateRouteStopHighlight(map: MapLibreMap, selectedRouteId?: string | null) {
+  if (!map.getLayer(STOP_HIGHLIGHT_LAYER_ID)) return;
+  const route = selectedRouteId ? localRoutes.getById(selectedRouteId) : undefined;
+  map.setFilter(STOP_HIGHLIGHT_LAYER_ID, ['in', ['get', 'stopId'], ['literal', route?.stopIds ?? []]]);
 }
 
 /** Додає шар об'ємних будівель (якщо його ще немає) — видимість керується окремо через layout.visibility. */
@@ -73,15 +172,24 @@ function ensureBuildingsLayer(map: MapLibreMap, visible: boolean) {
 }
 
 /** Оновлює вже додані шари маршрутів/зупинок під нові фільтри панелі керування — без перестворення джерел. */
-function updateStaticTransitLayers(map: MapLibreMap, visibleKinds: TransportKind[], showStops: boolean) {
+function updateStaticTransitLayers(
+  map: MapLibreMap,
+  visibleKinds: TransportKind[],
+  showStops: boolean,
+  selectedRouteId?: string | null
+) {
   const routesSource = map.getSource(ROUTES_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
-  routesSource?.setData(buildRouteLinesGeoJson(visibleKinds));
+  routesSource?.setData(buildRouteLinesGeoJson(visibleKinds, selectedRouteId));
 
   const stopsSource = map.getSource(STOPS_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
   stopsSource?.setData(buildStopsGeoJson(visibleKinds));
 
-  if (map.getLayer(STOPS_LAYER_ID)) {
-    map.setLayoutProperty(STOPS_LAYER_ID, 'visibility', showStops ? 'visible' : 'none');
+  updateRouteStopHighlight(map, selectedRouteId);
+
+  for (const layerId of [STOPS_LAYER_ID, STOPS_HALO_LAYER_ID]) {
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, 'visibility', showStops ? 'visible' : 'none');
+    }
   }
 }
 
@@ -91,6 +199,9 @@ interface MapViewProps {
   onVehicleSelect?: (vehicleId: string) => void;
   selectedVehicleId?: string | null;
   onStopSelect?: (stopId: string) => void;
+  /** Обраний маршрут (клік по лінії на карті або вибір у пошуку/картці) — підсвічує лінію й зупинки. */
+  selectedRouteId?: string | null;
+  onRouteSelect?: (routeId: string) => void;
   /** Які види транспорту показувати (лінії маршрутів на карті) — керується панеллю керування шарами. */
   visibleKinds?: TransportKind[];
   /** Показувати шар зупинок з локальної бази. */
@@ -111,6 +222,8 @@ export function MapView({
   onVehicleSelect,
   selectedVehicleId,
   onStopSelect,
+  selectedRouteId = null,
+  onRouteSelect,
   visibleKinds = ['metro', 'tram', 'trolleybus', 'bus'],
   showStops = true,
   onMapReady
@@ -125,6 +238,8 @@ export function MapView({
   const [mapReady, setMapReady] = useState(false);
   const onStopSelectRef = useRef(onStopSelect);
   onStopSelectRef.current = onStopSelect;
+  const onRouteSelectRef = useRef(onRouteSelect);
+  onRouteSelectRef.current = onRouteSelect;
   const onMapReadyRef = useRef(onMapReady);
   onMapReadyRef.current = onMapReady;
 
@@ -148,17 +263,23 @@ export function MapView({
 
     map.on('load', () => {
       ensureBuildingsLayer(map, show3DBuildings);
-      addStaticTransitLayers(map, visibleKinds, showStops);
+      addStaticTransitLayers(map, visibleKinds, showStops, selectedRouteId);
       map.on('click', STOPS_LAYER_ID, (e) => {
         const stopId = e.features?.[0]?.properties?.stopId as string | undefined;
         if (stopId) onStopSelectRef.current?.(stopId);
       });
-      map.on('mouseenter', STOPS_LAYER_ID, () => {
-        map.getCanvas().style.cursor = 'pointer';
+      map.on('click', ROUTES_LAYER_ID, (e) => {
+        const routeId = e.features?.[0]?.properties?.routeId as string | undefined;
+        if (routeId) onRouteSelectRef.current?.(routeId);
       });
-      map.on('mouseleave', STOPS_LAYER_ID, () => {
-        map.getCanvas().style.cursor = '';
-      });
+      for (const layerId of [STOPS_LAYER_ID, ROUTES_LAYER_ID]) {
+        map.on('mouseenter', layerId, () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', layerId, () => {
+          map.getCanvas().style.cursor = '';
+        });
+      }
 
       setMapReady(true);
       onMapReadyRef.current?.(map);
@@ -182,7 +303,7 @@ export function MapView({
     map.setStyle(MAP_STYLES[mapStyle]);
     map.once('styledata', () => {
       ensureBuildingsLayer(map, show3DBuildings);
-      addStaticTransitLayers(map, visibleKinds, showStops);
+      addStaticTransitLayers(map, visibleKinds, showStops, selectedRouteId);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapStyle]);
@@ -202,8 +323,20 @@ export function MapView({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
-    updateStaticTransitLayers(map, visibleKinds, showStops);
+    updateStaticTransitLayers(map, visibleKinds, showStops, selectedRouteId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleKinds, showStops, mapReady]);
+
+  // Вибір маршруту (клік по лінії, пошук, картка зупинки) — перефарбовуємо лінії
+  // й підсвічуємо зупинки без зміни фільтрів видів транспорту/зупинок.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    const routesSource = map.getSource(ROUTES_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+    routesSource?.setData(buildRouteLinesGeoJson(visibleKinds, selectedRouteId));
+    updateRouteStopHighlight(map, selectedRouteId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRouteId, mapReady]);
 
   // Маркер користувача
   useEffect(() => {

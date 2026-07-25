@@ -1,16 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 interface SearchBarProps {
   placeholder?: string;
   onSubmit: (query: string) => void;
   onFocus?: () => void;
+  onBlur?: () => void;
+  /** Викликається на кожну зміну введення — для живих підказок (напр. на карті). */
+  onQueryChange?: (query: string) => void;
   autoFocus?: boolean;
+  /** Керований ззовні очищений стан (напр. після вибору підказки на карті). */
+  value?: string;
 }
 
-export function SearchBar({ placeholder = 'Пошук зупинок, маршрутів, адрес…', onSubmit, onFocus, autoFocus }: SearchBarProps) {
-  const [value, setValue] = useState('');
+export function SearchBar({
+  placeholder = 'Пошук зупинок, маршрутів, адрес…',
+  onSubmit,
+  onFocus,
+  onBlur,
+  onQueryChange,
+  autoFocus,
+  value: controlledValue
+}: SearchBarProps) {
+  const [value, setValue] = useState(controlledValue ?? '');
   const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (controlledValue !== undefined) setValue(controlledValue);
+  }, [controlledValue]);
+
+  function updateValue(next: string) {
+    setValue(next);
+    onQueryChange?.(next);
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,12 +55,15 @@ export function SearchBar({ placeholder = 'Пошук зупинок, маршр
         </svg>
         <input
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => updateValue(e.target.value)}
           onFocus={() => {
             setFocused(true);
             onFocus?.();
           }}
-          onBlur={() => setFocused(false)}
+          onBlur={() => {
+            setFocused(false);
+            onBlur?.();
+          }}
           autoFocus={autoFocus}
           placeholder={placeholder}
           className="w-full bg-transparent font-body text-sm text-graphite placeholder:text-graphite/40 focus:outline-none"
@@ -46,7 +71,7 @@ export function SearchBar({ placeholder = 'Пошук зупинок, маршр
         {value && (
           <button
             type="button"
-            onClick={() => setValue('')}
+            onClick={() => updateValue('')}
             aria-label="Очистити пошук"
             className="shrink-0 text-graphite/40 hover:text-graphite"
           >

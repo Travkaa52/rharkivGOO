@@ -15,7 +15,10 @@ export const MAP_STYLES = {
 
 export const TRANSPORT_COLORS: Record<string, string> = {
   metro: '#C9A24B', // gold
-  tram: '#0B3D2E', // forest
-  trolleybus: '#12513D', // forest-light
-  bus: '#A8D5BA' // mint
+  tram: '#E4572E', // теракотовий — трамвайні лінії Харкова добре читаються на зеленій/темній карті
+  trolleybus: '#2C7BE5', // синій — тролейбус
+  bus: '#4FA37A' // мʼятно-зелений — автобус
 };
+
+/** Пріоритет виду транспорту для "домінантного" кольору зупинки-хаба (напр. коло станції метро завжди золоте, навіть якщо там є й автобуси). */
+export const KIND_PRIORITY: readonly string[] = ['metro', 'tram', 'trolleybus', 'bus'];
