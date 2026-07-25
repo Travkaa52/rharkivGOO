@@ -16,6 +16,14 @@ body,
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Видима клавіатурна фокусна рамка для всіх інтерактивних елементів —
+   раніше фокус був повністю невидимий (проблема доступності). */
+:focus-visible {
+  outline: 2px solid theme('colors.mint.DEFAULT');
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
 /* Приховуємо стандартні контроли MapLibre під наш glass-стиль */
 .maplibregl-ctrl-group {
   border-radius: 1rem !important;

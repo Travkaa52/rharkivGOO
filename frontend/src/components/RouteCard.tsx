@@ -1,17 +1,32 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { TransportKindIcon } from '@/components/TransportKindIcon';
+import { FavoriteButton } from '@/components/FavoriteButton';
 import type { TransportRoute } from '@/types/transport';
 
 export function RouteCard({ route }: { route: TransportRoute }) {
+  const navigate = useNavigate();
   const isFavorite = useFavoritesStore((s) => s.isRouteFavorite(route.id));
   const addRoute = useFavoritesStore((s) => s.addRoute);
   const removeRoute = useFavoritesStore((s) => s.removeRoute);
 
+  // Раніше картка була <Link> (тег <a>), а зірочка обраного — <button> всередині
+  // неї: HTML забороняє вкладати інтерактивні елементи в посилання, і це ламало
+  // клавіатурну навігацію та читалки екрана. Тепер картка — це div з роллю
+  // "link" і навігацією через useNavigate, а кнопка обраного лежить поруч,
+  // а не всередині клікабельної області.
   return (
-    <Link
-      to={`/routes/${route.id}`}
-      className="flex items-center gap-3 rounded-xl2 border border-white/60 bg-white/90 p-3 shadow-glass transition hover:shadow-glass-lg active:scale-[0.99]"
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={() => navigate(`/routes/${route.id}`)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate(`/routes/${route.id}`);
+        }
+      }}
+      className="flex cursor-pointer items-center gap-3 rounded-xl2 border border-white/60 bg-white/90 p-3 shadow-glass transition hover:shadow-glass-lg active:scale-[0.99]"
     >
       <div className="relative shrink-0">
         <div
@@ -32,17 +47,11 @@ export function RouteCard({ route }: { route: TransportRoute }) {
           {route.headsignForward} ↔ {route.headsignBackward}
         </p>
       </div>
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          isFavorite ? removeRoute(route.id) : addRoute(route.id);
-        }}
-        aria-label={isFavorite ? 'Прибрати з обраного' : 'Додати в обране'}
-        className="shrink-0 p-1 text-lg"
-      >
-        {isFavorite ? '★' : '☆'}
-      </button>
-    </Link>
+      <FavoriteButton
+        active={isFavorite}
+        onToggle={() => (isFavorite ? removeRoute(route.id) : addRoute(route.id))}
+        label={isFavorite ? 'Прибрати з обраного' : 'Додати в обране'}
+      />
+    </div>
   );
 }

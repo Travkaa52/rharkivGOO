@@ -1,5 +1,6 @@
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { TransportKindIcon } from '@/components/TransportKindIcon';
+import { FavoriteButton } from '@/components/FavoriteButton';
 import type { Stop } from '@/types/transport';
 
 export function StopCard({ stop, etaMinutes, onClick }: { stop: Stop; etaMinutes?: number; onClick?: () => void }) {
@@ -8,9 +9,17 @@ export function StopCard({ stop, etaMinutes, onClick }: { stop: Stop; etaMinutes
   const removeStop = useFavoritesStore((s) => s.removeStop);
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-xl2 border border-white/60 bg-white/90 p-3 text-left shadow-glass transition hover:shadow-glass-lg active:scale-[0.99]"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+      className="flex w-full cursor-pointer items-center gap-3 rounded-xl2 border border-white/60 bg-white/90 p-3 text-left shadow-glass transition hover:shadow-glass-lg active:scale-[0.99]"
     >
       {/* Іконки видів транспорту, що обслуговують зупинку — щоб одразу було
           видно метро/трамвай/тролейбус/автобус, а не тільки буквений код. */}
@@ -27,17 +36,11 @@ export function StopCard({ stop, etaMinutes, onClick }: { stop: Stop; etaMinutes
           </p>
         )}
       </div>
-      <span
-        onClick={(e) => {
-          e.stopPropagation();
-          isFavorite ? removeStop(stop.id) : addStop(stop.id);
-        }}
-        className="shrink-0 p-1 text-lg"
-        role="button"
-        aria-label={isFavorite ? 'Прибрати з обраного' : 'Додати в обране'}
-      >
-        {isFavorite ? '★' : '☆'}
-      </span>
-    </button>
+      <FavoriteButton
+        active={isFavorite}
+        onToggle={() => (isFavorite ? removeStop(stop.id) : addStop(stop.id))}
+        label={isFavorite ? 'Прибрати з обраного' : 'Додати в обране'}
+      />
+    </div>
   );
 }

@@ -35,9 +35,9 @@
       "stop-1240897121",
       "stop-388311629"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:49",
+    "lastDeparture": "17:21",
+    "intervalMinutes": 27
   },
   {
     "id": "route-tram-23",
@@ -1123,9 +1123,9 @@
       "stop-2578454065",
       "stop-395286068"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:03",
+    "lastDeparture": "19:46",
+    "intervalMinutes": 30
   },
   {
     "id": "route-trolleybus-35",
@@ -1169,14 +1169,14 @@
       "stop-1139551580",
       "stop-1457299700"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "05:38",
+    "lastDeparture": "19:38",
+    "intervalMinutes": 23
   },
   {
     "id": "route-bus-305e",
     "kind": "bus",
-    "number": "305e",
+    "number": "305е",
     "name": "305е",
     "color": "#43A047",
     "headsignForward": "Кінцева",
@@ -1512,9 +1512,9 @@
       "stop-6979951028",
       "stop-3914972529"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:03",
+    "lastDeparture": "21:14",
+    "intervalMinutes": 22
   },
   {
     "id": "route-trolleybus-12",
@@ -1706,7 +1706,7 @@
   {
     "id": "route-bus-41e",
     "kind": "bus",
-    "number": "41e",
+    "number": "41е",
     "name": "Автобус 41e: Героїв праці — Наталії Ужвій вулиця",
     "color": "#43A047",
     "headsignForward": "Наталії Ужвій вулиця",
@@ -2370,9 +2370,9 @@
       "stop-2614967587",
       "stop-4232085058"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:01",
+    "intervalMinutes": 15
   },
   {
     "id": "route-trolleybus-34",
@@ -2417,9 +2417,9 @@
       "stop-2614967587",
       "stop-7083246110"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:01",
+    "intervalMinutes": 15
   },
   {
     "id": "route-bus-212е",
@@ -2994,7 +2994,7 @@
   {
     "id": "route-bus-275e",
     "kind": "bus",
-    "number": "275e",
+    "number": "275е",
     "name": "Автобус 275е: Уборевіча - Героїв праці",
     "color": "#43A047",
     "headsignForward": "Героїв праці",
@@ -3105,9 +3105,9 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-автобус107еодеськавулицянаталіїужвійвулиця",
+    "id": "route-bus-107е",
     "kind": "bus",
-    "number": "Автобус 107е: Одеська вулиця - Наталії Ужвій вулиця",
+    "number": "107е",
     "name": "Автобус 107е: Одеська вулиця - Наталії Ужвій вулиця",
     "color": "#43A047",
     "headsignForward": "Наталії Ужвій вулиця",
@@ -3267,9 +3267,9 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-автобус250есортіровкапівденнийвокзал",
+    "id": "route-bus-250е",
     "kind": "bus",
-    "number": "Автобус 250е \"Сортіровка-Південний вокзал\"",
+    "number": "250е",
     "name": "Автобус 250е \"Сортіровка-Південний вокзал\"",
     "color": "#43A047",
     "headsignForward": "Південний вокзал",
@@ -3326,9 +3326,9 @@
     "intervalMinutes": 10
   },
   {
-    "id": "route-bus-автобус97есортіровкадержпром",
+    "id": "route-bus-97е",
     "kind": "bus",
-    "number": "Автобус 97е \"Сортіровка-Держпром\"",
+    "number": "97е",
     "name": "Автобус 97е \"Сортіровка-Держпром\"",
     "color": "#43A047",
     "headsignForward": "Держпром",
@@ -3492,9 +3492,9 @@
       "stop-9203000835",
       "stop-2094827387"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:03",
+    "lastDeparture": "20:32",
+    "intervalMinutes": 12
   },
   {
     "id": "route-trolleybus-1",
@@ -3519,9 +3519,9 @@
       "stop-7069265140",
       "stop-3156818133"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:09",
+    "lastDeparture": "21:26",
+    "intervalMinutes": 7
   },
   {
     "id": "route-trolleybus-7",
@@ -3536,9 +3536,9 @@
       "stop-3280535692",
       "stop-1709319694"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:30",
+    "lastDeparture": "17:55",
+    "intervalMinutes": 31
   },
   {
     "id": "route-trolleybus-45",
@@ -3565,8 +3565,8 @@
     "number": "46",
     "name": "Тролейбус 46",
     "color": "#0288D1",
-    "headsignForward": "Кінцева",
-    "headsignBackward": "Кінцева",
+    "headsignForward": "mікрорайон «Обрій»",
+    "headsignBackward": "Вулиця 12-го Квітня",
     "stopIds": [
       "stop-3280535696",
       "stop-1260301844",
@@ -3614,9 +3614,9 @@
       "stop-2093960049",
       "stop-2093965915"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:25",
+    "lastDeparture": "18:15",
+    "intervalMinutes": 40
   },
   {
     "id": "route-trolleybus-18",
@@ -3650,9 +3650,9 @@
       "stop-6979951016",
       "stop-2178370455"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "07:51",
+    "lastDeparture": "17:21",
+    "intervalMinutes": 34
   },
   {
     "id": "route-trolleybus-40",
@@ -3692,9 +3692,9 @@
       "stop-7083141761",
       "stop-3201459673"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:15",
+    "lastDeparture": "17:56",
+    "intervalMinutes": 26
   },
   {
     "id": "route-trolleybus-3",
@@ -3732,9 +3732,9 @@
       "stop-1916734829",
       "stop-7071878776"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "05:50",
+    "lastDeparture": "20:35",
+    "intervalMinutes": 13
   },
   {
     "id": "route-trolleybus-3",
@@ -3771,9 +3771,9 @@
       "stop-1357108470",
       "stop-1916766613"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "05:50",
+    "lastDeparture": "20:35",
+    "intervalMinutes": 13
   },
   {
     "id": "route-trolleybus-6",
@@ -3810,9 +3810,9 @@
       "stop-4916422523",
       "stop-3156415568"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:00",
+    "lastDeparture": "21:06",
+    "intervalMinutes": 41
   },
   {
     "id": "route-trolleybus-27",
@@ -3854,9 +3854,9 @@
       "stop-2604870631",
       "stop-2604870633"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:10",
+    "lastDeparture": "19:10",
+    "intervalMinutes": 29
   },
   {
     "id": "route-trolleybus-11",
@@ -3876,9 +3876,9 @@
       "stop-6015329310",
       "stop-4163009841"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:13",
+    "lastDeparture": "18:40",
+    "intervalMinutes": 23
   },
   {
     "id": "route-trolleybus-11",
@@ -3898,9 +3898,9 @@
       "stop-2622334474",
       "stop-5157287237"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:13",
+    "lastDeparture": "18:40",
+    "intervalMinutes": 23
   },
   {
     "id": "route-bus-42",
@@ -4102,9 +4102,9 @@
       "stop-5077176778",
       "stop-1981162098"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:03",
+    "lastDeparture": "21:14",
+    "intervalMinutes": 22
   },
   {
     "id": "route-bus-1193",
@@ -4530,7 +4530,7 @@
   {
     "id": "route-bus-263e",
     "kind": "bus",
-    "number": "263e",
+    "number": "263е",
     "name": "Автобус №263е: 602-й мікрорайон - Інститут протезування",
     "color": "#43A047",
     "headsignForward": "Котельнікова",
@@ -4740,9 +4740,9 @@
       "stop-7122213050",
       "stop-1262646590"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:09",
+    "lastDeparture": "21:26",
+    "intervalMinutes": 7
   },
   {
     "id": "route-trolleybus-13",
@@ -4776,9 +4776,9 @@
       "stop-7128002653",
       "stop-7128002652"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:03",
+    "lastDeparture": "20:32",
+    "intervalMinutes": 12
   },
   {
     "id": "route-trolleybus-47",
@@ -5027,9 +5027,9 @@
       "stop-6979951046",
       "stop-2178332416"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:15",
+    "lastDeparture": "17:56",
+    "intervalMinutes": 26
   },
   {
     "id": "route-trolleybus-48",
@@ -5213,9 +5213,9 @@
       "stop-2209992393",
       "stop-7073927880"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "05:45",
+    "lastDeparture": "21:19",
+    "intervalMinutes": 26
   },
   {
     "id": "route-trolleybus-55",
@@ -5244,9 +5244,9 @@
       "stop-7083843746",
       "stop-8817488226"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "05:45",
+    "lastDeparture": "21:19",
+    "intervalMinutes": 26
   },
   {
     "id": "route-trolleybus-50",
@@ -5483,9 +5483,9 @@
       "stop-2578454065",
       "stop-395286068"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:03",
+    "lastDeparture": "19:46",
+    "intervalMinutes": 30
   },
   {
     "id": "route-bus-147е",
@@ -5594,9 +5594,9 @@
       "stop-13753030016",
       "stop-13753030036"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:30",
+    "lastDeparture": "17:55",
+    "intervalMinutes": 31
   },
   {
     "id": "route-trolleybus-7",
@@ -5622,9 +5622,9 @@
       "stop-13753030015",
       "stop-13753030037"
     ],
-    "firstDeparture": "05:30",
-    "lastDeparture": "21:30",
-    "intervalMinutes": 10
+    "firstDeparture": "06:30",
+    "lastDeparture": "17:55",
+    "intervalMinutes": 31
   },
   {
     "id": "route-metro-1",
