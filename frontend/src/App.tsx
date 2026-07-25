@@ -3,6 +3,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { TelegramGate } from '@/components/TelegramGate';
 import { useTelegramEnvironment } from '@/hooks/useTelegramEnvironment';
 import { MapPage } from '@/pages/MapPage';
+import { HomePage } from '@/pages/HomePage';
 import { RoutesPage } from '@/pages/RoutesPage';
 import { RouteDetailPage } from '@/pages/RouteDetailPage';
 import { TransportKindPage } from '@/pages/TransportKindPage';
@@ -17,8 +18,8 @@ export default function App() {
   return (
     <div className="relative">
       <Routes>
-        {/* Карта — головний екран застосунку: користувач одразу потрапляє сюди після відкриття, без затримок на визначення середовища. */}
-        <Route path="/" element={<MapPage />} />
+        {/* Головна — дашборд (обране/поруч/швидкі дії); Карта — окремий повноекранний маршрут. */}
+        <Route path="/" element={<HomePage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/routes" element={<RoutesPage />} />
         <Route path="/routes/:routeId" element={<RouteDetailPage />} />

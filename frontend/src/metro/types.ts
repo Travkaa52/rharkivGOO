@@ -8,6 +8,9 @@ import type { MetroStation } from '@/metro/MetroStation';
  */
 export type MetroDirection = 'forward' | 'backward';
 
+/** Тип доби для розкладу: будній день (Пн-Пт) чи вихідний (Сб-Нд) — впливає лише на базовий інтервал руху. */
+export type MetroDayType = 'weekday' | 'weekend';
+
 /** Фаза руху потяга на поточному перегоні/зупинці — використовується і для рендеру, і для розрахунку швидкості. */
 export type MetroTrainPhase = 'dwell' | 'accelerating' | 'cruising' | 'braking';
 
@@ -59,15 +62,27 @@ export interface MetroLineJson extends TransportRoute {
   curves?: MetroSegmentCurve[];
   /**
    * Опціональний точний перелік часу відправлень (якщо в реальному розкладі
-   * рейси не рівномірні). Якщо задано — MetroSchedule ігнорує firstDeparture/
-   * lastDeparture/intervalMinutes і використовує ЛИШЕ цей список. Формат "HH:MM".
+   * рейси не рівномірні). Якщо задано — MetroSchedule ігнорує будь-які
+   * інтервали (weekday/weekend/пікові) і використовує ЛИШЕ цей список. Формат "HH:MM".
    */
   explicitDepartures?: string[];
   /**
+   * Інтервал руху у будній день (Пн-Пт), хвилин. Якщо не задано —
+   * використовується базове поле `intervalMinutes`.
+   */
+  intervalMinutesWeekday?: number;
+  /**
+   * Інтервал руху у вихідний день (Сб-Нд), хвилин. Якщо не задано —
+   * використовується базове поле `intervalMinutes`.
+   */
+  intervalMinutesWeekend?: number;
+  /**
    * Інтервал руху може відрізнятись у різні періоди доби (напр. годинапік
-   * частіше). Якщо задано — має пріоритет над одним сталим intervalMinutes.
+   * частіше). Якщо задано — має пріоритет над одним сталим intervalMinutes
+   * (застосовується поверх weekday-розкладу; у вихідні пікові періоди
+   * зазвичай не діють, тому вони застосовуються лише до weekday-варіанту).
    * Періоди не повинні перетинатись; поза заданими періодами використовується
-   * базовий intervalMinutes.
+   * intervalMinutesWeekday/intervalMinutes.
    */
   peakIntervals?: { fromTime: string; toTime: string; intervalMinutes: number }[];
 }

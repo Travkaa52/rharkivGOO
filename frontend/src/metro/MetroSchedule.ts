@@ -1,5 +1,5 @@
 import { timeStringToSeconds } from '@/metro/geometry';
-import type { MetroLineJson, MetroLineScheduleEntry } from '@/metro/types';
+import type { MetroDayType, MetroLineJson, MetroLineScheduleEntry } from '@/metro/types';
 
 /**
  * Стоянка на станції за замовчуванням, секунд — застосовується ЛИШЕ якщо
@@ -23,8 +23,14 @@ export interface ResolvedDeparture {
  * Розклад НІКОЛИ не генерується випадково: він або береться дослівно з
  * `explicitDepartures` (якщо в даних є точний перелік рейсів), або
  * детерміновано обчислюється за формулою `firstDeparture + i * headwaySec`
- * (рівномірний інтервал руху, як у реальних розкладах метро) з урахуванням
- * `peakIntervals`, якщо вони задані для лінії.
+ * (рівномірний інтервал руху, як у реальних розкладах метро).
+ *
+ * Базовий інтервал залежить від типу доби — за офіційними даними
+ * КП «Харківський метрополітен» (metro.kharkiv.ua): у будні дні (Пн-Пт)
+ * поїзди курсують частіше, ніж у вихідні (Сб-Нд). Значення задаються в
+ * routes.json полями `intervalMinutesWeekday` / `intervalMinutesWeekend`
+ * (з фолбеком на базове `intervalMinutes`, якщо вони не вказані), а не
+ * зашиті тут константою — це лишається "чистими даними", як і решта розкладу.
  */
 export class MetroSchedule {
   readonly firstDepartureSec: number;
@@ -33,7 +39,8 @@ export class MetroSchedule {
   readonly stationTiming: ReadonlyMap<string, { arrivalOffsetSec: number; dwellSec: number }>;
 
   private readonly explicitDepartureSecs: number[] | null;
-  private readonly baseHeadwaySec: number;
+  private readonly weekdayHeadwaySec: number;
+  private readonly weekendHeadwaySec: number;
   private readonly peakIntervals: { fromSec: number; toSec: number; headwaySec: number }[];
 
   constructor(line: MetroLineJson, schedule: MetroLineScheduleEntry[]) {
@@ -61,7 +68,8 @@ export class MetroSchedule {
     }
     this.stationTiming = timing;
 
-    this.baseHeadwaySec = Math.max(MIN_HEADWAY_SEC, Math.round(line.intervalMinutes * 60));
+    this.weekdayHeadwaySec = Math.max(MIN_HEADWAY_SEC, Math.round((line.intervalMinutesWeekday ?? line.intervalMinutes) * 60));
+    this.weekendHeadwaySec = Math.max(MIN_HEADWAY_SEC, Math.round((line.intervalMinutesWeekend ?? line.intervalMinutes) * 60));
 
     this.peakIntervals = (line.peakIntervals ?? [])
       .map((p) => ({
@@ -76,20 +84,24 @@ export class MetroSchedule {
       : null;
   }
 
-  /** Інтервал руху (секунд), чинний у момент часу `atSec` — з урахуванням пікових періодів. */
-  private headwayAt(atSec: number): number {
-    for (const period of this.peakIntervals) {
-      if (atSec >= period.fromSec && atSec < period.toSec) return period.headwaySec;
+  /** Інтервал руху (секунд), чинний у момент часу `atSec` для заданого типу доби — з урахуванням пікових періодів (діють лише у будні). */
+  private headwayAt(atSec: number, dayType: MetroDayType): number {
+    if (dayType === 'weekday') {
+      for (const period of this.peakIntervals) {
+        if (atSec >= period.fromSec && atSec < period.toSec) return period.headwaySec;
+      }
+      return this.weekdayHeadwaySec;
     }
-    return this.baseHeadwaySec;
+    return this.weekendHeadwaySec;
   }
 
   /**
    * Детерміновано генерує повний перелік часу відправлень за добу для
-   * цього напрямку. Обчислюється один раз при побудові лінії й кешується
-   * викликачем (MetroRoute) — це чиста функція від даних розкладу.
+   * цього напрямку й заданого типу доби (будній/вихідний). Обчислюється
+   * один раз при побудові лінії (двічі — для weekday і weekend) і
+   * кешується викликачем (MetroLine) — це чиста функція від даних розкладу.
    */
-  buildDailyDepartures(): ResolvedDeparture[] {
+  buildDailyDepartures(dayType: MetroDayType): ResolvedDeparture[] {
     if (this.explicitDepartureSecs) {
       return this.explicitDepartureSecs
         .filter((sec) => sec >= this.firstDepartureSec && sec <= this.lastDepartureSec)
@@ -104,7 +116,7 @@ export class MetroSchedule {
 
     while (cursor <= this.lastDepartureSec && safetyCounter <= maxIterations) {
       departures.push({ departureAtSec: cursor });
-      cursor += this.headwayAt(cursor);
+      cursor += this.headwayAt(cursor, dayType);
       safetyCounter += 1;
     }
 

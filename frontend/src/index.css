@@ -8,6 +8,8 @@ body,
   height: 100%;
   margin: 0;
   overscroll-behavior: none;
+  background-color: #0a0f0d;
+  color: #ffffff;
 }
 
 * {

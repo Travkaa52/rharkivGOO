@@ -1,6 +1,6 @@
 import { secondsSinceMidnight } from '@/metro/geometry';
 import { MetroLine, type MetroStationLookup } from '@/metro/MetroLine';
-import type { MetroLineJson, MetroTrainSnapshot } from '@/metro/types';
+import type { MetroDayType, MetroLineJson, MetroTrainSnapshot } from '@/metro/types';
 import type { TransportRoute } from '@/types/transport';
 
 export interface MetroSimulationEngineOptions {
@@ -8,6 +8,12 @@ export interface MetroSimulationEngineOptions {
   routes: TransportRoute[];
   /** Пошук станції за id (зазвичай localStops.getById). */
   stationLookup: MetroStationLookup;
+}
+
+/** Будній день (Пн-Пт) чи вихідний (Сб-Нд) за календарем — саме дата, а не випадковість чи припущення, визначає тип доби. */
+function dayTypeOf(date: Date): MetroDayType {
+  const day = date.getDay(); // 0 = неділя, 6 = субота
+  return day === 0 || day === 6 ? 'weekend' : 'weekday';
 }
 
 /**
@@ -43,10 +49,11 @@ export class MetroSimulationEngine {
   /** Знімки всіх активних потягів на конкретний момент часу (Date — локальний час пристрою користувача). */
   getSnapshotAt(date: Date): MetroTrainSnapshot[] {
     const nowSec = secondsSinceMidnight(date);
+    const dayType = dayTypeOf(date);
     const snapshots: MetroTrainSnapshot[] = [];
 
     for (const line of this.lines) {
-      for (const train of line.getActiveTrains(nowSec)) {
+      for (const train of line.getActiveTrains(nowSec, dayType)) {
         snapshots.push(train.getSnapshot(nowSec));
       }
     }

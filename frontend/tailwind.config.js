@@ -6,18 +6,21 @@ export default {
       colors: {
         // Design tokens for Kharkiv GO
         forest: {
-          DEFAULT: '#0B3D2E', // темно-зелений — primary brand
+          DEFAULT: '#0E5A3C', // темно-зелений — primary brand (з мокапу)
           light: '#12513D',
-          dark: '#072B20'
+          dark: '#0B3B29'
         },
         gold: {
-          DEFAULT: '#C9A24B', // золотий — accent
+          DEFAULT: '#C6A552', // золотий — accent (з мокапу)
           light: '#E0C179',
           dark: '#A8842F'
         },
         mint: {
           DEFAULT: '#A8D5BA', // світло-зелений — secondary accent
           light: '#CFE9DA'
+        },
+        accentBlue: {
+          DEFAULT: '#2C7BE5' // синя лінія метро / акцент інтерфейсу (з мокапу)
         },
         graphite: {
           DEFAULT: '#2B2F31', // графітовий — text / dark surfaces
@@ -27,6 +30,14 @@ export default {
         surface: {
           DEFAULT: '#FFFFFF',
           soft: '#F5F7F6'
+        },
+        // Темна тема застосунку (основний вигляд з нового мокапу) —
+        // майже чорний зелено-графітовий фон + прозорі темні "скляні" поверхні.
+        ink: {
+          DEFAULT: '#0A0F0D', // базовий фон застосунку
+          soft: '#0F1613', // трохи світліша підкладка (картки, панелі)
+          surface: '#141C19', // поверхня картки
+          border: 'rgba(255,255,255,0.08)'
         }
       },
       fontFamily: {
@@ -42,7 +53,8 @@ export default {
       },
       boxShadow: {
         glass: '0 8px 32px 0 rgba(11, 61, 46, 0.15)',
-        'glass-lg': '0 12px 48px 0 rgba(11, 61, 46, 0.22)'
+        'glass-lg': '0 12px 48px 0 rgba(11, 61, 46, 0.22)',
+        'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.45)'
       },
       keyframes: {
         'pulse-soft': {
