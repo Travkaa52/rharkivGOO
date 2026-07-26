@@ -26,6 +26,13 @@ export const LiveMetroMap: React.FC = () => {
   const [activeLineId, setActiveLineId] = useState<string | null>(null);
   const [showTimetableTab, setShowTimetableTab] = useState<'arrivals' | 'timetable'>('arrivals');
 
+  // Визначення автоматичного дня та можливість ручного вибору користувачем
+  const autoDayType = useMemo(() => dayTypeOf(now), [now]);
+  const [manualDayType, setManualDayType] = useState<LiveMetroDayType | null>(null);
+
+  // Активний день (ручний або автоматичний)
+  const activeDayType = manualDayType ?? autoDayType;
+
   const animFrameRef = useRef<number | null>(null);
 
   // --- Цикл анімації реального часу (60 FPS для плавності потягів) ---
@@ -33,7 +40,6 @@ export const LiveMetroMap: React.FC = () => {
     let lastUpdate = 0;
 
     const tick = (timestamp: number) => {
-      // Оновлюємо стан кожні ~50 мс для оптимізації та плавності 
       if (timestamp - lastUpdate > 50) {
         const currentDate = new Date();
         setNow(currentDate);
@@ -50,7 +56,6 @@ export const LiveMetroMap: React.FC = () => {
   }, []);
 
   const nowSec = useMemo(() => secOfDay(now), [now]);
-  const currentDayType = useMemo(() => dayTypeOf(now), [now]);
 
   // --- Найближчі прибуття для обраної станції ---
   const upcomingArrivals: UpcomingDeparture[] = useMemo(() => {
@@ -61,8 +66,8 @@ export const LiveMetroMap: React.FC = () => {
   // --- Графік на день для обраної станції ---
   const stationTimetable: StationDayTimetableEntry[] = useMemo(() => {
     if (!selectedStation) return [];
-    return getStationDayTimetable(selectedStation.id, currentDayType);
-  }, [selectedStation, currentDayType]);
+    return getStationDayTimetable(selectedStation.id, activeDayType);
+  }, [selectedStation, activeDayType]);
 
   // Генерація SVG Path для ліній
   const getLinePathD = (stations: SchematicStation[]) => {
@@ -79,54 +84,147 @@ export const LiveMetroMap: React.FC = () => {
     }
   };
 
+  // Перевірка, чи день є вихідним (враховуємо можливі назви типу 'weekend' чи 'holiday')
+  const isWeekend = activeDayType === 'weekend' || (activeDayType as string) === 'holiday';
+
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh', backgroundColor: '#0B0F17', color: '#F3F4F6', overflow: 'hidden', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
-      {/* 1. ВЕРХНІЙ ЛЕВИЙ УГОЛ: Логотип Метрополітену, Годинник та Статус */}
+      {/* 1. ВЕРХНІЙ ЛЕВИЙ КУТОК: Логотип, Годинник, Статус та Вибір Типу Дня */}
       <div style={{
         position: 'absolute',
         top: 16,
         left: 16,
         zIndex: 20,
         display: 'flex',
-        alignItems: 'center',
-        gap: 14,
-        backgroundColor: 'rgba(15, 23, 42, 0.88)',
-        padding: '10px 16px',
-        borderRadius: 14,
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
+        flexDirection: 'column',
+        gap: 10,
+        maxWidth: 540
       }}>
-        <img 
-          src="/icons/metro-logo.svg" 
-          alt="Харківський Метрополітен" 
-          style={{ width: 40, height: 40, objectFit: 'contain' }}
-          onError={(e) => {
-            // Резервний плейсхолдер, якщо логотип ще завантажується
-            (e.target as HTMLElement).style.display = 'none';
-          }}
-        />
-        <div>
-          <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.3px', color: '#FFFFFF' }}>
-            Харківський Метрополітен
+        {/* Головна інфо-шапка */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          backgroundColor: 'rgba(15, 23, 42, 0.88)',
+          padding: '10px 16px',
+          borderRadius: 14,
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
+        }}>
+          <img 
+            src="/icons/metro-logo.svg" 
+            alt="Харківський Метрополітен" 
+            style={{ width: 40, height: 40, objectFit: 'contain' }}
+            onError={(e) => {
+              (e.target as HTMLElement).style.display = 'none';
+            }}
+          />
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.3px', color: '#FFFFFF' }}>
+              Харківський Метрополітен
+            </div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#10B981', fontWeight: 600 }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 8px #10B981' }}></span>
+                ЖИВЕ МЕТРО
+              </span>
+              <span>•</span>
+              <span style={{ color: '#E5E7EB', fontFamily: 'monospace', fontSize: 13 }}>
+                {now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </span>
+              <span>•</span>
+              <span>Активно потягів: <strong style={{ color: '#FFF' }}>{trains.length}</strong></span>
+            </div>
           </div>
-          <div style={{ fontSize: 12, color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#10B981', fontWeight: 600 }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 8px #10B981' }}></span>
-              ЖИВЕ МЕТРО
+        </div>
+
+        {/* ПАНЕЛЬ ВИБОРУ ТИПУ ДНЯ ТА ПОВІДОМЛЕННЯ ПРО ІНТЕРВАЛ */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          backgroundColor: 'rgba(15, 23, 42, 0.88)',
+          padding: '10px 14px',
+          borderRadius: 14,
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+        }}>
+          {/* Перемикач Будній / Вихідний */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 600, marginRight: 2 }}>
+              Режим розкладу:
             </span>
-            <span>•</span>
-            <span style={{ color: '#E5E7EB', fontFamily: 'monospace', fontSize: 13 }}>
-              {now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </span>
-            <span>•</span>
-            <span>Активно потягів: <strong style={{ color: '#FFF' }}>{trains.length}</strong></span>
+
+            <button
+              onClick={() => setManualDayType('weekday' as LiveMetroDayType)}
+              style={{
+                backgroundColor: !isWeekend ? '#2563EB' : 'rgba(255, 255, 255, 0.06)',
+                color: !isWeekend ? '#FFFFFF' : '#9CA3AF',
+                border: !isWeekend ? '1px solid #60A5FA' : '1px solid rgba(255, 255, 255, 0.1)',
+                padding: '5px 12px',
+                borderRadius: 8,
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 600,
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+            >
+              💼 Будній день
+            </button>
+
+            <button
+              onClick={() => setManualDayType('weekend' as LiveMetroDayType)}
+              style={{
+                backgroundColor: isWeekend ? '#D97706' : 'rgba(255, 255, 255, 0.06)',
+                color: isWeekend ? '#FFFFFF' : '#9CA3AF',
+                border: isWeekend ? '1px solid #FBBF24' : '1px solid rgba(255, 255, 255, 0.1)',
+                padding: '5px 12px',
+                borderRadius: 8,
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 600,
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+            >
+              ☕ Вихідний день
+            </button>
+          </div>
+
+          {/* Інформаційне повідомлення біля кнопок */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 8,
+            backgroundColor: isWeekend ? 'rgba(217, 119, 6, 0.15)' : 'rgba(37, 99, 235, 0.15)',
+            borderLeft: `3px solid ${isWeekend ? '#F59E0B' : '#3B82F6'}`,
+            padding: '8px 10px',
+            borderRadius: '0 8px 8px 0',
+            fontSize: 12,
+            lineHeight: '1.4',
+            color: '#F3F4F6',
+            transition: 'all 0.3s ease'
+          }}>
+            <span style={{ fontSize: 14 }}>💡</span>
+            <div>
+              <strong>Зверніть увагу!</strong> Інтервал руху потягів між станціями у{' '}
+              <span style={{ color: isWeekend ? '#FBBF24' : '#60A5FA', fontWeight: 700 }}>
+                {isWeekend ? 'вихідний день складає 20 хв' : 'будній день складає 10 хв'}
+              </span>.
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 2. ВЕРХНІЙ ПРАВИЙ УГОЛ: Фильтр ліній */}
+      {/* 2. ВЕРХНІЙ ПРАВИЙ КУТОК: Фільтр ліній */}
       <div style={{
         position: 'absolute',
         top: 16,
@@ -193,7 +291,7 @@ export const LiveMetroMap: React.FC = () => {
           </filter>
         </defs>
 
-        {/* ПЕРЕСАДОЧНІ ВУЗЛИ (Зв'язки між станціями) */}
+        {/* ПЕРЕСАДОЧНІ ВУЗЛИ */}
         <g id="interchanges" opacity={0.7}>
           {/* Держпром (Л3) <-> Університет (Л2) */}
           <line x1={555} y1={430} x2={560} y2={460} stroke="#FFFFFF" strokeWidth={12} strokeLinecap="round" />
@@ -215,9 +313,7 @@ export const LiveMetroMap: React.FC = () => {
 
           return (
             <g key={line.id} opacity={isDimmed ? 0.15 : 1} style={{ transition: 'opacity 0.3s' }}>
-              {/* Неонова підкладка */}
               <path d={pathD} fill="none" stroke={line.color} strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" opacity={0.3} filter="url(#glow-line)" />
-              {/* Основна лінія */}
               <path d={pathD} fill="none" stroke={line.color} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
             </g>
           );
@@ -242,14 +338,12 @@ export const LiveMetroMap: React.FC = () => {
                 style={{ cursor: 'pointer' }}
                 opacity={isDimmed ? 0.2 : 1}
               >
-                {/* Радіальне виділення при виборі */}
                 {isSelected && (
                   <circle r={14} fill="none" stroke="#60A5FA" strokeWidth={3} filter="url(#glow-train)">
                     <animate attributeName="r" values="12;16;12" dur="2s" repeatCount="indefinite" />
                   </circle>
                 )}
 
-                {/* Точка станції */}
                 <circle
                   r={isInterchange ? 6.5 : 4.5}
                   fill="#FFFFFF"
@@ -257,12 +351,10 @@ export const LiveMetroMap: React.FC = () => {
                   strokeWidth={isInterchange ? 3 : 2}
                 />
 
-                {/* Подвійний кільцевий контур для пересадочних */}
                 {isInterchange && (
                   <circle r={9} fill="none" stroke="#FFFFFF" strokeWidth={1.2} opacity={0.8} />
                 )}
 
-                {/* Назва станції */}
                 <text
                   x={14}
                   y={4}
@@ -278,7 +370,7 @@ export const LiveMetroMap: React.FC = () => {
           });
         })}
 
-        {/* 4. РЕАЛЬНІ ПОТЯГИ (Отримані з liveMetroEngine) */}
+        {/* 4. РЕАЛЬНІ ПОТЯГИ */}
         {trains.map((train) => {
           if (activeLineId && activeLineId !== train.lineId) return null;
           const isSelected = selectedTrain?.id === train.id;
@@ -293,7 +385,6 @@ export const LiveMetroMap: React.FC = () => {
               }}
               style={{ cursor: 'pointer', transition: 'transform 0.05s linear' }}
             >
-              {/* Пульсація при стоянці на станції (dwell) */}
               {train.phase === 'dwell' && (
                 <circle r={12} fill={train.lineColor} opacity={0.4}>
                   <animate attributeName="r" values="8;18;8" dur="1.2s" repeatCount="indefinite" />
@@ -301,9 +392,7 @@ export const LiveMetroMap: React.FC = () => {
                 </circle>
               )}
 
-              {/* Маркер потяга з поворотом за напрямком headingDeg */}
               <g transform={`rotate(${train.headingDeg})`}>
-                {/* Корпус потяга (капсула/стрілка) */}
                 <rect
                   x={-6}
                   y={-10}
@@ -315,11 +404,9 @@ export const LiveMetroMap: React.FC = () => {
                   strokeWidth={isSelected ? 2.5 : 1.5}
                   filter="url(#glow-train)"
                 />
-                {/* Передок потяга (напрямок) */}
                 <path d="M -3 -8 L 0 -12 L 3 -8 Z" fill="#FFFFFF" />
               </g>
 
-              {/* Номер/Напрямок потяга */}
               <text
                 x={12}
                 y={-10}
@@ -351,7 +438,6 @@ export const LiveMetroMap: React.FC = () => {
           backdropFilter: 'blur(16px)',
           boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
         }}>
-          {/* Заголовок станції */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
             <div>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#FFF' }}>{selectedStation.name}</h2>
@@ -365,7 +451,6 @@ export const LiveMetroMap: React.FC = () => {
             </button>
           </div>
 
-          {/* Перемикач Табло / Графік */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)', pb: 8 }}>
             <button
               onClick={() => setShowTimetableTab('arrivals')}
@@ -395,7 +480,7 @@ export const LiveMetroMap: React.FC = () => {
                 fontWeight: 600
               }}
             >
-              📅 Повний графік
+              📅 Повний графік ({isWeekend ? 'Вихідний' : 'Будній'})
             </button>
           </div>
 
@@ -412,7 +497,7 @@ export const LiveMetroMap: React.FC = () => {
                     key={idx}
                     style={{
                       display: 'flex',
-                      justify: 'space-between',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
                       backgroundColor: 'rgba(255, 255, 255, 0.05)',
                       padding: '8px 12px',
