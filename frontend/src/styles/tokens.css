@@ -1,0 +1,68 @@
+/**
+ * Kharkiv GO — єдина дизайн-система.
+ * Всі кольори визначені як CSS-змінні, щоб theme (light/dark/system)
+ * перемикався миттєво без перезбірки Tailwind-класів.
+ * Tailwind config посилається на ці змінні (colors.*.DEFAULT: 'rgb(var(--x) / <alpha-value>)').
+ */
+
+:root {
+  /* Brand */
+  --color-forest: 14 90 60;
+  --color-forest-light: 18 81 61;
+  --color-forest-dark: 11 59 41;
+  --color-gold: 198 165 82;
+  --color-gold-light: 224 193 121;
+  --color-gold-dark: 168 132 47;
+  --color-mint: 168 213 186;
+  --color-blue: 44 123 229;
+
+  /* Surfaces — light theme (default) */
+  --color-bg: 245 247 246;
+  --color-surface: 255 255 255;
+  --color-surface-soft: 245 247 246;
+  --color-surface-raised: 255 255 255;
+  --color-border: 14 20 18 / 0.08;
+  --color-text: 27 31 29;
+  --color-text-muted: 27 31 29 / 0.6;
+  --color-text-inverted: 255 255 255;
+
+  --shadow-glass: 0 8px 32px 0 rgba(11, 61, 46, 0.12);
+  --shadow-glass-lg: 0 12px 48px 0 rgba(11, 61, 46, 0.18);
+
+  /* Spacing scale (8pt grid) — reference only, Tailwind spacing already matches */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+}
+
+[data-theme='dark'] {
+  --color-bg: 10 15 13;
+  --color-surface: 20 28 25;
+  --color-surface-soft: 15 22 19;
+  --color-surface-raised: 24 33 29;
+  --color-border: 255 255 255 / 0.08;
+  --color-text: 255 255 255;
+  --color-text-muted: 255 255 255 / 0.62;
+  --color-text-inverted: 14 20 18;
+
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+  --shadow-glass-lg: 0 12px 48px 0 rgba(0, 0, 0, 0.55);
+}
+
+/* Typography scale — one set of styles used everywhere, no per-screen overrides */
+.text-display-xl { font-family: theme('fontFamily.display'); font-weight: 800; font-size: 2rem; line-height: 2.25rem; letter-spacing: -0.02em; }
+.text-display-lg { font-family: theme('fontFamily.display'); font-weight: 800; font-size: 1.5rem; line-height: 1.875rem; letter-spacing: -0.01em; }
+.text-display-md { font-family: theme('fontFamily.display'); font-weight: 700; font-size: 1.25rem; line-height: 1.625rem; }
+.text-title      { font-family: theme('fontFamily.display'); font-weight: 700; font-size: 1.0625rem; line-height: 1.375rem; }
+.text-body        { font-family: theme('fontFamily.body'); font-weight: 400; font-size: 0.9375rem; line-height: 1.375rem; }
+.text-body-sm     { font-family: theme('fontFamily.body'); font-weight: 400; font-size: 0.8125rem; line-height: 1.125rem; }
+.text-caption     { font-family: theme('fontFamily.body'); font-weight: 600; font-size: 0.6875rem; line-height: 0.875rem; letter-spacing: 0.04em; text-transform: uppercase; }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { RouteCard } from '@/components/RouteCard';
 import { routesApi } from '@/api/routes';
@@ -39,6 +40,17 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
   return (
     <div className="min-h-dvh bg-surface-soft pb-20">
       <PageHeader title={title} subtitle={subtitle} />
+      {kind === 'metro' && (
+        <div className="px-4 pb-2">
+          <Link
+            to="/metro/live"
+            className="flex items-center justify-between rounded-xl2 bg-forest px-4 py-3 text-sm font-semibold text-white shadow-glass transition-transform active:scale-[0.98]"
+          >
+            <span>🚇 Живе метро — поїзди на схемі в реальному часі</span>
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
+      )}
       <div className="flex flex-col gap-2 px-4">
         {loading && <p className="py-8 text-center text-sm text-graphite/50">Завантаження маршрутів…</p>}
         {errorMsg && <p className="py-8 text-center text-sm text-red-500">{errorMsg}</p>}

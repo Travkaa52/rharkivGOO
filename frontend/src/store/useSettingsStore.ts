@@ -9,7 +9,10 @@ interface SettingsState extends AppSettings {
   setTheme: (theme: AppSettings['theme']) => void;
   setMapStyle: (style: AppSettings['mapStyle']) => void;
   setLanguage: (lang: AppSettings['language']) => void;
+  setUnits: (units: AppSettings['units']) => void;
   togglePushNotifications: () => void;
+  /** Очищає всі локальні кеші застосунку (обране/історію не чіпає — тільки службові дані). */
+  clearCache: () => Promise<void>;
   /** Панель керування шарами карти: увімкнути/вимкнути показ виду транспорту. */
   toggleTransportKind: (kind: TransportKind) => void;
   /** Показати всі види транспорту одночасно. */
@@ -32,7 +35,18 @@ export const useSettingsStore = create<SettingsState>()(
       setTheme: (theme) => set({ theme }),
       setMapStyle: (mapStyle) => set({ mapStyle }),
       setLanguage: (language) => set({ language }),
+      setUnits: (units) => set({ units }),
       togglePushNotifications: () => set((state) => ({ pushNotificationsEnabled: !state.pushNotificationsEnabled })),
+      clearCache: async () => {
+        try {
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((key) => caches.delete(key)));
+          }
+        } catch {
+          // ignore — Cache API може бути недоступний поза Service Worker контекстом
+        }
+      },
       toggleTransportKind: (kind) =>
         set((state) => {
           const isVisible = state.visibleTransportKinds.includes(kind);

@@ -1,70 +1,156 @@
+import { useState, type ReactNode } from 'react';
 import { PageHeader } from '@/components/PageHeader';
+import { Card, SegmentedControl, Switch, Button, Emblem } from '@/components/ui';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import type { AppSettings } from '@/types/user';
 
-function SettingRow({ label, children }: { label: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="flex items-center justify-between rounded-xl2 bg-white/90 px-4 py-3 shadow-glass">
-      <span className="text-sm text-graphite">{label}</span>
-      {children}
+    <section className="flex flex-col gap-2">
+      <h2 className="text-caption px-1 text-ink-muted">{title}</h2>
+      <Card padding="none" className="divide-y divide-border overflow-hidden">
+        {children}
+      </Card>
+    </section>
+  );
+}
+
+function Row({ label, hint, control }: { label: string; hint?: string; control: ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+      <div className="min-w-0">
+        <p className="text-body text-ink-text">{label}</p>
+        {hint && <p className="text-body-sm text-ink-muted">{hint}</p>}
+      </div>
+      <div className="shrink-0">{control}</div>
     </div>
   );
 }
 
 export function SettingsPage() {
   const settings = useSettingsStore();
+  const [clearing, setClearing] = useState<'idle' | 'done'>('idle');
+  const [notifStatus, setNotifStatus] = useState<NotificationPermission | 'unsupported'>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+  );
+
+  const handleTogglePush = async () => {
+    if (!settings.pushNotificationsEnabled && notifStatus !== 'granted' && typeof Notification !== 'undefined') {
+      const result = await Notification.requestPermission();
+      setNotifStatus(result);
+      if (result !== 'granted') return;
+    }
+    settings.togglePushNotifications();
+  };
+
+  const handleClearCache = async () => {
+    await settings.clearCache();
+    setClearing('done');
+    setTimeout(() => setClearing('idle'), 2000);
+  };
 
   return (
-    <div className="min-h-dvh bg-surface-soft pb-20">
+    <div className="min-h-dvh bg-bg pb-24">
       <PageHeader title="Налаштування" />
-      <div className="flex flex-col gap-2 px-4">
-        <SettingRow label="Тема оформлення">
-          <select
-            value={settings.theme}
-            onChange={(e) => settings.setTheme(e.target.value as AppSettings['theme'])}
-            className="rounded-full bg-surface-soft px-3 py-1 text-sm"
-          >
-            <option value="system">Системна</option>
-            <option value="light">Світла</option>
-            <option value="dark">Темна</option>
-          </select>
-        </SettingRow>
 
-        <SettingRow label="Стиль карти">
-          <select
-            value={settings.mapStyle}
-            onChange={(e) => settings.setMapStyle(e.target.value as AppSettings['mapStyle'])}
-            className="rounded-full bg-surface-soft px-3 py-1 text-sm"
-          >
-            <option value="day">Денний</option>
-            <option value="night">Нічний</option>
-          </select>
-        </SettingRow>
+      <div className="flex flex-col items-center gap-2 px-4 pb-2 pt-1 text-center">
+        <Emblem size={48} glow />
+        <p className="text-body-sm text-ink-muted">Kharkiv GO · офіційний вигляд транспорту Харкова</p>
+      </div>
 
-        <SettingRow label="Мова">
-          <select
-            value={settings.language}
-            onChange={(e) => settings.setLanguage(e.target.value as AppSettings['language'])}
-            className="rounded-full bg-surface-soft px-3 py-1 text-sm"
-          >
-            <option value="uk">Українська</option>
-            <option value="ru">Русский</option>
-            <option value="en">English</option>
-          </select>
-        </SettingRow>
+      <div className="flex flex-col gap-5 px-4 pt-3">
+        <Section title="Оформлення">
+          <Row
+            label="Тема"
+            control={
+              <SegmentedControl
+                value={settings.theme}
+                onChange={settings.setTheme}
+                options={[
+                  { value: 'system', label: 'Авто' },
+                  { value: 'light', label: 'Світла' },
+                  { value: 'dark', label: 'Темна' }
+                ]}
+                className="w-44"
+              />
+            }
+          />
+          <Row
+            label="Стиль карти"
+            control={
+              <SegmentedControl
+                value={settings.mapStyle}
+                onChange={settings.setMapStyle}
+                options={[
+                  { value: 'day', label: 'Денний' },
+                  { value: 'night', label: 'Нічний' }
+                ]}
+                className="w-32"
+              />
+            }
+          />
+        </Section>
 
-        <SettingRow label="Push-сповіщення">
-          <button
-            onClick={settings.togglePushNotifications}
-            className={`h-6 w-11 rounded-full transition ${settings.pushNotificationsEnabled ? 'bg-forest' : 'bg-graphite/20'}`}
-          >
-            <span
-              className={`block h-5 w-5 translate-y-0.5 rounded-full bg-white shadow transition-transform ${
-                settings.pushNotificationsEnabled ? 'translate-x-5' : 'translate-x-0.5'
-              }`}
-            />
-          </button>
-        </SettingRow>
+        <Section title="Мова та одиниці">
+          <Row
+            label="Мова застосунку"
+            control={
+              <SegmentedControl
+                value={settings.language}
+                onChange={settings.setLanguage}
+                options={[
+                  { value: 'uk', label: 'Українська' },
+                  { value: 'en', label: 'English' }
+                ]}
+                className="w-44"
+              />
+            }
+          />
+          <Row
+            label="Одиниці виміру"
+            control={
+              <SegmentedControl
+                value={settings.units}
+                onChange={settings.setUnits}
+                options={[
+                  { value: 'metric', label: 'км' },
+                  { value: 'imperial', label: 'mi' }
+                ]}
+                className="w-24"
+              />
+            }
+          />
+        </Section>
+
+        <Section title="Сповіщення">
+          <Row
+            label="Push-сповіщення"
+            hint={notifStatus === 'denied' ? 'Заблоковано в налаштуваннях браузера' : 'Про затримки та зміни маршрутів'}
+            control={
+              <Switch
+                checked={settings.pushNotificationsEnabled}
+                onChange={handleTogglePush}
+                disabled={notifStatus === 'denied'}
+                label="Push-сповіщення"
+              />
+            }
+          />
+        </Section>
+
+        <Section title="Карта">
+          <Row
+            label="Зупинки на карті"
+            control={<Switch checked={settings.showStopsOnMap} onChange={settings.toggleStopsOnMap} label="Зупинки на карті" />}
+          />
+          <Row label="3D-будівлі" control={<Switch checked={settings.is3DMode} onChange={settings.toggle3DMode} label="3D-будівлі" />} />
+        </Section>
+
+        <Section title="Дані">
+          <div className="px-4 py-3.5">
+            <Button variant="secondary" size="sm" fullWidth onClick={handleClearCache} disabled={clearing === 'done'}>
+              {clearing === 'done' ? 'Кеш очищено ✓' : 'Очистити кеш'}
+            </Button>
+          </div>
+        </Section>
       </div>
     </div>
   );

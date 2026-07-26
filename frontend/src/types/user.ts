@@ -17,9 +17,9 @@ export interface UserProfile {
 export interface AppSettings {
   theme: 'light' | 'dark' | 'system';
   mapStyle: 'day' | 'night';
-  units: 'metric';
+  units: 'metric' | 'imperial';
   pushNotificationsEnabled: boolean;
-  language: 'uk' | 'ru' | 'en';
+  language: 'uk' | 'en';
   /** Які види транспорту показувати на карті (лінії маршрутів + рух метро). */
   visibleTransportKinds: import('./transport').TransportKind[];
   /** Показувати шар зупинок на карті. */
