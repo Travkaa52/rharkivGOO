@@ -1,0 +1,67 @@
+@import './styles/tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overscroll-behavior: none;
+  /* Прибирає нативний pinch-to-zoom/double-tap-zoom браузера на всій сторінці.
+     Без цього мобільний Safari/Chrome іноді "перехоплює" двопальцевий жест
+     від MapLibre на середині руху: сторінка масштабується як growserver-zoom,
+     canvas карти лишається старого розміру відносно нового devicePixelRatio,
+     WebGL-контекст губить прив'язку до drawingBuffer — і карта на мить/назавжди
+     стає чорною, поки не станеться ще один resize. */
+  touch-action: pan-x pan-y;
+}
+
+body {
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-text));
+  font-family: theme('fontFamily.body');
+  transition: background-color 0.2s ease, color 0.2s ease;
+  overscroll-behavior: none;
+}
+
+/* Сам контейнер карти отримує touch-action: none — жест повністю віддається
+   MapLibre (яка сама коректно обробляє pinch-zoom/rotate/pitch через canvas),
+   а не браузеру. Це і є основний фікс чорного екрана при масштабуванні
+   двома пальцями. */
+.maplibregl-map,
+.maplibregl-canvas-container,
+.maplibregl-canvas {
+  touch-action: none !important;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--color-mint));
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+.maplibregl-ctrl-group {
+  border-radius: 1rem !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+/* Єдина "скляна" поверхня, що використовується для карток, шторок, панелей на всіх екранах */
+.glass-surface {
+  background-color: rgb(var(--color-surface-raised) / 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgb(var(--color-border));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
