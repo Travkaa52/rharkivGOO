@@ -24,8 +24,8 @@ interface SettingsState extends AppSettings {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      theme: 'system',
-      mapStyle: 'day',
+      theme: 'dark',
+      mapStyle: 'night',
       units: 'metric',
       pushNotificationsEnabled: false,
       language: 'uk',

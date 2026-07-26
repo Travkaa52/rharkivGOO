@@ -37,7 +37,7 @@ export function RouteDetailPage() {
     return (
       <div className="min-h-dvh bg-surface-soft pb-20">
         <PageHeader title="Маршрут" />
-        <p className="px-4 text-sm text-graphite/50">Завантаження…</p>
+        <p className="px-4 text-sm text-white/50">Завантаження…</p>
       </div>
     );
   }
@@ -66,9 +66,9 @@ export function RouteDetailPage() {
             </div>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-graphite/40">{KIND_LABELS_UK[route.kind]}</p>
-            <h1 className="truncate font-display text-lg font-extrabold text-graphite">{route.name}</h1>
-            <p className="truncate text-sm text-graphite/50">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-white/40">{KIND_LABELS_UK[route.kind]}</p>
+            <h1 className="truncate font-display text-lg font-extrabold text-white">{route.name}</h1>
+            <p className="truncate text-sm text-white/50">
               {route.headsignForward} ↔ {route.headsignBackward}
             </p>
           </div>
@@ -81,23 +81,23 @@ export function RouteDetailPage() {
           </button>
         </div>
 
-        <div className="mt-4 flex gap-2 text-xs text-graphite/60">
-          <span className="rounded-full bg-white/80 px-3 py-1 shadow-glass">
+        <div className="mt-4 flex gap-2 text-xs text-white/60">
+          <span className="rounded-full bg-ink-surface/80 px-3 py-1 shadow-glass">
             {route.firstDeparture}–{route.lastDeparture}
           </span>
-          <span className="rounded-full bg-white/80 px-3 py-1 shadow-glass">
+          <span className="rounded-full bg-ink-surface/80 px-3 py-1 shadow-glass">
             інтервал ~{route.intervalMinutes} хв
           </span>
         </div>
       </div>
 
       <div className="mt-4 px-4">
-        <h2 className="mb-2 font-display text-sm font-bold text-graphite/70">Зупинки на маршруті</h2>
+        <h2 className="mb-2 font-display text-sm font-bold text-white/70">Зупинки на маршруті</h2>
         <ol className="relative flex flex-col gap-4 border-l-2 border-mint pl-4">
           {route.stopIds.map((stopId, idx) => {
             const photo = getStationPhoto(stopId);
             return (
-              <li key={`${stopId}-${idx}`} className="relative flex items-center gap-3 text-sm text-graphite">
+              <li key={`${stopId}-${idx}`} className="relative flex items-center gap-3 text-sm text-white">
                 <span
                   className="absolute -left-[1.15rem] top-1 h-3 w-3 rounded-full border-2 border-white"
                   style={{ backgroundColor: route.color }}

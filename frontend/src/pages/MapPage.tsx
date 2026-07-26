@@ -178,7 +178,7 @@ export function MapPage() {
           <div className="pointer-events-auto mx-auto max-w-md animate-slide-up">
             <StopCard stop={selectedStop} onClick={() => setSelectedStopId(null)} />
             {arrivals.length > 0 && (
-              <ul className="mt-2 flex max-h-40 flex-col gap-1 overflow-y-auto rounded-xl2 border border-white/60 bg-white/90 p-2 shadow-glass">
+              <ul className="mt-2 flex max-h-40 flex-col gap-1 overflow-y-auto rounded-xl2 border border-ink-border bg-ink-surface/90 p-2 shadow-glass">
                 {arrivals
                   .sort((a, b) => a.etaMinutes - b.etaMinutes)
                   .map((a) => {
@@ -198,9 +198,9 @@ export function MapPage() {
                             >
                               {route.number}
                             </span>
-                            <span className="text-graphite/60">{KIND_LABELS_UK[route.kind]}</span>
+                            <span className="text-white/60">{KIND_LABELS_UK[route.kind]}</span>
                           </span>
-                          <span className="font-semibold text-forest">
+                          <span className="font-semibold text-mint">
                             {a.etaMinutes === 0 ? 'прибуває' : `≈ ${a.etaMinutes} хв`}
                           </span>
                         </button>

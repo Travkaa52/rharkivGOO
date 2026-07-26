@@ -25,11 +25,11 @@ export function FavoritesPage() {
       <PageHeader title="Обране" subtitle="Ваші улюблені зупинки та маршрути" />
       <div className="flex flex-col gap-4 px-4">
         {isEmpty && (
-          <div className="flex flex-col items-center gap-2 rounded-xl2 bg-white/70 py-14 text-center">
-            <svg width="32" height="32" viewBox="0 0 24 24" className="fill-transparent stroke-graphite/30" strokeWidth="1.6">
+          <div className="flex flex-col items-center gap-2 rounded-xl2 bg-ink-surface/70 py-14 text-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" className="fill-transparent stroke-white/20" strokeWidth="1.6">
               <path d="M12 3.5l2.55 5.44 5.95.8-4.3 4.24 1.05 5.98L12 17.02l-5.25 2.94 1.05-5.98-4.3-4.24 5.95-.8L12 3.5Z" strokeLinejoin="round" />
             </svg>
-            <p className="text-sm text-graphite/60">
+            <p className="text-sm text-white/60">
               Ще немає обраного.
               <br />
               Натисніть на зірочку біля зупинки чи маршруту, щоб додати сюди.
@@ -39,7 +39,7 @@ export function FavoritesPage() {
 
         {routes.length > 0 && (
           <section className="flex flex-col gap-2">
-            <h2 className="font-display text-sm font-bold text-graphite/70">Маршрути</h2>
+            <h2 className="font-display text-sm font-bold text-white/70">Маршрути</h2>
             <div className="flex flex-col gap-2">
               {routes.map((route) => (
                 <RouteCard key={route!.id} route={route!} />
@@ -50,7 +50,7 @@ export function FavoritesPage() {
 
         {stops.length > 0 && (
           <section className="flex flex-col gap-2">
-            <h2 className="font-display text-sm font-bold text-graphite/70">Зупинки</h2>
+            <h2 className="font-display text-sm font-bold text-white/70">Зупинки</h2>
             <div className="flex flex-col gap-2">
               {stops.map((stop) => (
                 <StopCard key={stop!.id} stop={stop!} onClick={() => navigate(`/map?stop=${stop!.id}`)} />

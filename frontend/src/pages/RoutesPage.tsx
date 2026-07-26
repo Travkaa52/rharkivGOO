@@ -28,7 +28,7 @@ export function RoutesPage() {
             onClick={() => setActiveTab(tab.kind)}
             className={clsx(
               'shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition',
-              activeTab === tab.kind ? 'bg-forest text-white shadow-glass' : 'bg-white/70 text-graphite/60'
+              activeTab === tab.kind ? 'bg-forest text-white shadow-glass' : 'bg-ink-surface/70 text-white/60'
             )}
           >
             {tab.label}

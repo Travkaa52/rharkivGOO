@@ -208,7 +208,7 @@ export function LiveMetroPage() {
           <span className="text-[13px] font-semibold text-white/90">Харківський метрополітен</span>
         </div>
 
-        <div className="flex overflow-hidden rounded-full border border-white/15 bg-white/5">
+        <div className="flex overflow-hidden rounded-full border border-ink-border bg-white/5">
           <button
             type="button"
             onClick={() => setDayType('weekday')}
@@ -235,7 +235,7 @@ export function LiveMetroPage() {
       {/* Головний векторний полотно-контейнер */}
       <div
         ref={containerRef}
-        className="relative mx-4 mb-4 flex-1 overflow-hidden rounded-xl3 border border-white/10 bg-[#FAFBFD] shadow-2xl touch-none"
+        className="relative mx-4 mb-4 flex-1 overflow-hidden rounded-xl3 border border-white/10 bg-[#0B120F] shadow-2xl touch-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endPointer}
@@ -261,14 +261,14 @@ export function LiveMetroPage() {
           <path
             d="M 180 80 C 220 220, 260 380, 350 460 C 420 520, 500 560, 620 540 C 740 520, 780 520, 820 580 C 870 640, 820 750, 720 820"
             fill="none"
-            stroke="#E3F0F8"
+            stroke="#12211B"
             strokeWidth={22}
             strokeLinecap="round"
           />
           <path
             d="M 100 420 Q 240 430 350 460"
             fill="none"
-            stroke="#E3F0F8"
+            stroke="#12211B"
             strokeWidth={16}
             strokeLinecap="round"
           />
@@ -279,10 +279,10 @@ export function LiveMetroPage() {
               d="M 0 0 L 12 -24 L 24 0 L 36 -24 L 48 0 L 38 0 L 30 -16 L 24 -4 L 18 -16 L 10 0 Z"
               fill="#D92B27"
             />
-            <text x={64} y={-5} className="font-display font-extrabold" fontSize={32} fill="#111827">
+            <text x={64} y={-5} className="font-display font-extrabold" fontSize={32} fill="#F5F7F6">
               Харківський метрополітен
             </text>
-            <text x={64} y={18} className="font-sans font-medium" fontSize={18} fill="#6B7280">
+            <text x={64} y={18} className="font-sans font-medium" fontSize={18} fill="#9FB3A9">
               Kharkiv subway system
             </text>
           </g>
@@ -293,35 +293,35 @@ export function LiveMetroPage() {
             <g transform="translate(0, 0)">
               <rect x={0} y={0} width={28} height={20} rx={4} fill="#D92B27" />
               <text x={14} y={14} textAnchor="middle" fill="#FFF" fontSize={13} fontWeight="bold">1</text>
-              <text x={38} y={10} className="font-bold" fontSize={14} fill="#111827">Холодногірсько-</text>
-              <text x={38} y={25} className="font-bold" fontSize={14} fill="#111827">Заводська лінія</text>
-              <text x={38} y={38} className="font-normal" fontSize={11} fill="#6B7280">Kholodnohirsko-Zavodska line</text>
+              <text x={38} y={10} className="font-bold" fontSize={14} fill="#F5F7F6">Холодногірсько-</text>
+              <text x={38} y={25} className="font-bold" fontSize={14} fill="#F5F7F6">Заводська лінія</text>
+              <text x={38} y={38} className="font-normal" fontSize={11} fill="#9FB3A9">Kholodnohirsko-Zavodska line</text>
             </g>
 
             {/* Синя лінія */}
             <g transform="translate(0, 60)">
               <rect x={0} y={0} width={28} height={20} rx={4} fill="#0072BC" />
               <text x={14} y={14} textAnchor="middle" fill="#FFF" fontSize={13} fontWeight="bold">2</text>
-              <text x={38} y={12} className="font-bold" fontSize={14} fill="#111827">Салтівська лінія</text>
-              <text x={38} y={27} className="font-normal" fontSize={11} fill="#6B7280">Saltivska line</text>
+              <text x={38} y={12} className="font-bold" fontSize={14} fill="#F5F7F6">Салтівська лінія</text>
+              <text x={38} y={27} className="font-normal" fontSize={11} fill="#9FB3A9">Saltivska line</text>
             </g>
 
             {/* Зелена лінія */}
             <g transform="translate(0, 110)">
               <rect x={0} y={0} width={28} height={20} rx={4} fill="#009640" />
               <text x={14} y={14} textAnchor="middle" fill="#FFF" fontSize={13} fontWeight="bold">3</text>
-              <text x={38} y={12} className="font-bold" fontSize={14} fill="#111827">Олексіївська лінія</text>
-              <text x={38} y={27} className="font-normal" fontSize={11} fill="#6B7280">Oleksiyivska line</text>
+              <text x={38} y={12} className="font-bold" fontSize={14} fill="#F5F7F6">Олексіївська лінія</text>
+              <text x={38} y={27} className="font-normal" fontSize={11} fill="#9FB3A9">Oleksiyivska line</text>
             </g>
 
             {/* Години роботи та контакти */}
             <g transform="translate(0, 175)">
-              <text x={0} y={0} className="font-bold" fontSize={15} fill="#111827">Працюємо з 5:30 до 24:00</text>
-              <text x={0} y={16} className="font-normal" fontSize={12} fill="#9CA3AF">Works from 5:30 to 24:00</text>
-              <line x1={0} y1={28} x2={220} y2={28} stroke="#E5E7EB" strokeWidth={1} />
-              <text x={0} y={45} className="font-medium" fontSize={12} fill="#6B7280">www.metro.kharkov.ua</text>
-              <text x={0} y={62} className="font-normal" fontSize={11} fill="#9CA3AF">Підтримка eTicket: 0-800-505-685</text>
-              <text x={0} y={85} className="font-normal" fontSize={10} fill="#9CA3AF">Дизайн: Білецький Тимофій · Версія 5.1.1</text>
+              <text x={0} y={0} className="font-bold" fontSize={15} fill="#F5F7F6">Працюємо з 5:30 до 24:00</text>
+              <text x={0} y={16} className="font-normal" fontSize={12} fill="#6E8377">Works from 5:30 to 24:00</text>
+              <line x1={0} y1={28} x2={220} y2={28} stroke="#1E2A24" strokeWidth={1} />
+              <text x={0} y={45} className="font-medium" fontSize={12} fill="#9FB3A9">www.metro.kharkov.ua</text>
+              <text x={0} y={62} className="font-normal" fontSize={11} fill="#6E8377">Підтримка eTicket: 0-800-505-685</text>
+              <text x={0} y={85} className="font-normal" fontSize={10} fill="#6E8377">Дизайн: Білецький Тимофій · Версія 5.1.1</text>
             </g>
           </g>
 
@@ -502,7 +502,7 @@ function StationMarker({
           textAnchor={offsetX > 0 ? 'start' : offsetX < 0 ? 'end' : 'middle'}
           className="font-display font-extrabold"
           fontSize={13}
-          fill="#111827"
+          fill="#F5F7F6"
           style={{ paintOrder: 'stroke', stroke: '#FFFFFF', strokeWidth: 3.5, strokeLinejoin: 'round' }}
         >
           {station.name}
@@ -513,7 +513,7 @@ function StationMarker({
           textAnchor={offsetX > 0 ? 'start' : offsetX < 0 ? 'end' : 'middle'}
           className="font-sans font-medium"
           fontSize={9.5}
-          fill="#6B7280"
+          fill="#9FB3A9"
           style={{ paintOrder: 'stroke', stroke: '#FFFFFF', strokeWidth: 2.5, strokeLinejoin: 'round' }}
         >
           {station.nameEn}
@@ -569,7 +569,7 @@ function ZoomButton({ label, onClick, small }: { label: string; onClick: () => v
       type="button"
       onClick={onClick}
       className={[
-        'flex items-center justify-center rounded-full border border-black/10 bg-white/90 font-display font-bold text-gray-800 shadow-lg transition-transform active:scale-95 hover:bg-white',
+        'flex items-center justify-center rounded-full border border-black/10 bg-ink-surface/90 font-display font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-white',
         small ? 'h-8 w-8 text-sm' : 'h-10 w-10 text-xl'
       ].join(' ')}
     >
@@ -706,7 +706,7 @@ function TimetableBlock({ entry }: { entry: StationDayTimetableEntry }) {
 
 function InfoCardShell({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="absolute inset-x-3 bottom-3 z-30 animate-slide-up rounded-2xl border border-white/15 bg-black/85 p-3.5 shadow-2xl backdrop-blur-xl">
+    <div className="absolute inset-x-3 bottom-3 z-30 animate-slide-up rounded-2xl border border-ink-border bg-black/85 p-3.5 shadow-2xl backdrop-blur-xl">
       <button type="button" onClick={onClose} className="absolute right-3 top-3 text-white/50 hover:text-white" aria-label="Закрити">
         ✕
       </button>

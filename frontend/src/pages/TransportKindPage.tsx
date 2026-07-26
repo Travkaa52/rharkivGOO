@@ -52,10 +52,10 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
         </div>
       )}
       <div className="flex flex-col gap-2 px-4">
-        {loading && <p className="py-8 text-center text-sm text-graphite/50">Завантаження маршрутів…</p>}
+        {loading && <p className="py-8 text-center text-sm text-white/50">Завантаження маршрутів…</p>}
         {errorMsg && <p className="py-8 text-center text-sm text-red-500">{errorMsg}</p>}
         {!loading && !errorMsg && routes.length === 0 && (
-          <p className="py-8 text-center text-sm text-graphite/50">Маршрутів поки немає.</p>
+          <p className="py-8 text-center text-sm text-white/50">Маршрутів поки немає.</p>
         )}
         {routes.map((route) => (
           <RouteCard key={route.id} route={route} />

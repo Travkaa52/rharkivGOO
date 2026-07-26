@@ -21,17 +21,17 @@ export function HistoryPage() {
       <PageHeader title="Історія" subtitle="Останні пошукові запити" />
       <div className="px-4">
         {entries.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-xl2 bg-white/70 py-14 text-center">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="text-graphite/30">
+          <div className="flex flex-col items-center gap-2 rounded-xl2 bg-ink-surface/70 py-14 text-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="text-white/30">
               <circle cx="12" cy="12" r="8" />
               <path d="M12 8v4l3 2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <p className="text-sm text-graphite/50">Історія пошуку порожня.</p>
+            <p className="text-sm text-white/50">Історія пошуку порожня.</p>
           </div>
         ) : (
           <>
             <div className="mb-2 flex justify-end">
-              <button onClick={clear} className="rounded-lg px-2 py-1 text-xs text-graphite/40 transition hover:text-red-400">
+              <button onClick={clear} className="rounded-lg px-2 py-1 text-xs text-white/40 transition hover:text-red-400">
                 Очистити все
               </button>
             </div>
@@ -39,21 +39,21 @@ export function HistoryPage() {
               {entries.map((entry) => (
                 <li
                   key={entry.id}
-                  className="flex items-center gap-3 rounded-xl2 bg-white/90 p-3 shadow-glass transition hover:shadow-glass-lg"
+                  className="flex items-center gap-3 rounded-xl2 bg-ink-surface/90 p-3 shadow-glass transition hover:shadow-glass-lg"
                 >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mint/30 text-forest">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mint/30 text-mint">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       {TYPE_ICON[entry.type]}
                     </svg>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-graphite">{entry.query}</p>
-                    <p className="text-xs text-graphite/40">{TYPE_LABELS[entry.type]}</p>
+                    <p className="truncate text-sm text-white">{entry.query}</p>
+                    <p className="text-xs text-white/40">{TYPE_LABELS[entry.type]}</p>
                   </div>
                   <button
                     onClick={() => removeEntry(entry.id)}
                     aria-label="Видалити запис"
-                    className="shrink-0 rounded-full p-1.5 text-graphite/30 transition hover:bg-graphite/5 hover:text-red-400"
+                    className="shrink-0 rounded-full p-1.5 text-white/30 transition hover:bg-white/10 hover:text-red-400"
                   >
                     ✕
                   </button>
