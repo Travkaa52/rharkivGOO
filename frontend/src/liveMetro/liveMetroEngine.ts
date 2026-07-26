@@ -1,4 +1,5 @@
 import { DWELL_SEC, SCHEMATIC_LINES, type LiveMetroDayType, type SchematicLine, type SchematicPoint, type SchematicStation } from '@/liveMetro/schematicData';
+import { TIMETABLES } from '@/liveMetro/timetableData';
 
 export type LiveMetroDirection = 'forward' | 'backward';
 export type LiveMetroPhase = 'dwell' | 'accelerating' | 'cruising' | 'braking';
@@ -119,8 +120,21 @@ export const BUILT_LINES: BuiltLine[] = SCHEMATIC_LINES.map((line) => ({
 
 const MIN_HEADWAY_SEC = 60;
 
-/** Детермінований перелік часу відправлень за добу для напрямку. */
+/** Реальні відправлення з першої станції напрямку (за фактичним графіком станції), якщо є в TIMETABLES. */
+function realDeparturesFromTimetable(line: SchematicLine, direction: LiveMetroDirection, dayType: LiveMetroDayType): number[] | null {
+  const stations = direction === 'forward' ? line.stations : [...line.stations].reverse();
+  const originId = stations[0].id;
+  const entry = TIMETABLES[dayType]?.[originId]?.[line.id];
+  const times = entry?.[direction];
+  if (!times || times.length === 0) return null;
+  return times.map(timeToSec).sort((a, b) => a - b);
+}
+
+/** Детермінований перелік часу відправлень за добу для напрямку. Реальний графік станції — пріоритетно, інакше рівномірний інтервал. */
 function buildDailyDepartures(line: SchematicLine, direction: LiveMetroDirection, dayType: LiveMetroDayType): number[] {
+  const real = realDeparturesFromTimetable(line, direction, dayType);
+  if (real) return real;
+
   const firstDepartureStr = direction === 'forward' ? line.firstDepartureForward[dayType] : line.firstDepartureBackward[dayType];
   const firstSec = timeToSec(firstDepartureStr);
   const lastSec = timeToSec(line.lastDeparture);
@@ -273,10 +287,18 @@ export function getUpcomingArrivalsForStation(stationId: string, date: Date, lim
       const stationIndex = route.stations.findIndex((s) => s.id === stationId);
       if (stationIndex === -1) continue;
 
-      const arrivalOffset = route.arrivalOffsetSec[stationIndex];
-      const departures = getDailyDepartures(line, route.direction, dayType);
-      const upcoming = departures
-        .map((departureAtSec) => departureAtSec + arrivalOffset)
+      // Пріоритет — реальний графік саме цієї станції (найточніший), інакше — розрахунок від відправлень лінії.
+      const realTimes = TIMETABLES[dayType]?.[stationId]?.[line.id]?.[route.direction];
+      let candidateEtas: number[];
+      if (realTimes && realTimes.length > 0) {
+        candidateEtas = realTimes.map(timeToSec);
+      } else {
+        const arrivalOffset = route.arrivalOffsetSec[stationIndex];
+        const departures = getDailyDepartures(line, route.direction, dayType);
+        candidateEtas = departures.map((departureAtSec) => departureAtSec + arrivalOffset);
+      }
+
+      const upcoming = candidateEtas
         .filter((etaSec) => etaSec >= nowSec)
         .sort((a, b) => a - b)
         .slice(0, limitPerDirection);
@@ -295,6 +317,48 @@ export function getUpcomingArrivalsForStation(stationId: string, date: Date, lim
   }
 
   return results.sort((a, b) => a.etaSec - b.etaSec);
+}
+
+export interface StationDayTimetableEntry {
+  lineId: string;
+  lineNumber: string;
+  lineColor: string;
+  direction: LiveMetroDirection;
+  headsign: string;
+  times: string[];
+}
+
+/** Повний графік відправлень (усі лінії/напрямки) для станції на конкретний день — для показу таблиці «Графік». */
+export function getStationDayTimetable(stationId: string, dayType: LiveMetroDayType): StationDayTimetableEntry[] {
+  const result: StationDayTimetableEntry[] = [];
+  const perDay = TIMETABLES[dayType]?.[stationId];
+  if (!perDay) return result;
+
+  for (const { line } of BUILT_LINES) {
+    const entry = perDay[line.id];
+    if (!entry) continue;
+    if (entry.forward.length) {
+      result.push({
+        lineId: line.id,
+        lineNumber: line.number,
+        lineColor: line.color,
+        direction: 'forward',
+        headsign: line.headsignForward,
+        times: entry.forward
+      });
+    }
+    if (entry.backward.length) {
+      result.push({
+        lineId: line.id,
+        lineNumber: line.number,
+        lineColor: line.color,
+        direction: 'backward',
+        headsign: line.headsignBackward,
+        times: entry.backward
+      });
+    }
+  }
+  return result;
 }
 
 export function formatEtaClock(etaSec: number): string {

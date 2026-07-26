@@ -2,14 +2,17 @@ import { useCallback, useMemo, useRef, useState, type PointerEvent, type WheelEv
 import { PageHeader } from '@/components/PageHeader';
 import { BUILT_LINES } from '@/liveMetro/liveMetroEngine';
 import {
+  dayTypeOf,
   formatEtaClock,
   formatEtaCountdown,
+  getStationDayTimetable,
   getUpcomingArrivalsForStation,
   secOfDay,
-  type LiveMetroTrain
+  type LiveMetroTrain,
+  type StationDayTimetableEntry
 } from '@/liveMetro/liveMetroEngine';
 import { useLiveMetroTrains } from '@/liveMetro/useLiveMetroTrains';
-import type { SchematicLine, SchematicStation } from '@/liveMetro/schematicData';
+import type { LiveMetroDayType, SchematicLine, SchematicStation } from '@/liveMetro/schematicData';
 import { getStationPhoto } from '@/data/stationPhotos';
 
 const VIEW_W = 1200;
@@ -17,8 +20,12 @@ const VIEW_H = 1000;
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 3.5;
 
-/** Спрайти поїздів, надані власником проєкту (public/sprites/*). Використовуємо як умовну "морду" потяга на схемі. */
-const TRAIN_SPRITES = ['/sprites/metro.jpg', '/sprites/metro2.jpg'];
+/** Спрайти поїздів по лінії (public/sprites/*, надані власником проєкту), по одному на колір лінії. */
+const TRAIN_SPRITES: Record<string, string> = {
+  'route-metro-1': '/sprites/metro-red-line.jpg',
+  'route-metro-2': '/sprites/metro-blue-line.jpg',
+  'route-metro-3': '/sprites/metro-green-line.jpg'
+};
 
 interface Transform {
   x: number;
@@ -31,6 +38,7 @@ export function LiveMetroPage() {
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, scale: 1 });
   const [selectedTrainId, setSelectedTrainId] = useState<string | null>(null);
   const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
+  const [dayType, setDayType] = useState<LiveMetroDayType>(() => dayTypeOf(new Date()));
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const dragState = useRef<{ pointerId: number; startX: number; startY: number; startTx: number; startTy: number } | null>(null);
@@ -56,6 +64,10 @@ export function LiveMetroPage() {
     if (!selectedStationId) return [];
     return getUpcomingArrivalsForStation(selectedStationId, new Date(), 3);
   }, [selectedStationId, trains]);
+  const stationTimetable = useMemo(() => {
+    if (!selectedStationId) return [];
+    return getStationDayTimetable(selectedStationId, dayType);
+  }, [selectedStationId, dayType]);
 
   const clampScale = (s: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s));
 
@@ -116,6 +128,32 @@ export function LiveMetroPage() {
   return (
     <div className="flex min-h-dvh flex-col bg-ink pb-20">
       <PageHeader title="Живе метро" subtitle="Позиції поїздів на схемі, у реальному часі" />
+
+      <div className="mx-4 mb-2 flex items-center gap-2">
+        <span className="text-[12px] text-white/50">Графік станції:</span>
+        <div className="flex overflow-hidden rounded-full border border-white/15">
+          <button
+            type="button"
+            onClick={() => setDayType('weekday')}
+            className={[
+              'px-3 py-1 text-[12px] font-medium transition-colors',
+              dayType === 'weekday' ? 'bg-mint text-ink' : 'bg-transparent text-white/70'
+            ].join(' ')}
+          >
+            Будній день
+          </button>
+          <button
+            type="button"
+            onClick={() => setDayType('weekend')}
+            className={[
+              'px-3 py-1 text-[12px] font-medium transition-colors',
+              dayType === 'weekend' ? 'bg-mint text-ink' : 'bg-transparent text-white/70'
+            ].join(' ')}
+          >
+            Вихідний
+          </button>
+        </div>
+      </div>
 
       <div
         ref={containerRef}
@@ -219,7 +257,14 @@ export function LiveMetroPage() {
 
         {selectedTrain && <TrainInfoCard train={selectedTrain} onClose={() => setSelectedTrainId(null)} />}
         {selectedStation && (
-          <StationInfoCard station={selectedStation} arrivals={stationArrivals} nowSec={nowSec} onClose={() => setSelectedStationId(null)} />
+          <StationInfoCard
+            station={selectedStation}
+            arrivals={stationArrivals}
+            timetable={stationTimetable}
+            dayType={dayType}
+            nowSec={nowSec}
+            onClose={() => setSelectedStationId(null)}
+          />
         )}
       </div>
     </div>
@@ -270,7 +315,7 @@ function StationMarker({
 }
 
 function TrainMarker({ train, selected, onClick }: { train: LiveMetroTrain; selected: boolean; onClick: () => void }) {
-  const spriteSrc = TRAIN_SPRITES[train.lineNumber === 'М2' ? 1 : 0];
+  const spriteSrc = TRAIN_SPRITES[train.lineId] ?? '/sprites/metro-red-line.jpg';
   const isDwell = train.phase === 'dwell';
   // Умовний "погляд" спрайту вліво/вправо залежно від курсу — фото не мають кута, тож просто дзеркалимо.
   const facingLeft = train.headingDeg > 90 && train.headingDeg < 270;
@@ -358,15 +403,20 @@ function TrainInfoCard({ train, onClose }: { train: LiveMetroTrain; onClose: () 
 function StationInfoCard({
   station,
   arrivals,
+  timetable,
+  dayType,
   nowSec,
   onClose
 }: {
   station: SchematicStation;
   arrivals: ReturnType<typeof getUpcomingArrivalsForStation>;
+  timetable: StationDayTimetableEntry[];
+  dayType: LiveMetroDayType;
   nowSec: number;
   onClose: () => void;
 }) {
   const photo = getStationPhoto(station.id);
+  const [showFullTimetable, setShowFullTimetable] = useState(false);
 
   return (
     <InfoCardShell onClose={onClose}>
@@ -385,6 +435,7 @@ function StationInfoCard({
           ) : null}
         </div>
       </div>
+
       <div className="mt-2 flex flex-col gap-1.5">
         {arrivals.length === 0 && <p className="text-[12px] text-white/50">Найближчим часом поїздів немає.</p>}
         {arrivals.map((a, i) => (
@@ -397,7 +448,48 @@ function StationInfoCard({
           </div>
         ))}
       </div>
+
+      {timetable.length > 0 && (
+        <div className="mt-3 border-t border-white/10 pt-2">
+          <button
+            type="button"
+            onClick={() => setShowFullTimetable((v) => !v)}
+            className="flex w-full items-center justify-between text-[12px] font-medium text-white/70"
+          >
+            <span>
+              Повний графік · {dayType === 'weekday' ? 'будній день' : 'вихідний'}
+            </span>
+            <span className="text-white/40">{showFullTimetable ? '▲' : '▼'}</span>
+          </button>
+
+          {showFullTimetable && (
+            <div className="mt-2 max-h-48 overflow-y-auto pr-1">
+              {timetable.map((entry, i) => (
+                <TimetableBlock key={`${entry.lineId}-${entry.direction}-${i}`} entry={entry} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </InfoCardShell>
+  );
+}
+
+function TimetableBlock({ entry }: { entry: StationDayTimetableEntry }) {
+  return (
+    <div className="mb-2">
+      <div className="mb-1 flex items-center gap-2 text-[11px] font-medium text-white/80">
+        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.lineColor }} />
+        {entry.lineNumber} → {entry.headsign}
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {entry.times.map((t, i) => (
+          <span key={i} className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] tabular-nums text-white/70">
+            {t}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
