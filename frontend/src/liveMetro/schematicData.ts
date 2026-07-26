@@ -16,6 +16,8 @@ export interface SchematicStation {
   name: string;
   nameEn: string;
   point: { x: number; y: number };
+  /** Зміщення підпису назви станції (відносно x: 0, y: -16 за замовчуванням). */
+  labelOffset?: { x?: number; y?: number };
   /** Час прибуття від початкової станції лінії (пряме сполучення), сек. */
   arrivalOffsetSec: number;
   /** id станцій-пересадок (на інших лініях), з якими є перехід. */
@@ -46,8 +48,17 @@ const st = (
   x: number,
   y: number,
   arrivalOffsetSec: number,
-  interchangeWith?: string[]
-): SchematicStation => ({ id: `stop-metro-${id}`, name, nameEn, point: { x, y }, arrivalOffsetSec, interchangeWith });
+  interchangeWith?: string[],
+  labelOffset?: { x?: number; y?: number }
+): SchematicStation => ({
+  id: `stop-metro-${id}`,
+  name,
+  nameEn,
+  point: { x, y },
+  arrivalOffsetSec,
+  interchangeWith,
+  labelOffset
+});
 
 export const LINE_RED = 'route-metro-1';
 export const LINE_BLUE = 'route-metro-2';
@@ -55,44 +66,44 @@ export const LINE_GREEN = 'route-metro-3';
 
 /** Лінія 1 — Холодногірсько-Заводська (червона). */
 const redStations: SchematicStation[] = [
-  st('holodna-gora', 'Холодна гора', 'Kholodna Hora', 60, 480, 0),
-  st('vokzalna', 'Південний вокзал', 'Pivdenniy Vokzal', 175, 480, 110),
-  st('tsentralnyi-rynok', 'Центральний ринок', 'Tsentralniy Rynok', 290, 505, 230),
-  st('maidan-konstytutsii', 'Майдан Конституції', 'Maydan Konstytutsiy', 490, 660, 380, ['stop-metro-istorychnyi-muzei']),
-  st('levada', 'Проспект Гагаріна', 'Prospekt Gagarina', 475, 745, 490),
-  st('sportyvna', 'Спортивна', 'Sportyvna', 555, 780, 590, ['stop-metro-metrobudivnykiv']),
-  st('zavodska', 'Завод ім. Малишева', 'Zavod imeni Malysheva', 680, 830, 710),
-  st('turboatom', 'Турбоатом', 'Turboatom', 720, 910, 830),
-  st('palats-sportu', 'Палац Спорту', 'Palats Sportu', 750, 990, 950),
-  st('armiiska', 'Армійська', 'Armiyska', 780, 1060, 1070),
-  st('imeni-o-s-maselskogo', 'Ім. О.С. Масельського', 'Imeni O.S. Maselskoho', 900, 1060, 1190),
-  st('traktornyi-zavod', 'Тракторний завод', 'Traktorniy Zavod', 1010, 1060, 1310),
-  st('industrialna', 'Індустріальна', 'Industrialna', 1120, 1060, 1430)
+  st('holodna-gora', 'Холодна гора', 'Kholodna Hora', 100, 520, 0, undefined, { y: -18 }),
+  st('vokzalna', 'Південний вокзал', 'Pivdenniy Vokzal', 210, 520, 110, undefined, { y: -18 }),
+  st('tsentralnyi-rynok', 'Центральний ринок', 'Tsentralniy Rynok', 320, 520, 230, undefined, { y: -18 }),
+  st('maidan-konstytutsii', 'Майдан Конституції', 'Maydan Konstytutsiy', 480, 520, 380, ['stop-metro-istorychnyi-muzei'], { y: 24 }),
+  st('levada', 'Проспект Гагаріна', 'Prospekt Gagarina', 580, 580, 490, undefined, { x: 80, y: 4 }),
+  st('sportyvna', 'Спортивна', 'Sportyvna', 680, 680, 590, ['stop-metro-metrobudivnykiv'], { x: 60, y: -10 }),
+  st('zavodska', 'Завод ім. Малишева', 'Zavod imeni Malysheva', 760, 760, 710, undefined, { x: 80, y: 4 }),
+  st('turboatom', 'Турбоатом', 'Turboatom', 830, 830, 830, undefined, { x: 65, y: 4 }),
+  st('palats-sportu', 'Палац Спорту', 'Palats Sportu', 900, 900, 950, undefined, { x: 70, y: 4 }),
+  st('armiiska', 'Армійська', 'Armiyska', 970, 970, 1070, undefined, { x: 60, y: 4 }),
+  st('imeni-o-s-maselskogo', 'Ім. О.С. Масельського', 'Imeni O.S. Maselskoho', 1040, 970, 1190, undefined, { y: 22 }),
+  st('traktornyi-zavod', 'Тракторний завод', 'Traktorniy Zavod', 1110, 970, 1310, undefined, { y: 22 }),
+  st('industrialna', 'Індустріальна', 'Industrialna', 1170, 970, 1430, undefined, { y: 22 })
 ];
 
 /** Лінія 2 — Салтівська (синя). */
 const blueStations: SchematicStation[] = [
-  st('heroiv-pratsi', 'Героїв Праці', 'Heroiv Pratsi', 1070, 60, 0),
-  st('studentska', 'Студентська', 'Studentska', 1010, 150, 120),
-  st('akademika-pavlova', 'Академіка Павлова', 'Akademika Pavlova', 955, 240, 240),
-  st('akademika-barabashova', 'Академіка Барабашова', 'Akademika Barabashova', 900, 330, 360),
-  st('kyivska', 'Київська', 'Kyivska', 845, 420, 480),
-  st('iaroslava-mudrogo', 'Пушкінська', 'Pushkinska', 790, 495, 600),
-  st('universytet', 'Університет', 'Universytet', 690, 500, 720, ['stop-metro-derzhprom']),
-  st('arhitektora-beketova', 'Архітектора Бекетова', 'Arkhitektora Beketova', 770, 590, 840)
+  st('heroiv-pratsi', 'Героїв Праці', 'Heroiv Pratsi', 900, 80, 0, undefined, { x: -75, y: 4 }),
+  st('studentska', 'Студентська', 'Studentska', 900, 150, 120, undefined, { x: -65, y: 4 }),
+  st('akademika-pavlova', 'Академіка Павлова', 'Akademika Pavlova', 900, 220, 240, undefined, { x: -85, y: 4 }),
+  st('akademika-barabashova', 'Академіка Барабашова', 'Akademika Barabashova', 900, 290, 360, undefined, { x: -95, y: 4 }),
+  st('kyivska', 'Київська', 'Kyivska', 830, 360, 480, undefined, { x: 50, y: -10 }),
+  st('iaroslava-mudrogo', 'Пушкінська', 'Pushkinska', 730, 360, 600, undefined, { y: -18 }),
+  st('universytet', 'Університет', 'Universytet', 580, 360, 720, ['stop-metro-derzhprom'], { y: -18 }),
+  st('arhitektora-beketova', 'Архітектора Бекетова', 'Arkhitektora Beketova', 480, 440, 840, undefined, { x: -90, y: 4 })
 ];
 
 /** Лінія 3 — Олексіївська (зелена). */
 const greenStations: SchematicStation[] = [
-  st('peremoga', 'Перемога', 'Peremoha', 430, 60, 0),
-  st('oleksiivska', 'Олексіївська', 'Oleksiyivska', 455, 150, 120),
-  st('23-serpnia', '23 Серпня', '23 Serpnya', 495, 240, 240),
-  st('botanichnyi-sad', 'Ботанічний сад', 'Botanichniy Sad', 540, 330, 360),
-  st('naukova', 'Наукова', 'Naukova', 585, 420, 480),
-  st('derzhprom', 'Держпром', 'Derzhprom', 630, 495, 600, ['stop-metro-universytet']),
-  st('istorychnyi-muzei', 'Історичний музей', 'Istorychniy Muzey', 545, 615, 730, ['stop-metro-maidan-konstytutsii']),
-  st('zahysnykiv-ukrainy', 'Захисників України', 'Zakhysnykiv Ukrayiny', 650, 700, 850),
-  st('metrobudivnykiv', 'Метробудівників', 'Metrobudivnykiv', 615, 810, 970, ['stop-metro-sportyvna'])
+  st('peremoga', 'Перемога', 'Peremoha', 340, 80, 0, undefined, { x: -60, y: 4 }),
+  st('oleksiivska', 'Олексіївська', 'Oleksiyivska', 340, 150, 120, undefined, { x: -70, y: 4 }),
+  st('23-serpnia', '23 Серпня', '23 Serpnya', 340, 220, 240, undefined, { x: -60, y: 4 }),
+  st('botanichnyi-sad', 'Ботанічний сад', 'Botanichniy Sad', 340, 290, 360, undefined, { x: -80, y: 4 }),
+  st('naukova', 'Наукова', 'Naukova', 410, 360, 480, undefined, { y: -18 }),
+  st('derzhprom', 'Держпром', 'Derzhprom', 540, 360, 600, ['stop-metro-universytet'], { y: 22 }),
+  st('istorychnyi-muzei', 'Історичний музей', 'Istorychniy Muzey', 480, 480, 730, ['stop-metro-maidan-konstytutsii'], { x: -80, y: 4 }),
+  st('zahysnykiv-ukrainy', 'Захисників України', 'Zakhysnykiv Ukrayiny', 580, 680, 850, undefined, { x: -90, y: 4 }),
+  st('metrobudivnykiv', 'Метробудівників', 'Metrobudivnykiv', 640, 740, 970, ['stop-metro-sportyvna'], { x: -80, y: 4 })
 ];
 
 export const SCHEMATIC_LINES: SchematicLine[] = [
