@@ -5,9 +5,10 @@ import {
   SchematicLine,
   LiveMetroDayType,
   DWELL_SEC
-} from '../data/metroData'; // Укажите ваш путь к TS-файлу с данными
+} from '../data/metroData';
 
 interface TrainPosition {
+  id: string;
   lineId: string;
   color: string;
   x: number;
@@ -21,7 +22,6 @@ export const LiveMetroMap: React.FC = () => {
   const [activeLineId, setActiveLineId] = useState<string | null>(null);
   const [dayType, setDayType] = useState<LiveMetroDayType>('weekday');
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
-  const [trains, setTrains] = useState<TrainPosition[]>([]);
 
   // Часы реального времени
   useEffect(() => {
@@ -40,29 +40,60 @@ export const LiveMetroMap: React.FC = () => {
     return map;
   }, []);
 
-  // Расчет живых поездов на линиях на основе интервалов и таймингов
-  useEffect(() => {
+  // Динамический расчет пересадочных узлов
+  const interchangeLines = useMemo(() => {
+    const renderedPairs = new Set<string>();
+    const lines: Array<{ id: string; x1: number; y1: number; x2: number; y2: number }> = [];
+
+    SCHEMATIC_LINES.forEach((line) => {
+      line.stations.forEach((st) => {
+        if (!st.interchangeWith) return;
+        st.interchangeWith.forEach((otherId) => {
+          const key = [st.id, otherId].sort().join('--');
+          if (renderedPairs.has(key)) return;
+          renderedPairs.add(key);
+
+          const target = allStationsMap.get(otherId);
+          if (target) {
+            lines.push({
+              id: key,
+              x1: st.point.x,
+              y1: st.point.y,
+              x2: target.station.point.x,
+              y2: target.station.point.y
+            });
+          }
+        });
+      });
+    });
+
+    return lines;
+  }, [allStationsMap]);
+
+  // Расчет живых поездов на основе времени и интервалов
+  const trains = useMemo(() => {
     const calculatedTrains: TrainPosition[] = [];
     const nowSec = currentTime.getHours() * 3600 + currentTime.getMinutes() * 60 + currentTime.getSeconds();
 
     SCHEMATIC_LINES.forEach((line) => {
       const intervalSec = (line.intervalMinutes[dayType] || 10) * 60;
-      const totalLineTime = line.stations[line.stations.length - 1].arrivalOffsetSec;
+      const lastStation = line.stations[line.stations.length - 1];
+      const totalLineTime = lastStation ? lastStation.arrivalOffsetSec : 0;
 
       if (totalLineTime === 0) return;
 
-      // Симуляция поездов для прямого и обратного направления
-      ['forward', 'backward'].forEach((dir) => {
+      (['forward', 'backward'] as const).forEach((dir) => {
         const isForward = dir === 'forward';
-        
+
         for (let offset = 0; offset < totalLineTime + intervalSec; offset += intervalSec) {
           const trainProgressSec = (nowSec + offset) % (totalLineTime + intervalSec);
 
           if (trainProgressSec <= totalLineTime) {
-            // Находим сегмент между двумя станциями
             for (let i = 0; i < line.stations.length - 1; i++) {
               const stA = isForward ? line.stations[i] : line.stations[line.stations.length - 1 - i];
               const stB = isForward ? line.stations[i + 1] : line.stations[line.stations.length - 2 - i];
+
+              if (!stA || !stB) continue;
 
               const tA = isForward ? stA.arrivalOffsetSec : totalLineTime - stA.arrivalOffsetSec;
               const tB = isForward ? stB.arrivalOffsetSec : totalLineTime - stB.arrivalOffsetSec;
@@ -76,11 +107,12 @@ export const LiveMetroMap: React.FC = () => {
                 const y = stA.point.y + (stB.point.y - stA.point.y) * ratio;
 
                 calculatedTrains.push({
+                  id: `${line.id}-${dir}-${offset}`,
                   lineId: line.id,
                   color: line.color,
                   x,
                   y,
-                  direction: isForward ? 'forward' : 'backward',
+                  direction: dir,
                   nextStationName: stB.name
                 });
                 break;
@@ -91,7 +123,7 @@ export const LiveMetroMap: React.FC = () => {
       });
     });
 
-    setTrains(calculatedTrains);
+    return calculatedTrains;
   }, [currentTime, dayType]);
 
   // Генерация точек для SVG Path линий
@@ -109,7 +141,6 @@ export const LiveMetroMap: React.FC = () => {
           alt="Логотип Харьковского Метрополитена" 
           style={{ width: 42, height: 42, objectFit: 'contain' }}
           onError={(e) => {
-            // Резервная иконка, если SVG еще не добавлен в public/icons
             e.currentTarget.style.display = 'none';
           }}
         />
@@ -142,7 +173,7 @@ export const LiveMetroMap: React.FC = () => {
       </div>
 
       {/* SVG КАРТА (СХЕМА) */}
-      <svg viewBox="0 0 1200 1000" style={{ width: '100%', height: '100%', cursor: 'grab' }}>
+      <svg viewBox="0 0 1200 1000" style={{ width: '100%', height: '100%' }}>
         <defs>
           <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="4" result="blur" />
@@ -150,29 +181,24 @@ export const LiveMetroMap: React.FC = () => {
           </filter>
         </defs>
 
-        {/* 1. ПЕРЕСАДОЧНЫЕ УЗЛЫ (Капсулы между связями) */}
+        {/* 1. ПЕРЕСАДОЧНЫЕ УЗЛЫ */}
         <g id="interchanges" opacity={0.6}>
-          {/* Держпром <-> Університет */}
-          <line x1={555} y1={430} x2={560} y2={460} stroke="#FFF" strokeWidth={14} strokeLinecap="round" />
-          <line x1={555} y1={430} x2={560} y2={460} stroke="#111827" strokeWidth={8} strokeLinecap="round" />
-
-          {/* Майдан Конституції <-> Історичний музей */}
-          <line x1={330} y1={540} x2={390} y2={560} stroke="#FFF" strokeWidth={14} strokeLinecap="round" />
-          <line x1={330} y1={540} x2={390} y2={560} stroke="#111827" strokeWidth={8} strokeLinecap="round" />
-
-          {/* Спортивна <-> Метробудівників */}
-          <line x1={430} y1={660} x2={420} y2={660} stroke="#FFF" strokeWidth={14} strokeLinecap="round" />
-          <line x1={430} y1={660} x2={420} y2={660} stroke="#111827" strokeWidth={8} strokeLinecap="round" />
+          {interchangeLines.map((line) => (
+            <g key={line.id}>
+              <line x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} stroke="#FFF" strokeWidth={14} strokeLinecap="round" />
+              <line x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} stroke="#111827" strokeWidth={8} strokeLinecap="round" />
+            </g>
+          ))}
         </g>
 
         {/* 2. ЛИНИИ МЕТРО */}
         {SCHEMATIC_LINES.map((line) => {
           const isDimmed = activeLineId && activeLineId !== line.id;
+          const pathD = getLinePathD(line.stations);
           return (
             <g key={line.id} opacity={isDimmed ? 0.2 : 1} style={{ transition: 'opacity 0.3s' }}>
-              {/* Внешняя подсветка линии */}
               <path
-                d={getLinePathD(line.stations)}
+                d={pathD}
                 fill="none"
                 stroke={line.color}
                 strokeWidth={12}
@@ -180,9 +206,8 @@ export const LiveMetroMap: React.FC = () => {
                 strokeLinejoin="round"
                 opacity={0.3}
               />
-              {/* Основная линия */}
               <path
-                d={getLinePathD(line.stations)}
+                d={pathD}
                 fill="none"
                 stroke={line.color}
                 strokeWidth={7}
@@ -208,10 +233,8 @@ export const LiveMetroMap: React.FC = () => {
                 style={{ cursor: 'pointer' }}
                 opacity={isDimmed ? 0.2 : 1}
               >
-                {/* Внешнее кольцо выделения */}
                 {isSelected && <circle r={14} fill="none" stroke="#60A5FA" strokeWidth={3} filter="url(#glow)" />}
 
-                {/* Точка станции */}
                 <circle
                   r={isInterchange ? 7 : 5}
                   fill="#FFF"
@@ -219,7 +242,6 @@ export const LiveMetroMap: React.FC = () => {
                   strokeWidth={isInterchange ? 3 : 2.5}
                 />
 
-                {/* Название станции */}
                 <text
                   x={12}
                   y={4}
@@ -236,10 +258,10 @@ export const LiveMetroMap: React.FC = () => {
         })}
 
         {/* 4. ЖИВЫЕ ПОЕЗДА В РЕАЛЬНОМ ВРЕМЕНИ */}
-        {trains.map((train, idx) => {
+        {trains.map((train) => {
           if (activeLineId && activeLineId !== train.lineId) return null;
           return (
-            <g key={`train-${idx}`} transform={`translate(${train.x}, ${train.y})`}>
+            <g key={train.id} transform={`translate(${train.x}, ${train.y})`}>
               <circle r={8} fill="#FFF" filter="url(#glow)" />
               <circle r={5} fill={train.color} />
             </g>
