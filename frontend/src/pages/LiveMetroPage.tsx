@@ -356,7 +356,6 @@ function LineTracks({ line }: { line: any }) {
   }
 
   const pFirst = stations[0].point;
-  const pLast = stations[stations.length - 1].point;
 
   return (
     <g>
