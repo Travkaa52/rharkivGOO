@@ -51,9 +51,7 @@ export const LiveMetroMap: React.FC = () => {
 
     animFrameRef.current = requestAnimationFrame(tick);
     return () => {
-      if (animFrameRef.current !== null) {
-        cancelAnimationFrame(animFrameRef.current);
-      }
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, []);
 
@@ -83,7 +81,6 @@ export const LiveMetroMap: React.FC = () => {
       case 'accelerating': return 'Розгін';
       case 'cruising': return 'У дорозі';
       case 'braking': return 'Прибуття (гальмування)';
-      default: return '';
     }
   };
 
@@ -121,7 +118,7 @@ export const LiveMetroMap: React.FC = () => {
             alt="Харківський Метрополітен" 
             style={{ width: 40, height: 40, objectFit: 'contain' }}
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = 'none';
+              (e.target as HTMLElement).style.display = 'none';
             }}
           />
           <div>
@@ -585,3 +582,4 @@ export const LiveMetroMap: React.FC = () => {
     </div>
   );
 };
+                
