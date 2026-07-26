@@ -5,6 +5,7 @@ import { routesApi } from '@/api/routes';
 import { localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { TransportKindIcon, KIND_LABELS_UK } from '@/components/TransportKindIcon';
+import { getStationPhoto } from '@/data/stationPhotos';
 import type { TransportRoute } from '@/types/transport';
 
 export function RouteDetailPage() {
@@ -93,15 +94,25 @@ export function RouteDetailPage() {
       <div className="mt-4 px-4">
         <h2 className="mb-2 font-display text-sm font-bold text-graphite/70">Зупинки на маршруті</h2>
         <ol className="relative flex flex-col gap-4 border-l-2 border-mint pl-4">
-          {route.stopIds.map((stopId, idx) => (
-            <li key={`${stopId}-${idx}`} className="relative text-sm text-graphite">
-              <span
-                className="absolute -left-[1.15rem] top-1 h-3 w-3 rounded-full border-2 border-white"
-                style={{ backgroundColor: route.color }}
-              />
-              {localStops.getById(stopId)?.name ?? `Зупинка ${stopId}`}
-            </li>
-          ))}
+          {route.stopIds.map((stopId, idx) => {
+            const photo = getStationPhoto(stopId);
+            return (
+              <li key={`${stopId}-${idx}`} className="relative flex items-center gap-3 text-sm text-graphite">
+                <span
+                  className="absolute -left-[1.15rem] top-1 h-3 w-3 rounded-full border-2 border-white"
+                  style={{ backgroundColor: route.color }}
+                />
+                {photo && (
+                  <img
+                    src={photo}
+                    alt=""
+                    className="h-10 w-14 shrink-0 rounded-md object-cover shadow-glass"
+                  />
+                )}
+                <span className="min-w-0 flex-1 truncate">{localStops.getById(stopId)?.name ?? `Зупинка ${stopId}`}</span>
+              </li>
+            );
+          })}
         </ol>
       </div>
     </div>

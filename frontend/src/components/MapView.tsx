@@ -67,7 +67,7 @@ function addStaticTransitLayers(
       source: ROUTES_SOURCE_ID,
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint: {
-        'line-color': ['coalesce', ['get', 'color'], '#0B3D2E'],
+        'line-color': ['coalesce', ['get', 'color'], '#05522E'],
         'line-width': [
           'case',
           ['get', 'selected'],

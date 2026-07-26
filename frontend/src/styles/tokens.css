@@ -6,28 +6,30 @@
  */
 
 :root {
-  /* Brand */
-  --color-forest: 14 90 60;
-  --color-forest-light: 18 81 61;
-  --color-forest-dark: 11 59 41;
-  --color-gold: 198 165 82;
-  --color-gold-light: 224 193 121;
-  --color-gold-dark: 168 132 47;
-  --color-mint: 168 213 186;
+  /* Brand — узгоджено з гербом і прапором Харкова: соковитий зелений щит
+     та золотий ріг достатку (замість попереднього тьмяного теал-беж). */
+  --color-forest: 0 122 66;
+  --color-forest-light: 45 158 101;
+  --color-forest-dark: 5 82 46;
+  --color-gold: 214 163 22;
+  --color-gold-light: 240 195 79;
+  --color-gold-dark: 160 116 10;
+  --color-mint: 173 219 194;
   --color-blue: 44 123 229;
+  --color-graphite: 27 31 29;
 
   /* Surfaces — light theme (default) */
-  --color-bg: 245 247 246;
+  --color-bg: 246 248 245;
   --color-surface: 255 255 255;
-  --color-surface-soft: 245 247 246;
+  --color-surface-soft: 246 248 245;
   --color-surface-raised: 255 255 255;
   --color-border: 14 20 18 / 0.08;
   --color-text: 27 31 29;
   --color-text-muted: 27 31 29 / 0.6;
   --color-text-inverted: 255 255 255;
 
-  --shadow-glass: 0 8px 32px 0 rgba(11, 61, 46, 0.12);
-  --shadow-glass-lg: 0 12px 48px 0 rgba(11, 61, 46, 0.18);
+  --shadow-glass: 0 8px 32px 0 rgba(6, 66, 38, 0.12);
+  --shadow-glass-lg: 0 12px 48px 0 rgba(6, 66, 38, 0.18);
 
   /* Spacing scale (8pt grid) — reference only, Tailwind spacing already matches */
   --space-1: 4px;

@@ -1,4 +1,4 @@
-import emblemUrl from '@/assets/emblem/kharkiv-coa.svg';
+import emblemUrl from '@/assets/emblem/kharkiv-coa.webp';
 import clsx from 'clsx';
 
 interface EmblemProps {

@@ -10,6 +10,7 @@ import {
 } from '@/liveMetro/liveMetroEngine';
 import { useLiveMetroTrains } from '@/liveMetro/useLiveMetroTrains';
 import type { SchematicLine, SchematicStation } from '@/liveMetro/schematicData';
+import { getStationPhoto } from '@/data/stationPhotos';
 
 const VIEW_W = 1200;
 const VIEW_H = 1000;
@@ -365,9 +366,25 @@ function StationInfoCard({
   nowSec: number;
   onClose: () => void;
 }) {
+  const photo = getStationPhoto(station.id);
+
   return (
     <InfoCardShell onClose={onClose}>
-      <div className="font-display text-sm font-bold text-white">{station.name}</div>
+      <div className="flex gap-3">
+        {photo && (
+          <img
+            src={photo}
+            alt={station.name}
+            className="h-16 w-20 shrink-0 rounded-lg object-cover shadow-glass-dark ring-1 ring-white/15"
+          />
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="font-display text-sm font-bold text-white">{station.name}</div>
+          {station.interchangeWith?.length ? (
+            <p className="mt-0.5 text-[11px] text-gold-light">Пересадка на іншу лінію</p>
+          ) : null}
+        </div>
+      </div>
       <div className="mt-2 flex flex-col gap-1.5">
         {arrivals.length === 0 && <p className="text-[12px] text-white/50">Найближчим часом поїздів немає.</p>}
         {arrivals.map((a, i) => (

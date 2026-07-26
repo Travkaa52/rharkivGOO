@@ -54,7 +54,7 @@ export function initTelegramApp() {
   tg.ready();
   tg.expand();
   try {
-    tg.setHeaderColor('#0B3D2E');
+    tg.setHeaderColor('#05522E');
     tg.setBackgroundColor('#F4F7F5');
   } catch {
     // деякі клієнти Telegram не підтримують кастомізацію кольорів — не критично
