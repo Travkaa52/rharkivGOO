@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { BUILT_LINES } from '@/liveMetro/liveMetroEngine';
 import {
+  BUILT_LINES,
   dayTypeOf,
   formatEtaClock,
   formatEtaCountdown,
@@ -20,7 +20,7 @@ const VIEW_H = 1000;
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 3.5;
 
-/** Спрайти поїздів по лінії (public/sprites/*, надані власником проєкту), по одному на колір лінії. */
+/** Спрайти поїздів по лінії (public/sprites/*), по одному на колір лінії. */
 const TRAIN_SPRITES: Record<string, string> = {
   'route-metro-1': '/sprites/metro-red-line.jpg',
   'route-metro-2': '/sprites/metro-blue-line.jpg',
@@ -41,6 +41,9 @@ export function LiveMetroPage() {
   const [dayType, setDayType] = useState<LiveMetroDayType>(() => dayTypeOf(new Date()));
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const transformRef = useRef(transform);
+  transformRef.current = transform;
+
   const dragState = useRef<{ pointerId: number; startX: number; startY: number; startTx: number; startTy: number } | null>(null);
   const pinchState = useRef<{ distance: number; scale: number } | null>(null);
   const activePointers = useRef<Map<number, { x: number; y: number }>>(new Map());
@@ -57,6 +60,35 @@ export function LiveMetroPage() {
     return Array.from(map.values());
   }, []);
 
+  // Унікальні парні пересадочні лінії без дублювання
+  const interchangeLines = useMemo(() => {
+    const renderedPairs = new Set<string>();
+    const lines: Array<{ id: string; x1: number; y1: number; x2: number; y2: number }> = [];
+
+    for (const { line } of BUILT_LINES) {
+      for (const station of line.stations) {
+        if (!station.interchangeWith?.length) continue;
+        for (const otherId of station.interchangeWith) {
+          const other = allStations.find((o) => o.id === otherId);
+          if (!other) continue;
+
+          const pairKey = [station.id, otherId].sort().join('--');
+          if (renderedPairs.has(pairKey)) continue;
+          renderedPairs.add(pairKey);
+
+          lines.push({
+            id: pairKey,
+            x1: station.point.x,
+            y1: station.point.y,
+            x2: other.point.x,
+            y2: other.point.y
+          });
+        }
+      }
+    }
+    return lines;
+  }, [allStations]);
+
   const selectedStation = selectedStationId ? allStations.find((s) => s.id === selectedStationId) ?? null : null;
 
   const nowSec = secOfDay(new Date());
@@ -64,6 +96,7 @@ export function LiveMetroPage() {
     if (!selectedStationId) return [];
     return getUpcomingArrivalsForStation(selectedStationId, new Date(), 3);
   }, [selectedStationId, trains]);
+
   const stationTimetable = useMemo(() => {
     if (!selectedStationId) return [];
     return getStationDayTimetable(selectedStationId, dayType);
@@ -75,21 +108,23 @@ export function LiveMetroPage() {
     (e.target as Element).setPointerCapture?.(e.pointerId);
     activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
+    const currentTransform = transformRef.current;
+
     if (activePointers.current.size === 1) {
       dragState.current = {
         pointerId: e.pointerId,
         startX: e.clientX,
         startY: e.clientY,
-        startTx: transform.x,
-        startTy: transform.y
+        startTx: currentTransform.x,
+        startTy: currentTransform.y
       };
     } else if (activePointers.current.size === 2) {
       const pts = Array.from(activePointers.current.values());
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      pinchState.current = { distance: dist, scale: transform.scale };
+      pinchState.current = { distance: dist, scale: currentTransform.scale };
       dragState.current = null;
     }
-  }, [transform]);
+  }, []);
 
   const onPointerMove = useCallback((e: PointerEvent<HTMLDivElement>) => {
     if (!activePointers.current.has(e.pointerId)) return;
@@ -184,29 +219,19 @@ export function LiveMetroPage() {
             <SchemeLinePath key={line.id} line={line} />
           ))}
 
-          {/* Пересадочні з'єднання (пунктир між кластерами станцій-пересадок) */}
-          {BUILT_LINES.flatMap(({ line }) =>
-            line.stations
-              .filter((s) => s.interchangeWith?.length)
-              .flatMap((s) =>
-                (s.interchangeWith ?? []).map((otherId) => {
-                  const other = allStations.find((o) => o.id === otherId);
-                  if (!other) return null;
-                  return (
-                    <line
-                      key={`${s.id}-${otherId}`}
-                      x1={s.point.x}
-                      y1={s.point.y}
-                      x2={other.point.x}
-                      y2={other.point.y}
-                      stroke="rgba(255,255,255,0.35)"
-                      strokeWidth={3}
-                      strokeDasharray="4 5"
-                    />
-                  );
-                })
-              )
-          )}
+          {/* Пересадочні з'єднання */}
+          {interchangeLines.map((l) => (
+            <line
+              key={l.id}
+              x1={l.x1}
+              y1={l.y1}
+              x2={l.x2}
+              y2={l.y2}
+              stroke="rgba(255,255,255,0.35)"
+              strokeWidth={3}
+              strokeDasharray="4 5"
+            />
+          ))}
 
           {/* Станції */}
           {BUILT_LINES.map(({ line }) =>
@@ -317,7 +342,6 @@ function StationMarker({
 function TrainMarker({ train, selected, onClick }: { train: LiveMetroTrain; selected: boolean; onClick: () => void }) {
   const spriteSrc = TRAIN_SPRITES[train.lineId] ?? '/sprites/metro-red-line.jpg';
   const isDwell = train.phase === 'dwell';
-  // Умовний "погляд" спрайту вліво/вправо залежно від курсу — фото не мають кута, тож просто дзеркалимо.
   const facingLeft = train.headingDeg > 90 && train.headingDeg < 270;
   const size = selected ? 30 : 22;
 
@@ -368,7 +392,7 @@ function ZoomButton({ label, onClick, small }: { label: string; onClick: () => v
 
 function TrainInfoCard({ train, onClose }: { train: LiveMetroTrain; onClose: () => void }) {
   const nowSec = secOfDay(new Date());
-  const directionLabel = train.direction === 'forward' ? `→ ${train.headsign}` : `→ ${train.headsign}`;
+  const directionLabel = `→ ${train.headsign}`;
   const speedKmh = Math.round(train.speedRatio * 40);
 
   return (
@@ -439,7 +463,7 @@ function StationInfoCard({
       <div className="mt-2 flex flex-col gap-1.5">
         {arrivals.length === 0 && <p className="text-[12px] text-white/50">Найближчим часом поїздів немає.</p>}
         {arrivals.map((a, i) => (
-          <div key={i} className="flex items-center justify-between rounded-lg bg-white/5 px-2 py-1.5 text-[12px]">
+          <div key={`${a.lineNumber}-${a.headsign}-${i}`} className="flex items-center justify-between rounded-lg bg-white/5 px-2 py-1.5 text-[12px]">
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: a.lineColor }} />
               <span className="text-white/85">{a.lineNumber} → {a.headsign}</span>
