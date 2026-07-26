@@ -17,6 +17,7 @@ export default {
         },
         mint: { DEFAULT: 'rgb(var(--color-mint) / <alpha-value>)' },
         accentBlue: { DEFAULT: 'rgb(var(--color-blue) / <alpha-value>)' },
+        graphite: { DEFAULT: 'rgb(var(--color-graphite) / <alpha-value>)' },
         bg: 'rgb(var(--color-bg) / <alpha-value>)',
         surface: {
           DEFAULT: 'rgb(var(--color-surface) / <alpha-value>)',
