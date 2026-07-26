@@ -1,43 +1,33 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: ['selector', '[data-theme="dark"]'],
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        // Design tokens for Kharkiv GO
         forest: {
-          DEFAULT: '#0E5A3C', // темно-зелений — primary brand (з мокапу)
-          light: '#12513D',
-          dark: '#0B3B29'
+          DEFAULT: 'rgb(var(--color-forest) / <alpha-value>)',
+          light: 'rgb(var(--color-forest-light) / <alpha-value>)',
+          dark: 'rgb(var(--color-forest-dark) / <alpha-value>)'
         },
         gold: {
-          DEFAULT: '#C6A552', // золотий — accent (з мокапу)
-          light: '#E0C179',
-          dark: '#A8842F'
+          DEFAULT: 'rgb(var(--color-gold) / <alpha-value>)',
+          light: 'rgb(var(--color-gold-light) / <alpha-value>)',
+          dark: 'rgb(var(--color-gold-dark) / <alpha-value>)'
         },
-        mint: {
-          DEFAULT: '#A8D5BA', // світло-зелений — secondary accent
-          light: '#CFE9DA'
-        },
-        accentBlue: {
-          DEFAULT: '#2C7BE5' // синя лінія метро / акцент інтерфейсу (з мокапу)
-        },
-        graphite: {
-          DEFAULT: '#2B2F31', // графітовий — text / dark surfaces
-          light: '#3E4346',
-          dark: '#1A1D1E'
-        },
+        mint: { DEFAULT: 'rgb(var(--color-mint) / <alpha-value>)' },
+        accentBlue: { DEFAULT: 'rgb(var(--color-blue) / <alpha-value>)' },
+        bg: 'rgb(var(--color-bg) / <alpha-value>)',
         surface: {
-          DEFAULT: '#FFFFFF',
-          soft: '#F5F7F6'
+          DEFAULT: 'rgb(var(--color-surface) / <alpha-value>)',
+          soft: 'rgb(var(--color-surface-soft) / <alpha-value>)',
+          raised: 'rgb(var(--color-surface-raised) / <alpha-value>)'
         },
-        // Темна тема застосунку (основний вигляд з нового мокапу) —
-        // майже чорний зелено-графітовий фон + прозорі темні "скляні" поверхні.
+        border: 'rgb(var(--color-border))',
         ink: {
-          DEFAULT: '#0A0F0D', // базовий фон застосунку
-          soft: '#0F1613', // трохи світліша підкладка (картки, панелі)
-          surface: '#141C19', // поверхня картки
-          border: 'rgba(255,255,255,0.08)'
+          text: 'rgb(var(--color-text) / <alpha-value>)',
+          muted: 'rgb(var(--color-text-muted))',
+          inverted: 'rgb(var(--color-text-inverted) / <alpha-value>)'
         }
       },
       fontFamily: {
@@ -45,35 +35,61 @@ export default {
         body: ['"Inter"', 'system-ui', 'sans-serif']
       },
       borderRadius: {
-        xl2: '1.5rem',
-        xl3: '2rem'
+        sm: 'var(--radius-sm)',
+        md: 'var(--radius-md)',
+        lg: 'var(--radius-lg)',
+        xl2: 'var(--radius-lg)',
+        xl3: 'var(--radius-xl)'
       },
-      backdropBlur: {
-        xs: '2px'
-      },
+      backdropBlur: { xs: '2px' },
       boxShadow: {
-        glass: '0 8px 32px 0 rgba(11, 61, 46, 0.15)',
-        'glass-lg': '0 12px 48px 0 rgba(11, 61, 46, 0.22)',
-        'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.45)'
+        glass: 'var(--shadow-glass)',
+        'glass-lg': 'var(--shadow-glass-lg)'
       },
       keyframes: {
-        'pulse-soft': {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.6' }
+        'pulse-soft': { '0%,100%': { opacity: '1' }, '50%': { opacity: '0.6' } },
+        'slide-up': { from: { transform: 'translateY(16px)', opacity: '0' }, to: { transform: 'translateY(0)', opacity: '1' } },
+        'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
+        'scale-in': { from: { opacity: '0', transform: 'scale(0.96)' }, to: { opacity: '1', transform: 'scale(1)' } },
+        'sheet-up': { from: { transform: 'translateY(100%)' }, to: { transform: 'translateY(0)' } },
+        marquee: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
+        'splash-emblem-in': {
+          '0%': { opacity: '0', transform: 'scale(0.82) translateY(10px)' },
+          '60%': { opacity: '1', transform: 'scale(1.04) translateY(0)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' }
         },
-        'slide-up': {
-          from: { transform: 'translateY(16px)', opacity: '0' },
-          to: { transform: 'translateY(0)', opacity: '1' }
+        'splash-ring': {
+          '0%': { opacity: '0.55', transform: 'scale(0.9)' },
+          '100%': { opacity: '0', transform: 'scale(1.55)' }
         },
-        marquee: {
-          from: { transform: 'translateX(0)' },
-          to: { transform: 'translateX(-50%)' }
+        'splash-word-in': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' }
+        },
+        'splash-out': {
+          from: { opacity: '1', transform: 'scale(1)' },
+          to: { opacity: '0', transform: 'scale(1.03)' }
+        },
+        'progress-indeterminate': {
+          '0%': { transform: 'translateX(-100%) scaleX(0.4)' },
+          '50%': { transform: 'translateX(20%) scaleX(0.7)' },
+          '100%': { transform: 'translateX(120%) scaleX(0.4)' }
         }
       },
       animation: {
         'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
-        'slide-up': 'slide-up 0.25s ease-out',
-        marquee: 'marquee 4s linear infinite'
+        'slide-up': 'slide-up 0.25s cubic-bezier(0.22,1,0.36,1)',
+        'fade-in': 'fade-in 0.2s ease-out',
+        'scale-in': 'scale-in 0.18s cubic-bezier(0.22,1,0.36,1)',
+        'sheet-up': 'sheet-up 0.3s cubic-bezier(0.22,1,0.36,1)',
+        marquee: 'marquee 4s linear infinite',
+        'splash-emblem-in': 'splash-emblem-in 0.7s cubic-bezier(0.16,1,0.3,1) both',
+        'splash-ring-1': 'splash-ring 2.4s cubic-bezier(0.4,0,0.2,1) infinite',
+        'splash-ring-2': 'splash-ring 2.4s cubic-bezier(0.4,0,0.2,1) infinite 0.8s',
+        'splash-ring-3': 'splash-ring 2.4s cubic-bezier(0.4,0,0.2,1) infinite 1.6s',
+        'splash-word-in': 'splash-word-in 0.5s cubic-bezier(0.16,1,0.3,1) 0.25s both',
+        'splash-out': 'splash-out 0.45s cubic-bezier(0.4,0,1,1) both',
+        'progress-indeterminate': 'progress-indeterminate 1.2s cubic-bezier(0.4,0,0.2,1) infinite'
       }
     }
   },
