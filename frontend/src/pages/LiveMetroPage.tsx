@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import {
   BUILT_LINES,
@@ -17,11 +17,10 @@ import { getStationPhoto } from '@/data/stationPhotos';
 import { assetUrl } from '@/lib/assetUrl';
 
 const VIEW_W = 1200;
-const VIEW_H = 1100;
-const MIN_SCALE = 0.6;
-const MAX_SCALE = 3.5;
+const VIEW_H = 1000;
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 4.0;
 
-/** Спрайти поїздів по лінії (public/sprites/*), по одному на колір лінії. */
 const TRAIN_SPRITES: Record<string, string> = {
   'route-metro-1': assetUrl('/sprites/metro-red-line.jpg'),
   'route-metro-2': assetUrl('/sprites/metro-blue-line.jpg'),
@@ -40,6 +39,7 @@ export function LiveMetroPage() {
   const [selectedTrainId, setSelectedTrainId] = useState<string | null>(null);
   const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
   const [dayType, setDayType] = useState<LiveMetroDayType>(() => dayTypeOf(new Date()));
+  const [nowSec, setNowSec] = useState<number>(() => secOfDay(new Date()));
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformRef = useRef(transform);
@@ -48,6 +48,14 @@ export function LiveMetroPage() {
   const dragState = useRef<{ pointerId: number; startX: number; startY: number; startTx: number; startTy: number } | null>(null);
   const pinchState = useRef<{ distance: number; scale: number } | null>(null);
   const activePointers = useRef<Map<number, { x: number; y: number }>>(new Map());
+
+  // Обновление реального времени каждую секунду
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNowSec(secOfDay(new Date()));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const selectedTrain = useMemo(() => trains.find((t) => t.id === selectedTrainId) ?? null, [trains, selectedTrainId]);
 
@@ -61,7 +69,6 @@ export function LiveMetroPage() {
     return Array.from(map.values());
   }, []);
 
-  // Унікальні парні пересадочні лінії без дублювання
   const interchangeLines = useMemo(() => {
     const renderedPairs = new Set<string>();
     const lines: Array<{ id: string; x1: number; y1: number; x2: number; y2: number }> = [];
@@ -92,7 +99,6 @@ export function LiveMetroPage() {
 
   const selectedStation = selectedStationId ? allStations.find((s) => s.id === selectedStationId) ?? null : null;
 
-  const nowSec = secOfDay(new Date());
   const stationArrivals = useMemo(() => {
     if (!selectedStationId) return [];
     return getUpcomingArrivalsForStation(selectedStationId, new Date(), 3);
@@ -105,8 +111,11 @@ export function LiveMetroPage() {
 
   const clampScale = (s: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s));
 
+  // Исправлено: Pointer capture на контейнере
   const onPointerDown = useCallback((e: PointerEvent<HTMLDivElement>) => {
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    if (containerRef.current) {
+      containerRef.current.setPointerCapture(e.pointerId);
+    }
     activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
     const currentTransform = transformRef.current;
@@ -148,15 +157,33 @@ export function LiveMetroPage() {
   }, []);
 
   const endPointer = useCallback((e: PointerEvent<HTMLDivElement>) => {
+    if (containerRef.current?.hasPointerCapture(e.pointerId)) {
+      containerRef.current.releasePointerCapture(e.pointerId);
+    }
     activePointers.current.delete(e.pointerId);
     if (dragState.current?.pointerId === e.pointerId) dragState.current = null;
     if (activePointers.current.size < 2) pinchState.current = null;
   }, []);
 
+  // Zoom to cursor
   const onWheel = useCallback((e: WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
     const delta = -e.deltaY * 0.0015;
-    setTransform((t) => ({ ...t, scale: clampScale(t.scale * (1 + delta)) }));
+    setTransform((t) => {
+      const newScale = clampScale(t.scale * (1 + delta));
+      const scaleRatio = newScale / t.scale;
+
+      const newX = mouseX - (mouseX - t.x) * scaleRatio;
+      const newY = mouseY - (mouseY - t.y) * scaleRatio;
+
+      return { x: newX, y: newY, scale: newScale };
+    });
   }, []);
 
   const resetView = () => setTransform({ x: 0, y: 0, scale: 1 });
@@ -221,15 +248,15 @@ export function LiveMetroPage() {
           className="h-full w-full select-none"
           style={{
             transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
-            transformOrigin: '50% 50%'
+            transformOrigin: '0 0'
           }}
         >
-          {/* Лінії колій */}
+          {/* Линии метро */}
           {BUILT_LINES.map(({ line }) => (
             <SchemeLinePath key={line.id} line={line} />
           ))}
 
-          {/* Пересадочні з'єднання */}
+          {/* Пересадочные линии (пунктир) */}
           {interchangeLines.map((l) => (
             <line
               key={l.id}
@@ -237,13 +264,13 @@ export function LiveMetroPage() {
               y1={l.y1}
               x2={l.x2}
               y2={l.y2}
-              stroke="rgba(255,255,255,0.35)"
-              strokeWidth={3}
-              strokeDasharray="4 5"
+              stroke="rgba(255,255,255,0.6)"
+              strokeWidth={5}
+              strokeDasharray="4 4"
             />
           ))}
 
-          {/* Станції */}
+          {/* Маркеры станций */}
           {BUILT_LINES.map(({ line }) =>
             line.stations.map((station) => (
               <StationMarker
@@ -259,7 +286,7 @@ export function LiveMetroPage() {
             ))
           )}
 
-          {/* Поїзди */}
+          {/* Поезда */}
           {trains.map((train) => (
             <TrainMarker
               key={train.id}
@@ -273,14 +300,14 @@ export function LiveMetroPage() {
           ))}
         </svg>
 
-        {/* Керування масштабом */}
+        {/* Кнопки зума */}
         <div className="absolute right-3 top-3 flex flex-col gap-1.5">
           <ZoomButton label="+" onClick={() => setTransform((t) => ({ ...t, scale: clampScale(t.scale * 1.25) }))} />
           <ZoomButton label="−" onClick={() => setTransform((t) => ({ ...t, scale: clampScale(t.scale / 1.25) }))} />
           <ZoomButton label="⟲" onClick={resetView} small />
         </div>
 
-        {/* Легенда, як на офіційній схемі: номер лінії + повна назва */}
+        {/* Легенда */}
         <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5 rounded-xl2 border border-white/10 bg-black/45 px-3 py-2.5 backdrop-blur-xs">
           {BUILT_LINES.map(({ line }) => (
             <div key={line.id} className="flex items-center gap-2 text-[11px] font-medium text-white/85">
@@ -314,7 +341,7 @@ export function LiveMetroPage() {
 
 function SchemeLinePath({ line }: { line: SchematicLine }) {
   const d = line.stations.map((s, i) => `${i === 0 ? 'M' : 'L'} ${s.point.x} ${s.point.y}`).join(' ');
-  return <path d={d} fill="none" stroke={line.color} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" opacity={0.9} />;
+  return <path d={d} fill="none" stroke={line.color} strokeWidth={8} strokeLinecap="round" strokeLinejoin="round" opacity={0.9} />;
 }
 
 function StationMarker({
@@ -329,6 +356,9 @@ function StationMarker({
   onClick: () => void;
 }) {
   const isInterchange = !!station.interchangeWith?.length;
+  // Позиционирование текста над/под станцией
+  const textY = station.labelOffset?.y ?? -16;
+
   return (
     <g
       transform={`translate(${station.point.x}, ${station.point.y})`}
@@ -338,14 +368,15 @@ function StationMarker({
       }}
       className="cursor-pointer"
     >
-      <circle r={isInterchange ? 13 : 9} fill="#0c1310" stroke={color} strokeWidth={isInterchange ? 5 : 4} />
-      {selected && <circle r={isInterchange ? 19 : 15} fill="none" stroke="#C6A552" strokeWidth={2} />}
+      <circle r={isInterchange ? 12 : 8} fill="#0c1310" stroke={color} strokeWidth={isInterchange ? 5 : 4} />
+      {selected && <circle r={isInterchange ? 18 : 14} fill="none" stroke="#C6A552" strokeWidth={2} />}
       <text
-        x={0}
-        y={-16}
+        x={station.labelOffset?.x ?? 0}
+        y={textY}
         textAnchor="middle"
         className="pointer-events-none font-display"
-        fontSize={13}
+        fontSize={12}
+        fontWeight="600"
         fill="#F5F7F6"
         style={{ paintOrder: 'stroke', stroke: '#0A0F0D', strokeWidth: 3 }}
       >
@@ -360,6 +391,7 @@ function TrainMarker({ train, selected, onClick }: { train: LiveMetroTrain; sele
   const isDwell = train.phase === 'dwell';
   const facingLeft = train.headingDeg > 90 && train.headingDeg < 270;
   const size = selected ? 30 : 22;
+  const clipId = `clip-${train.id.replace(/[^a-zA-Z0-9-_]/g, '')}`;
 
   return (
     <g
@@ -369,10 +401,10 @@ function TrainMarker({ train, selected, onClick }: { train: LiveMetroTrain; sele
         onClick();
       }}
       className="cursor-pointer"
-      style={{ transition: 'opacity 200ms ease' }}
+      style={{ transition: 'transform 300ms linear' }}
     >
       <circle r={size / 2 + 3} fill={train.lineColor} opacity={selected ? 1 : 0.95} stroke="#fff" strokeWidth={2} />
-      <clipPath id={`clip-${train.id}`}>
+      <clipPath id={clipId}>
         <circle r={size / 2 - 1} />
       </clipPath>
       <image
@@ -381,7 +413,7 @@ function TrainMarker({ train, selected, onClick }: { train: LiveMetroTrain; sele
         y={-size / 2}
         width={size}
         height={size}
-        clipPath={`url(#clip-${train.id})`}
+        clipPath={`url(#${clipId})`}
         preserveAspectRatio="xMidYMid slice"
         transform={facingLeft ? 'scale(-1,1)' : undefined}
         opacity={isDwell ? 0.85 : 1}
