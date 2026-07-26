@@ -1,378 +1,499 @@
-import { DWELL_SEC, SCHEMATIC_LINES, type LiveMetroDayType, type SchematicLine, type SchematicPoint, type SchematicStation } from '@/liveMetro/schematicData';
-import { TIMETABLES } from '@/liveMetro/timetableData';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  SCHEMATIC_LINES,
+  type SchematicStation,
+  type LiveMetroDayType
+} from '@/liveMetro/schematicData';
+import {
+  getActiveTrains,
+  getUpcomingArrivalsForStation,
+  getStationDayTimetable,
+  secOfDay,
+  dayTypeOf,
+  formatEtaCountdown,
+  formatEtaClock,
+  type LiveMetroTrain,
+  type UpcomingDeparture,
+  type StationDayTimetableEntry
+} from '@/liveMetro/liveMetroEngine';
 
-export type LiveMetroDirection = 'forward' | 'backward';
-export type LiveMetroPhase = 'dwell' | 'accelerating' | 'cruising' | 'braking';
+export const LiveMetroMap: React.FC = () => {
+  // --- Стан та посилання ---
+  const [now, setNow] = useState<Date>(new Date());
+  const [trains, setTrains] = useState<LiveMetroTrain[]>([]);
+  const [selectedStation, setSelectedStation] = useState<SchematicStation | null>(null);
+  const [selectedTrain, setSelectedTrain] = useState<LiveMetroTrain | null>(null);
+  const [activeLineId, setActiveLineId] = useState<string | null>(null);
+  const [showTimetableTab, setShowTimetableTab] = useState<'arrivals' | 'timetable'>('arrivals');
 
-/** "HH:MM" -> секунди від півночі. */
-export function timeToSec(time: string): number {
-  const m = /^(\d{1,2}):(\d{2})$/.exec(time.trim());
-  if (!m) throw new Error(`liveMetroEngine: некоректний час "${time}"`);
-  return Number(m[1]) * 3600 + Number(m[2]) * 60;
-}
+  const animFrameRef = useRef<number | null>(null);
 
-export function secOfDay(date: Date): number {
-  return date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds() + date.getMilliseconds() / 1000;
-}
+  // --- Цикл анімації реального часу (60 FPS для плавності потягів) ---
+  useEffect(() => {
+    let lastUpdate = 0;
 
-export function dayTypeOf(date: Date): LiveMetroDayType {
-  const d = date.getDay();
-  return d === 0 || d === 6 ? 'weekend' : 'weekday';
-}
-
-function clamp01(t: number): number {
-  return t < 0 ? 0 : t > 1 ? 1 : t;
-}
-
-/** Плавний розгін/гальмування: повільний старт, швидка середина, повільне завершення. */
-function easeInOutCubic(t: number): number {
-  const c = clamp01(t);
-  return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
-}
-
-function easeInOutCubicDerivative(t: number): number {
-  const c = clamp01(t);
-  if (c < 0.5) return 12 * c * c;
-  const u = -2 * c + 2;
-  return 3 * u * u;
-}
-
-function lerpPoint(a: SchematicPoint, b: SchematicPoint, t: number): SchematicPoint {
-  const c = clamp01(t);
-  return { x: a.x + (b.x - a.x) * c, y: a.y + (b.y - a.y) * c };
-}
-
-function distance(a: SchematicPoint, b: SchematicPoint): number {
-  return Math.hypot(b.x - a.x, b.y - a.y);
-}
-
-function bearingDeg(a: SchematicPoint, b: SchematicPoint): number {
-  // 0° = вгору (північ схеми), за годинниковою стрілкою — узгоджено з обертанням спрайту.
-  const angle = (Math.atan2(b.x - a.x, -(b.y - a.y)) * 180) / Math.PI;
-  return (angle + 360) % 360;
-}
-
-export interface DirectionRoute {
-  direction: LiveMetroDirection;
-  headsign: string;
-  stations: SchematicStation[];
-  /** Час прибуття на станцію i (від початку рейсу), секунд — уже переорієнтовано під цей напрямок. */
-  arrivalOffsetSec: number[];
-  tripDurationSec: number;
-  totalActiveDurationSec: number;
-  firstDepartureSec: number;
-}
-
-export interface LiveMetroTrain {
-  id: string;
-  lineId: string;
-  lineNumber: string;
-  lineName: string;
-  lineColor: string;
-  direction: LiveMetroDirection;
-  headsign: string;
-  point: SchematicPoint;
-  headingDeg: number;
-  speedRatio: number; // 0..1 умовна швидкість (для UI/анімації), 1 = крейсерська
-  phase: LiveMetroPhase;
-  progressRatio: number;
-  previousStation: SchematicStation;
-  nextStation: SchematicStation;
-  etaNextStationSec: number;
-  etaTerminusSec: number;
-  departureAtSec: number;
-}
-
-function buildDirectionRoute(line: SchematicLine, direction: LiveMetroDirection): DirectionRoute {
-  const forward = direction === 'forward';
-  const stations = forward ? line.stations : [...line.stations].reverse();
-  const tripDurationSec = line.stations[line.stations.length - 1].arrivalOffsetSec;
-
-  const arrivalOffsetSec = forward
-    ? line.stations.map((s) => s.arrivalOffsetSec)
-    : [...line.stations].reverse().map((s) => tripDurationSec - s.arrivalOffsetSec);
-
-  const headsign = forward ? line.headsignForward : line.headsignBackward;
-  const firstDepartureSec = timeToSec(forward ? line.firstDepartureForward.weekday : line.firstDepartureBackward.weekday);
-
-  return {
-    direction,
-    headsign,
-    stations,
-    arrivalOffsetSec,
-    tripDurationSec,
-    totalActiveDurationSec: tripDurationSec + DWELL_SEC,
-    firstDepartureSec
-  };
-}
-
-interface BuiltLine {
-  line: SchematicLine;
-  forward: DirectionRoute;
-  backward: DirectionRoute;
-}
-
-export const BUILT_LINES: BuiltLine[] = SCHEMATIC_LINES.map((line) => ({
-  line,
-  forward: buildDirectionRoute(line, 'forward'),
-  backward: buildDirectionRoute(line, 'backward')
-}));
-
-const MIN_HEADWAY_SEC = 60;
-
-/** Реальні відправлення з першої станції напрямку (за фактичним графіком станції), якщо є в TIMETABLES. */
-function realDeparturesFromTimetable(line: SchematicLine, direction: LiveMetroDirection, dayType: LiveMetroDayType): number[] | null {
-  const stations = direction === 'forward' ? line.stations : [...line.stations].reverse();
-  const originId = stations[0].id;
-  const entry = TIMETABLES[dayType]?.[originId]?.[line.id];
-  const times = entry?.[direction];
-  if (!times || times.length === 0) return null;
-  return times.map(timeToSec).sort((a, b) => a - b);
-}
-
-/** Детермінований перелік часу відправлень за добу для напрямку. Реальний графік станції — пріоритетно, інакше рівномірний інтервал. */
-function buildDailyDepartures(line: SchematicLine, direction: LiveMetroDirection, dayType: LiveMetroDayType): number[] {
-  const real = realDeparturesFromTimetable(line, direction, dayType);
-  if (real) return real;
-
-  const firstDepartureStr = direction === 'forward' ? line.firstDepartureForward[dayType] : line.firstDepartureBackward[dayType];
-  const firstSec = timeToSec(firstDepartureStr);
-  const lastSec = timeToSec(line.lastDeparture);
-  const headwaySec = Math.max(MIN_HEADWAY_SEC, Math.round(line.intervalMinutes[dayType] * 60));
-
-  const departures: number[] = [];
-  let cursor = firstSec;
-  let safety = 0;
-  const maxIterations = Math.ceil((lastSec - firstSec) / MIN_HEADWAY_SEC) + 2;
-  while (cursor <= lastSec && safety <= maxIterations) {
-    departures.push(cursor);
-    cursor += headwaySec;
-    safety += 1;
-  }
-  return departures;
-}
-
-/** Кеш денних розкладів по (lineId+direction+dayType) — рахуємо один раз, не на кожен кадр. */
-const departuresCache = new Map<string, number[]>();
-function getDailyDepartures(line: SchematicLine, direction: LiveMetroDirection, dayType: LiveMetroDayType): number[] {
-  const key = `${line.id}:${direction}:${dayType}`;
-  let cached = departuresCache.get(key);
-  if (!cached) {
-    cached = buildDailyDepartures(line, direction, dayType);
-    departuresCache.set(key, cached);
-  }
-  return cached;
-}
-
-function sampleTrainAt(route: DirectionRoute, elapsedSec: number): {
-  point: SchematicPoint;
-  headingDeg: number;
-  speedRatio: number;
-  phase: LiveMetroPhase;
-  progressRatio: number;
-  segmentIndex: number;
-  nextStationOffsetSec: number;
-} {
-  const clamped = Math.max(0, Math.min(elapsedSec, route.totalActiveDurationSec));
-
-  let segmentIndex = 0;
-  for (let i = 0; i < route.stations.length - 1; i++) {
-    const departureOffset = i === 0 ? 0 : route.arrivalOffsetSec[i] + DWELL_SEC;
-    const arrivalOffset = route.arrivalOffsetSec[i + 1];
-    const windowEnd = arrivalOffset + DWELL_SEC;
-    segmentIndex = i;
-    if (clamped <= windowEnd || i === route.stations.length - 2) break;
-    void departureOffset;
-  }
-
-  const fromStation = route.stations[segmentIndex];
-  const toStation = route.stations[segmentIndex + 1];
-  const departureOffsetSec = segmentIndex === 0 ? 0 : route.arrivalOffsetSec[segmentIndex] + DWELL_SEC;
-  const arrivalOffsetSec = route.arrivalOffsetSec[segmentIndex + 1];
-  const cruiseDurationSec = Math.max(1, arrivalOffsetSec - departureOffsetSec);
-  const elapsedInSegment = clamped - departureOffsetSec;
-
-  if (elapsedInSegment >= cruiseDurationSec) {
-    return {
-      point: toStation.point,
-      headingDeg: bearingDeg(fromStation.point, toStation.point),
-      speedRatio: 0,
-      phase: 'dwell',
-      progressRatio: clamp01(clamped / route.tripDurationSec),
-      segmentIndex,
-      nextStationOffsetSec: arrivalOffsetSec
+    const tick = (timestamp: number) => {
+      // Оновлюємо стан кожні ~50 мс для оптимізації та плавності 
+      if (timestamp - lastUpdate > 50) {
+        const currentDate = new Date();
+        setNow(currentDate);
+        setTrains(getActiveTrains(currentDate));
+        lastUpdate = timestamp;
+      }
+      animFrameRef.current = requestAnimationFrame(tick);
     };
-  }
 
-  const t = clamp01(elapsedInSegment / cruiseDurationSec);
-  const easedT = easeInOutCubic(t);
-  const point = lerpPoint(fromStation.point, toStation.point, easedT);
-  const headingDeg = bearingDeg(fromStation.point, toStation.point);
+    animFrameRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, []);
 
-  const easedDerivative = easeInOutCubicDerivative(t);
-  const dist = distance(fromStation.point, toStation.point);
-  // Умовна швидкість, нормована на "типову" крейсерську похідну ~2.0 — лише для UI (0..~1+).
-  const speedRatio = Math.min(1.4, (dist * easedDerivative) / cruiseDurationSec / 6);
+  const nowSec = useMemo(() => secOfDay(now), [now]);
+  const currentDayType = useMemo(() => dayTypeOf(now), [now]);
 
-  const phase: LiveMetroPhase = t < 0.18 ? 'accelerating' : t > 0.82 ? 'braking' : 'cruising';
+  // --- Найближчі прибуття для обраної станції ---
+  const upcomingArrivals: UpcomingDeparture[] = useMemo(() => {
+    if (!selectedStation) return [];
+    return getUpcomingArrivalsForStation(selectedStation.id, now, 3);
+  }, [selectedStation, now]);
 
-  return {
-    point,
-    headingDeg,
-    speedRatio,
-    phase,
-    progressRatio: clamp01(clamped / route.tripDurationSec),
-    segmentIndex,
-    nextStationOffsetSec: arrivalOffsetSec
+  // --- Графік на день для обраної станції ---
+  const stationTimetable: StationDayTimetableEntry[] = useMemo(() => {
+    if (!selectedStation) return [];
+    return getStationDayTimetable(selectedStation.id, currentDayType);
+  }, [selectedStation, currentDayType]);
+
+  // Генерація SVG Path для ліній
+  const getLinePathD = (stations: SchematicStation[]) => {
+    return stations.reduce((acc, st, i) => `${acc} ${i === 0 ? 'M' : 'L'} ${st.point.x} ${st.point.y}`, '');
   };
-}
 
-/** Усі активні потяги (обидва напрямки, усі лінії) на момент `date`. Чиста функція часу — без GPS і випадковості. */
-export function getActiveTrains(date: Date): LiveMetroTrain[] {
-  const nowSec = secOfDay(date);
-  const dayType = dayTypeOf(date);
-  const trains: LiveMetroTrain[] = [];
-
-  for (const { line, forward, backward } of BUILT_LINES) {
-    for (const route of [forward, backward]) {
-      const departures = getDailyDepartures(line, route.direction, dayType);
-      for (const departureAtSec of departures) {
-        const elapsed = nowSec - departureAtSec;
-        if (elapsed < 0 || elapsed > route.totalActiveDurationSec) continue;
-
-        const sample = sampleTrainAt(route, elapsed);
-        trains.push({
-          id: `${line.id}-${route.direction}-${departureAtSec}`,
-          lineId: line.id,
-          lineNumber: line.number,
-          lineName: line.name,
-          lineColor: line.color,
-          direction: route.direction,
-          headsign: route.headsign,
-          point: sample.point,
-          headingDeg: sample.headingDeg,
-          speedRatio: sample.speedRatio,
-          phase: sample.phase,
-          progressRatio: sample.progressRatio,
-          previousStation: route.stations[sample.segmentIndex],
-          nextStation: route.stations[sample.segmentIndex + 1],
-          etaNextStationSec: departureAtSec + sample.nextStationOffsetSec,
-          etaTerminusSec: departureAtSec + route.tripDurationSec,
-          departureAtSec
-        });
-      }
+  // Позначка фази потяга українською
+  const getPhaseLabel = (phase: LiveMetroTrain['phase']) => {
+    switch (phase) {
+      case 'dwell': return 'На станції (посадка)';
+      case 'accelerating': return 'Розгін';
+      case 'cruising': return 'У дорозі';
+      case 'braking': return 'Прибуття (гальмування)';
     }
-  }
+  };
 
-  return trains;
-}
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100vh', backgroundColor: '#0B0F17', color: '#F3F4F6', overflow: 'hidden', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      
+      {/* 1. ВЕРХНІЙ ЛЕВИЙ УГОЛ: Логотип Метрополітену, Годинник та Статус */}
+      <div style={{
+        position: 'absolute',
+        top: 16,
+        left: 16,
+        zIndex: 20,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
+        backgroundColor: 'rgba(15, 23, 42, 0.88)',
+        padding: '10px 16px',
+        borderRadius: 14,
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
+      }}>
+        <img 
+          src="/icons/metro-logo.svg" 
+          alt="Харківський Метрополітен" 
+          style={{ width: 40, height: 40, objectFit: 'contain' }}
+          onError={(e) => {
+            // Резервний плейсхолдер, якщо логотип ще завантажується
+            (e.target as HTMLElement).style.display = 'none';
+          }}
+        />
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.3px', color: '#FFFFFF' }}>
+            Харківський Метрополітен
+          </div>
+          <div style={{ fontSize: 12, color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#10B981', fontWeight: 600 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 8px #10B981' }}></span>
+              ЖИВЕ МЕТРО
+            </span>
+            <span>•</span>
+            <span style={{ color: '#E5E7EB', fontFamily: 'monospace', fontSize: 13 }}>
+              {now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+            <span>•</span>
+            <span>Активно потягів: <strong style={{ color: '#FFF' }}>{trains.length}</strong></span>
+          </div>
+        </div>
+      </div>
 
-export interface UpcomingDeparture {
-  lineId: string;
-  lineNumber: string;
-  lineColor: string;
-  direction: LiveMetroDirection;
-  headsign: string;
-  etaSec: number;
-}
+      {/* 2. ВЕРХНІЙ ПРАВИЙ УГОЛ: Фильтр ліній */}
+      <div style={{
+        position: 'absolute',
+        top: 16,
+        right: 16,
+        zIndex: 20,
+        display: 'flex',
+        gap: 8,
+        backgroundColor: 'rgba(15, 23, 42, 0.85)',
+        padding: 6,
+        borderRadius: 12,
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)'
+      }}>
+        <button
+          onClick={() => setActiveLineId(null)}
+          style={{
+            backgroundColor: activeLineId === null ? '#3B82F6' : 'transparent',
+            color: '#FFF',
+            border: 'none',
+            padding: '6px 12px',
+            borderRadius: 8,
+            cursor: 'pointer',
+            fontSize: 12,
+            fontWeight: 600,
+            transition: 'all 0.2s'
+          }}
+        >
+          Усі лінії
+        </button>
+        {SCHEMATIC_LINES.map((line) => (
+          <button
+            key={line.id}
+            onClick={() => setActiveLineId(activeLineId === line.id ? null : line.id)}
+            style={{
+              backgroundColor: activeLineId === line.id ? line.color : 'transparent',
+              color: '#FFF',
+              border: activeLineId === line.id ? 'none' : `1px solid ${line.color}66`,
+              padding: '6px 12px',
+              borderRadius: 8,
+              cursor: 'pointer',
+              fontSize: 12,
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6
+            }}
+          >
+            <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: line.color }}></span>
+            {line.number}
+          </button>
+        ))}
+      </div>
 
-/** Найближчі прибуття (обидва напрямки, усі лінії, що проходять через станцію) на конкретну станцію. */
-export function getUpcomingArrivalsForStation(stationId: string, date: Date, limitPerDirection = 3): UpcomingDeparture[] {
-  const nowSec = secOfDay(date);
-  const dayType = dayTypeOf(date);
-  const results: UpcomingDeparture[] = [];
+      {/* 3. СХЕМА МЕТРО (SVG) */}
+      <svg viewBox="0 0 1200 1000" style={{ width: '100%', height: '100%', cursor: 'grab' }}>
+        <defs>
+          <filter id="glow-line" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+          <filter id="glow-train" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
 
-  for (const { line, forward, backward } of BUILT_LINES) {
-    for (const route of [forward, backward]) {
-      const stationIndex = route.stations.findIndex((s) => s.id === stationId);
-      if (stationIndex === -1) continue;
+        {/* ПЕРЕСАДОЧНІ ВУЗЛИ (Зв'язки між станціями) */}
+        <g id="interchanges" opacity={0.7}>
+          {/* Держпром (Л3) <-> Університет (Л2) */}
+          <line x1={555} y1={430} x2={560} y2={460} stroke="#FFFFFF" strokeWidth={12} strokeLinecap="round" />
+          <line x1={555} y1={430} x2={560} y2={460} stroke="#0B0F17" strokeWidth={6} strokeLinecap="round" />
 
-      // Пріоритет — реальний графік саме цієї станції (найточніший), інакше — розрахунок від відправлень лінії.
-      const realTimes = TIMETABLES[dayType]?.[stationId]?.[line.id]?.[route.direction];
-      let candidateEtas: number[];
-      if (realTimes && realTimes.length > 0) {
-        candidateEtas = realTimes.map(timeToSec);
-      } else {
-        const arrivalOffset = route.arrivalOffsetSec[stationIndex];
-        const departures = getDailyDepartures(line, route.direction, dayType);
-        candidateEtas = departures.map((departureAtSec) => departureAtSec + arrivalOffset);
-      }
+          {/* Майдан Конституції (Л1) <-> Історичний музей (Л2) */}
+          <line x1={330} y1={540} x2={390} y2={560} stroke="#FFFFFF" strokeWidth={12} strokeLinecap="round" />
+          <line x1={330} y1={540} x2={390} y2={560} stroke="#0B0F17" strokeWidth={6} strokeLinecap="round" />
 
-      const upcoming = candidateEtas
-        .filter((etaSec) => etaSec >= nowSec)
-        .sort((a, b) => a - b)
-        .slice(0, limitPerDirection);
+          {/* Спортивна (Л1) <-> Метробудівників (Л3) */}
+          <line x1={430} y1={660} x2={420} y2={660} stroke="#FFFFFF" strokeWidth={12} strokeLinecap="round" />
+          <line x1={430} y1={660} x2={420} y2={660} stroke="#0B0F17" strokeWidth={6} strokeLinecap="round" />
+        </g>
 
-      for (const etaSec of upcoming) {
-        results.push({
-          lineId: line.id,
-          lineNumber: line.number,
-          lineColor: line.color,
-          direction: route.direction,
-          headsign: route.headsign,
-          etaSec
-        });
-      }
-    }
-  }
+        {/* ЛІНІЇ МЕТРО */}
+        {SCHEMATIC_LINES.map((line) => {
+          const isDimmed = activeLineId && activeLineId !== line.id;
+          const pathD = getLinePathD(line.stations);
 
-  return results.sort((a, b) => a.etaSec - b.etaSec);
-}
+          return (
+            <g key={line.id} opacity={isDimmed ? 0.15 : 1} style={{ transition: 'opacity 0.3s' }}>
+              {/* Неонова підкладка */}
+              <path d={pathD} fill="none" stroke={line.color} strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" opacity={0.3} filter="url(#glow-line)" />
+              {/* Основна лінія */}
+              <path d={pathD} fill="none" stroke={line.color} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
+            </g>
+          );
+        })}
 
-export interface StationDayTimetableEntry {
-  lineId: string;
-  lineNumber: string;
-  lineColor: string;
-  direction: LiveMetroDirection;
-  headsign: string;
-  times: string[];
-}
+        {/* СТАНЦІЇ */}
+        {SCHEMATIC_LINES.map((line) => {
+          const isDimmed = activeLineId && activeLineId !== line.id;
 
-/** Повний графік відправлень (усі лінії/напрямки) для станції на конкретний день — для показу таблиці «Графік». */
-export function getStationDayTimetable(stationId: string, dayType: LiveMetroDayType): StationDayTimetableEntry[] {
-  const result: StationDayTimetableEntry[] = [];
-  const perDay = TIMETABLES[dayType]?.[stationId];
-  if (!perDay) return result;
+          return line.stations.map((station) => {
+            const isSelected = selectedStation?.id === station.id;
+            const isInterchange = Boolean(station.interchangeWith?.length);
 
-  for (const { line } of BUILT_LINES) {
-    const entry = perDay[line.id];
-    if (!entry) continue;
-    if (entry.forward.length) {
-      result.push({
-        lineId: line.id,
-        lineNumber: line.number,
-        lineColor: line.color,
-        direction: 'forward',
-        headsign: line.headsignForward,
-        times: entry.forward
-      });
-    }
-    if (entry.backward.length) {
-      result.push({
-        lineId: line.id,
-        lineNumber: line.number,
-        lineColor: line.color,
-        direction: 'backward',
-        headsign: line.headsignBackward,
-        times: entry.backward
-      });
-    }
-  }
-  return result;
-}
+            return (
+              <g
+                key={station.id}
+                transform={`translate(${station.point.x}, ${station.point.y})`}
+                onClick={() => {
+                  setSelectedStation(station);
+                  setSelectedTrain(null);
+                }}
+                style={{ cursor: 'pointer' }}
+                opacity={isDimmed ? 0.2 : 1}
+              >
+                {/* Радіальне виділення при виборі */}
+                {isSelected && (
+                  <circle r={14} fill="none" stroke="#60A5FA" strokeWidth={3} filter="url(#glow-train)">
+                    <animate attributeName="r" values="12;16;12" dur="2s" repeatCount="indefinite" />
+                  </circle>
+                )}
 
-export function formatEtaClock(etaSec: number): string {
-  const wrapped = ((etaSec % 86400) + 86400) % 86400;
-  const h = Math.floor(wrapped / 3600);
-  const m = Math.floor((wrapped % 3600) / 60);
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-}
+                {/* Точка станції */}
+                <circle
+                  r={isInterchange ? 6.5 : 4.5}
+                  fill="#FFFFFF"
+                  stroke={line.color}
+                  strokeWidth={isInterchange ? 3 : 2}
+                />
 
-export function formatEtaCountdown(etaSec: number, nowSec: number): string {
-  const diff = Math.round(etaSec - nowSec);
-  if (diff <= 0) return 'зараз';
-  const m = Math.floor(diff / 60);
-  const s = diff % 60;
-  if (m <= 0) return `${s} с`;
-  return `${m} хв ${s} с`;
-}
+                {/* Подвійний кільцевий контур для пересадочних */}
+                {isInterchange && (
+                  <circle r={9} fill="none" stroke="#FFFFFF" strokeWidth={1.2} opacity={0.8} />
+                )}
+
+                {/* Назва станції */}
+                <text
+                  x={14}
+                  y={4}
+                  fill={isSelected ? '#60A5FA' : '#E5E7EB'}
+                  fontSize={11}
+                  fontWeight={isSelected || isInterchange ? 700 : 500}
+                  style={{ userSelect: 'none', pointerEvents: 'none', letterSpacing: '0.2px' }}
+                >
+                  {station.name}
+                </text>
+              </g>
+            );
+          });
+        })}
+
+        {/* 4. РЕАЛЬНІ ПОТЯГИ (Отримані з liveMetroEngine) */}
+        {trains.map((train) => {
+          if (activeLineId && activeLineId !== train.lineId) return null;
+          const isSelected = selectedTrain?.id === train.id;
+
+          return (
+            <g
+              key={train.id}
+              transform={`translate(${train.point.x}, ${train.point.y})`}
+              onClick={() => {
+                setSelectedTrain(train);
+                setSelectedStation(null);
+              }}
+              style={{ cursor: 'pointer', transition: 'transform 0.05s linear' }}
+            >
+              {/* Пульсація при стоянці на станції (dwell) */}
+              {train.phase === 'dwell' && (
+                <circle r={12} fill={train.lineColor} opacity={0.4}>
+                  <animate attributeName="r" values="8;18;8" dur="1.2s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.6;0;0.6" dur="1.2s" repeatCount="indefinite" />
+                </circle>
+              )}
+
+              {/* Маркер потяга з поворотом за напрямком headingDeg */}
+              <g transform={`rotate(${train.headingDeg})`}>
+                {/* Корпус потяга (капсула/стрілка) */}
+                <rect
+                  x={-6}
+                  y={-10}
+                  width={12}
+                  height={20}
+                  rx={5}
+                  fill={train.lineColor}
+                  stroke="#FFFFFF"
+                  strokeWidth={isSelected ? 2.5 : 1.5}
+                  filter="url(#glow-train)"
+                />
+                {/* Передок потяга (напрямок) */}
+                <path d="M -3 -8 L 0 -12 L 3 -8 Z" fill="#FFFFFF" />
+              </g>
+
+              {/* Номер/Напрямок потяга */}
+              <text
+                x={12}
+                y={-10}
+                fill="#FFFFFF"
+                fontSize={9}
+                fontWeight={700}
+                style={{ userSelect: 'none', pointerEvents: 'none', textShadow: '0 1px 4px #000' }}
+              >
+                ➔ {train.headsign}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* 5. КАРТКА ОБРАНОЇ СТАНЦІЇ ТА ТАБЛО ПРИБУТТЯ */}
+      {selectedStation && (
+        <div style={{
+          position: 'absolute',
+          bottom: 24,
+          left: 24,
+          zIndex: 30,
+          backgroundColor: 'rgba(15, 23, 42, 0.94)',
+          padding: 20,
+          borderRadius: 16,
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          minWidth: 340,
+          maxWidth: 420,
+          backdropFilter: 'blur(16px)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
+        }}>
+          {/* Заголовок станції */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#FFF' }}>{selectedStation.name}</h2>
+              <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>Станція метрополітену</div>
+            </div>
+            <button
+              onClick={() => setSelectedStation(null)}
+              style={{ background: 'none', border: 'none', color: '#9CA3AF', cursor: 'pointer', fontSize: 20, padding: 0 }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Перемикач Табло / Графік */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)', pb: 8 }}>
+            <button
+              onClick={() => setShowTimetableTab('arrivals')}
+              style={{
+                background: showTimetableTab === 'arrivals' ? '#3B82F6' : 'transparent',
+                color: '#FFF',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontSize: 12,
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              ⏱ Найближчі потяги
+            </button>
+            <button
+              onClick={() => setShowTimetableTab('timetable')}
+              style={{
+                background: showTimetableTab === 'timetable' ? '#3B82F6' : 'transparent',
+                color: '#FFF',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontSize: 12,
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              📅 Повний графік
+            </button>
+          </div>
+
+          {/* Вкладка 1: Табло найближчих прибуть */}
+          {showTimetableTab === 'arrivals' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 220, overflowY: 'auto' }}>
+              {upcomingArrivals.length === 0 ? (
+                <div style={{ fontSize: 13, color: '#9CA3AF', fontStyle: 'italic', padding: '10px 0' }}>
+                  На сьогодні рейсів більше немає або метро зачинено.
+                </div>
+              ) : (
+                upcomingArrivals.map((arr, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      justify: 'space-between',
+                      alignItems: 'center',
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      borderLeft: `4px solid ${arr.lineColor}`
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#FFF' }}>
+                        до ст. {arr.headsign}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#9CA3AF' }}>
+                        {arr.lineNumber} • ЧАС: {formatEtaClock(arr.etaSec)}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#10B981', fontFamily: 'monospace' }}>
+                      {formatEtaCountdown(arr.etaSec, nowSec)}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Вкладка 2: Денний розклад */}
+          {showTimetableTab === 'timetable' && (
+            <div style={{ maxHeight: 220, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {stationTimetable.map((entry, idx) => (
+                <div key={idx} style={{ backgroundColor: 'rgba(255,255,255,0.03)', padding: 10, borderRadius: 8 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: entry.lineColor, marginBottom: 4 }}>
+                    Напрямок: {entry.headsign}
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {entry.times.map((t, tidx) => (
+                      <span key={tidx} style={{ fontSize: 11, fontFamily: 'monospace', backgroundColor: 'rgba(255,255,255,0.08)', padding: '2px 6px', borderRadius: 4 }}>
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 6. КАРТКА ОБРАНОГО ПОТЯГА */}
+      {selectedTrain && (
+        <div style={{
+          position: 'absolute',
+          bottom: 24,
+          right: 24,
+          zIndex: 30,
+          backgroundColor: 'rgba(15, 23, 42, 0.94)',
+          padding: 18,
+          borderRadius: 16,
+          border: `1px solid ${selectedTrain.lineColor}`,
+          minWidth: 280,
+          backdropFilter: 'blur(16px)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: selectedTrain.lineColor, textTransform: 'uppercase' }}>
+              Потяг {selectedTrain.lineNumber}
+            </span>
+            <button onClick={() => setSelectedTrain(null)} style={{ background: 'none', border: 'none', color: '#9CA3AF', cursor: 'pointer' }}>✕</button>
+          </div>
+
+          <h3 style={{ margin: '0 0 6px 0', fontSize: 16, color: '#FFF' }}>
+            Прямує до: {selectedTrain.headsign}
+          </h3>
+
+          <div style={{ fontSize: 13, color: '#D1D5DB', display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+            <div>Статус: <strong style={{ color: '#60A5FA' }}>{getPhaseLabel(selectedTrain.phase)}</strong></div>
+            <div>Наступна станція: <strong>{selectedTrain.nextStation.name}</strong></div>
+            <div>Прибуття на наступну: <strong style={{ color: '#10B981' }}>{formatEtaClock(selectedTrain.etaNextStationSec)}</strong></div>
+            <div>Кінцева станція: <strong>{formatEtaClock(selectedTrain.etaTerminusSec)}</strong></div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
