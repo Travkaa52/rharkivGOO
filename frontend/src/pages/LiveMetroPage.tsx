@@ -12,12 +12,12 @@ import {
   type StationDayTimetableEntry
 } from '@/liveMetro/liveMetroEngine';
 import { useLiveMetroTrains } from '@/liveMetro/useLiveMetroTrains';
-import type { LiveMetroDayType, SchematicLine, SchematicStation } from '@/liveMetro/schematicData';
+import type { LiveMetroDayType, SchematicStation } from '@/liveMetro/schematicData';
 import { getStationPhoto } from '@/data/stationPhotos';
 import { assetUrl } from '@/lib/assetUrl';
 
 const VIEW_W = 1200;
-const VIEW_H = 1000;
+const VIEW_H = 1100;
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 4.0;
 
@@ -49,7 +49,6 @@ export function LiveMetroPage() {
   const pinchState = useRef<{ distance: number; scale: number } | null>(null);
   const activePointers = useRef<Map<number, { x: number; y: number }>>(new Map());
 
-  // Обновление реального времени каждую секунду
   useEffect(() => {
     const timer = setInterval(() => {
       setNowSec(secOfDay(new Date()));
@@ -69,9 +68,9 @@ export function LiveMetroPage() {
     return Array.from(map.values());
   }, []);
 
-  const interchangeLines = useMemo(() => {
+  const interchangePairs = useMemo(() => {
     const renderedPairs = new Set<string>();
-    const lines: Array<{ id: string; x1: number; y1: number; x2: number; y2: number }> = [];
+    const pairs: Array<{ id: string; s1: SchematicStation; s2: SchematicStation }> = [];
 
     for (const { line } of BUILT_LINES) {
       for (const station of line.stations) {
@@ -84,17 +83,11 @@ export function LiveMetroPage() {
           if (renderedPairs.has(pairKey)) continue;
           renderedPairs.add(pairKey);
 
-          lines.push({
-            id: pairKey,
-            x1: station.point.x,
-            y1: station.point.y,
-            x2: other.point.x,
-            y2: other.point.y
-          });
+          pairs.push({ id: pairKey, s1: station, s2: other });
         }
       }
     }
-    return lines;
+    return pairs;
   }, [allStations]);
 
   const selectedStation = selectedStationId ? allStations.find((s) => s.id === selectedStationId) ?? null : null;
@@ -111,7 +104,6 @@ export function LiveMetroPage() {
 
   const clampScale = (s: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s));
 
-  // Исправлено: Pointer capture на контейнере
   const onPointerDown = useCallback((e: PointerEvent<HTMLDivElement>) => {
     if (containerRef.current) {
       containerRef.current.setPointerCapture(e.pointerId);
@@ -165,7 +157,6 @@ export function LiveMetroPage() {
     if (activePointers.current.size < 2) pinchState.current = null;
   }, []);
 
-  // Zoom to cursor
   const onWheel = useCallback((e: WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (!containerRef.current) return;
@@ -229,7 +220,7 @@ export function LiveMetroPage() {
 
       <div
         ref={containerRef}
-        className="relative mx-4 mb-4 flex-1 overflow-hidden rounded-xl3 border border-ink-border bg-[#0c1310] shadow-glass-dark touch-none"
+        className="relative mx-4 mb-4 flex-1 overflow-hidden rounded-xl3 border border-ink-border bg-white shadow-glass-dark touch-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endPointer}
@@ -251,26 +242,33 @@ export function LiveMetroPage() {
             transformOrigin: '0 0'
           }}
         >
-          {/* Линии метро */}
+          {/* Траси річок на тлі */}
+          <path
+            d="M 200 80 C 220 220, 280 380, 360 460 C 420 520, 500 560, 600 540 C 720 520, 760 520, 800 580 C 850 640, 800 750, 700 800"
+            fill="none"
+            stroke="#E3F0F8"
+            strokeWidth={18}
+            strokeLinecap="round"
+          />
+          <path
+            d="M 120 420 Q 250 430 360 460"
+            fill="none"
+            stroke="#E3F0F8"
+            strokeWidth={14}
+            strokeLinecap="round"
+          />
+
+          {/* Лінії метро */}
           {BUILT_LINES.map(({ line }) => (
-            <SchemeLinePath key={line.id} line={line} />
+            <LineTracks key={line.id} line={line} />
           ))}
 
-          {/* Пересадочные линии (пунктир) */}
-          {interchangeLines.map((l) => (
-            <line
-              key={l.id}
-              x1={l.x1}
-              y1={l.y1}
-              x2={l.x2}
-              y2={l.y2}
-              stroke="rgba(255,255,255,0.6)"
-              strokeWidth={5}
-              strokeDasharray="4 4"
-            />
+          {/* Пересадочні капсули (гантелі) */}
+          {interchangePairs.map((p) => (
+            <InterchangeCapsule key={p.id} s1={p.s1} s2={p.s2} />
           ))}
 
-          {/* Маркеры станций */}
+          {/* Маркери станцій та назви */}
           {BUILT_LINES.map(({ line }) =>
             line.stations.map((station) => (
               <StationMarker
@@ -286,7 +284,7 @@ export function LiveMetroPage() {
             ))
           )}
 
-          {/* Поезда */}
+          {/* Поїзди */}
           {trains.map((train) => (
             <TrainMarker
               key={train.id}
@@ -308,9 +306,9 @@ export function LiveMetroPage() {
         </div>
 
         {/* Легенда */}
-        <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5 rounded-xl2 border border-white/10 bg-black/45 px-3 py-2.5 backdrop-blur-xs">
+        <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5 rounded-xl2 border border-black/10 bg-white/80 px-3 py-2.5 backdrop-blur-md shadow-sm">
           {BUILT_LINES.map(({ line }) => (
-            <div key={line.id} className="flex items-center gap-2 text-[11px] font-medium text-white/85">
+            <div key={line.id} className="flex items-center gap-2 text-[11px] font-medium text-gray-800">
               <span
                 className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] text-[11px] font-bold text-white"
                 style={{ backgroundColor: line.color }}
@@ -339,9 +337,71 @@ export function LiveMetroPage() {
   );
 }
 
-function SchemeLinePath({ line }: { line: SchematicLine }) {
-  const d = line.stations.map((s, i) => `${i === 0 ? 'M' : 'L'} ${s.point.x} ${s.point.y}`).join(' ');
-  return <path d={d} fill="none" stroke={line.color} strokeWidth={8} strokeLinecap="round" strokeLinejoin="round" opacity={0.9} />;
+function LineTracks({ line }: { line: any }) {
+  const stations = line.stations as SchematicStation[];
+  if (!stations.length) return null;
+
+  let d = '';
+  if (line.id === 'route-metro-1') {
+    // Холодногірсько-Заводська
+    d = `M 100 480 L 370 480 L 480 580 L 480 640 L 580 740 L 850 1010 L 1120 1010`;
+  } else if (line.id === 'route-metro-2') {
+    // Салтівська
+    d = `M 880 110 L 600 440 L 490 530`;
+  } else if (line.id === 'route-metro-3') {
+    // Олексіївська
+    d = `M 330 110 L 490 350 L 510 440 L 610 540 L 510 640 L 510 700`;
+  } else {
+    d = stations.map((s, i) => `${i === 0 ? 'M' : 'L'} ${s.point.x} ${s.point.y}`).join(' ');
+  }
+
+  const pFirst = stations[0].point;
+  const pLast = stations[stations.length - 1].point;
+
+  return (
+    <g>
+      <path d={d} fill="none" stroke={line.color} strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />
+      {/* Т-подібні заглушки на кінцях ліній */}
+      {line.id === 'route-metro-1' && (
+        <>
+          <line x1={100} y1={468} x2={100} y2={492} stroke={line.color} strokeWidth={6} strokeLinecap="round" />
+          <line x1={1120} y1={998} x2={1120} y2={1022} stroke={line.color} strokeWidth={6} strokeLinecap="round" />
+        </>
+      )}
+      {line.id === 'route-metro-2' && (
+        <>
+          <line x1={pFirst.x - 8} y1={pFirst.y - 8} x2={pFirst.x + 8} y2={pFirst.y + 8} stroke={line.color} strokeWidth={6} strokeLinecap="round" />
+        </>
+      )}
+      {line.id === 'route-metro-3' && (
+        <>
+          <line x1={pFirst.x - 8} y1={pFirst.y - 8} x2={pFirst.x + 8} y2={pFirst.y + 8} stroke={line.color} strokeWidth={6} strokeLinecap="round" />
+        </>
+      )}
+    </g>
+  );
+}
+
+function InterchangeCapsule({ s1, s2 }: { s1: SchematicStation; s2: SchematicStation }) {
+  const dx = s2.point.x - s1.point.x;
+  const dy = s2.point.y - s1.point.y;
+  const dist = Math.hypot(dx, dy);
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+  return (
+    <g transform={`translate(${s1.point.x}, ${s1.point.y}) rotate(${angle})`}>
+      <rect
+        x={-8}
+        y={-10}
+        width={dist + 16}
+        height={20}
+        rx={10}
+        fill="#FFFFFF"
+        stroke="#1A1A1A"
+        strokeWidth={3}
+      />
+    </g>
+  );
 }
 
 function StationMarker({
@@ -356,8 +416,8 @@ function StationMarker({
   onClick: () => void;
 }) {
   const isInterchange = !!station.interchangeWith?.length;
-  // Позиционирование текста над/под станцией
-  const textY = station.labelOffset?.y ?? -16;
+  const offsetX = station.labelOffset?.x ?? 0;
+  const offsetY = station.labelOffset?.y ?? -16;
 
   return (
     <g
@@ -368,20 +428,33 @@ function StationMarker({
       }}
       className="cursor-pointer"
     >
-      <circle r={isInterchange ? 12 : 8} fill="#0c1310" stroke={color} strokeWidth={isInterchange ? 5 : 4} />
-      {selected && <circle r={isInterchange ? 18 : 14} fill="none" stroke="#C6A552" strokeWidth={2} />}
-      <text
-        x={station.labelOffset?.x ?? 0}
-        y={textY}
-        textAnchor="middle"
-        className="pointer-events-none font-display"
-        fontSize={12}
-        fontWeight="600"
-        fill="#F5F7F6"
-        style={{ paintOrder: 'stroke', stroke: '#0A0F0D', strokeWidth: 3 }}
-      >
-        {station.name}
-      </text>
+      <circle r={isInterchange ? 6 : 5} fill="#FFFFFF" stroke={color} strokeWidth={isInterchange ? 3 : 3} />
+      {selected && <circle r={isInterchange ? 12 : 10} fill="none" stroke="#C6A552" strokeWidth={2.5} />}
+
+      <g transform={`translate(${offsetX}, ${offsetY})`} className="pointer-events-none select-none">
+        <text
+          x={0}
+          y={0}
+          textAnchor={offsetX > 0 ? 'start' : offsetX < 0 ? 'end' : 'middle'}
+          className="font-display font-bold"
+          fontSize={12}
+          fill="#111827"
+          style={{ paintOrder: 'stroke', stroke: '#FFFFFF', strokeWidth: 3 }}
+        >
+          {station.name}
+        </text>
+        <text
+          x={0}
+          y={11}
+          textAnchor={offsetX > 0 ? 'start' : offsetX < 0 ? 'end' : 'middle'}
+          className="font-sans font-normal"
+          fontSize={9}
+          fill="#6B7280"
+          style={{ paintOrder: 'stroke', stroke: '#FFFFFF', strokeWidth: 2 }}
+        >
+          {station.nameEn}
+        </text>
+      </g>
     </g>
   );
 }
@@ -429,7 +502,7 @@ function ZoomButton({ label, onClick, small }: { label: string; onClick: () => v
       type="button"
       onClick={onClick}
       className={[
-        'flex items-center justify-center rounded-full border border-white/15 bg-black/50 font-display font-bold text-white shadow-glass-dark backdrop-blur-xs active:scale-95',
+        'flex items-center justify-center rounded-full border border-black/10 bg-white/90 font-display font-bold text-gray-800 shadow-md active:scale-95',
         small ? 'h-8 w-8 text-sm' : 'h-9 w-9 text-lg'
       ].join(' ')}
     >
@@ -567,7 +640,7 @@ function TimetableBlock({ entry }: { entry: StationDayTimetableEntry }) {
 
 function InfoCardShell({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="absolute inset-x-3 bottom-3 z-30 animate-slide-up rounded-xl2 border border-white/10 bg-black/70 p-3 shadow-glass-dark backdrop-blur-md">
+    <div className="absolute inset-x-3 bottom-3 z-30 animate-slide-up rounded-xl2 border border-white/10 bg-black/80 p-3 shadow-glass-dark backdrop-blur-md">
       <button type="button" onClick={onClose} className="absolute right-2 top-2 text-white/40 hover:text-white/80" aria-label="Закрити">
         ✕
       </button>
