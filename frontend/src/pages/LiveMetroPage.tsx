@@ -14,6 +14,7 @@ import {
 import { useLiveMetroTrains } from '@/liveMetro/useLiveMetroTrains';
 import type { LiveMetroDayType, SchematicLine, SchematicStation } from '@/liveMetro/schematicData';
 import { getStationPhoto } from '@/data/stationPhotos';
+import { assetUrl } from '@/lib/assetUrl';
 
 const VIEW_W = 1200;
 const VIEW_H = 1100;
@@ -22,9 +23,9 @@ const MAX_SCALE = 3.5;
 
 /** Спрайти поїздів по лінії (public/sprites/*), по одному на колір лінії. */
 const TRAIN_SPRITES: Record<string, string> = {
-  'route-metro-1': '/sprites/metro-red-line.jpg',
-  'route-metro-2': '/sprites/metro-blue-line.jpg',
-  'route-metro-3': '/sprites/metro-green-line.jpg'
+  'route-metro-1': assetUrl('/sprites/metro-red-line.jpg'),
+  'route-metro-2': assetUrl('/sprites/metro-blue-line.jpg'),
+  'route-metro-3': assetUrl('/sprites/metro-green-line.jpg')
 };
 
 interface Transform {
@@ -166,7 +167,7 @@ export function LiveMetroPage() {
 
       <div className="mx-4 mb-2 flex items-center gap-2">
         <img
-          src="/icons/metro-logo.svg"
+          src={assetUrl('/icons/metro-logo.svg')}
           alt="Харківський метрополітен"
           className="h-7 w-7 shrink-0 rounded-md"
         />
@@ -355,7 +356,7 @@ function StationMarker({
 }
 
 function TrainMarker({ train, selected, onClick }: { train: LiveMetroTrain; selected: boolean; onClick: () => void }) {
-  const spriteSrc = TRAIN_SPRITES[train.lineId] ?? '/sprites/metro-red-line.jpg';
+  const spriteSrc = TRAIN_SPRITES[train.lineId] ?? assetUrl('/sprites/metro-red-line.jpg');
   const isDwell = train.phase === 'dwell';
   const facingLeft = train.headingDeg > 90 && train.headingDeg < 270;
   const size = selected ? 30 : 22;
