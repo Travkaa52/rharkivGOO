@@ -16,7 +16,7 @@ import type { LiveMetroDayType, SchematicLine, SchematicStation } from '@/liveMe
 import { getStationPhoto } from '@/data/stationPhotos';
 
 const VIEW_W = 1200;
-const VIEW_H = 1000;
+const VIEW_H = 1100;
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 3.5;
 
@@ -165,6 +165,15 @@ export function LiveMetroPage() {
       <PageHeader title="Живе метро" subtitle="Позиції поїздів на схемі, у реальному часі" />
 
       <div className="mx-4 mb-2 flex items-center gap-2">
+        <img
+          src="/icons/metro-logo.svg"
+          alt="Харківський метрополітен"
+          className="h-7 w-7 shrink-0 rounded-md"
+        />
+        <span className="text-[13px] font-semibold text-white/90">Харківський метрополітен</span>
+      </div>
+
+      <div className="mx-4 mb-2 flex items-center gap-2">
         <span className="text-[12px] text-white/50">Графік станції:</span>
         <div className="flex overflow-hidden rounded-full border border-white/15">
           <button
@@ -270,12 +279,18 @@ export function LiveMetroPage() {
           <ZoomButton label="⟲" onClick={resetView} small />
         </div>
 
-        {/* Легенда */}
-        <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1 rounded-xl2 border border-white/10 bg-black/40 px-3 py-2 backdrop-blur-xs">
+        {/* Легенда, як на офіційній схемі: номер лінії + повна назва */}
+        <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5 rounded-xl2 border border-white/10 bg-black/45 px-3 py-2.5 backdrop-blur-xs">
           {BUILT_LINES.map(({ line }) => (
             <div key={line.id} className="flex items-center gap-2 text-[11px] font-medium text-white/85">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: line.color }} />
-              {line.number} · {line.headsignBackward} ↔ {line.headsignForward}
+              <span
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] text-[11px] font-bold text-white"
+                style={{ backgroundColor: line.color }}
+              >
+                {line.number}
+              </span>
+              <span className="h-2 w-4 shrink-0 rounded-full" style={{ backgroundColor: line.color }} />
+              <span className="whitespace-nowrap">{line.name}</span>
             </div>
           ))}
         </div>
