@@ -9,11 +9,16 @@ export type LiveMetroDayType = 'weekday' | 'weekend';
 /** Скільки секунд потяг стоїть на станції з відкритими дверима. */
 export const DWELL_SEC = 25;
 
+export interface SchematicPoint {
+  x: number;
+  y: number;
+}
+
 export interface SchematicStation {
   id: string;
   name: string;
   nameEn: string;
-  point: { x: number; y: number };
+  point: SchematicPoint;
   /** Зміщення підпису назви станції (x, y). */
   labelOffset?: { x?: number; y?: number };
   /** Час прибуття від початкової станції лінії, сек. */
