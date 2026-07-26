@@ -1,173 +1,288 @@
-/**
- * Схематичні (не геокоординатні) дані для екрана «Живе метро».
- *
- * Розташування станцій тут повторює компонування офіційної схеми
- * Харківського метрополітену (як на друкованій схемі в вагонах/на станціях):
- * три лінії, порядок станцій НЕ змінюється (він точно відповідає stopIds
- * з routes.json), три реальні пересадочні вузли:
- *  - Держпром (Л3) ↔ Університет (Л2)
- *  - Майдан Конституції (Л1) ↔ Історичний музей (Л2, кінцева)
- *  - Спортивна (Л1) ↔ Метробудівників (Л3, кінцева)
- *
- * Координати — умовні одиниці схеми (viewBox 0 0 1200 1000), не географічні,
- * але пропорції та взаємне розташування ліній підібрані «1в1» під офіційну схему.
- */
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  SCHEMATIC_LINES,
+  SchematicStation,
+  SchematicLine,
+  LiveMetroDayType,
+  DWELL_SEC
+} from '../data/metroData'; // Укажите ваш путь к TS-файлу с данными
 
-export interface SchematicPoint {
+interface TrainPosition {
+  lineId: string;
+  color: string;
   x: number;
   y: number;
+  direction: 'forward' | 'backward';
+  nextStationName: string;
 }
 
-export interface SchematicStation {
-  /** Має збігатись з id зупинки в stops.json (для показу реальної назви/зв'язку з іншими шарами). */
-  id: string;
-  name: string;
-  point: SchematicPoint;
-  /** Час прибуття (від початку рейсу прямого напрямку), секунд — з routes.json. */
-  arrivalOffsetSec: number;
-  /** id станцій-пересадок на інші лінії (для позначки на схемі). */
-  interchangeWith?: string[];
-}
+export const LiveMetroMap: React.FC = () => {
+  const [selectedStation, setSelectedStation] = useState<SchematicStation | null>(null);
+  const [activeLineId, setActiveLineId] = useState<string | null>(null);
+  const [dayType, setDayType] = useState<LiveMetroDayType>('weekday');
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [trains, setTrains] = useState<TrainPosition[]>([]);
 
-export type LiveMetroDayType = 'weekday' | 'weekend';
+  // Часы реального времени
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-export interface SchematicLine {
-  id: string;
-  number: string;
-  name: string;
-  color: string;
-  /** Станції в порядку "прямого" напрямку (forward), як у stopIds лінії. */
-  stations: SchematicStation[];
-  /** Назва кінцевої прямого напрямку (headsign forward). */
-  headsignForward: string;
-  /** Назва кінцевої зворотного напрямку (headsign backward). */
-  headsignBackward: string;
-  /** Перший рейс прямого напрямку, "HH:MM", окремо для буднів/вихідних. */
-  firstDepartureForward: Record<LiveMetroDayType, string>;
-  /** Перший рейс зворотного напрямку, "HH:MM", окремо для буднів/вихідних. */
-  firstDepartureBackward: Record<LiveMetroDayType, string>;
-  /** Останній можливий момент відправлення (обидва напрямки, як в routes.json). */
-  lastDeparture: string;
-  /** Інтервал руху, хвилин. */
-  intervalMinutes: Record<LiveMetroDayType, number>;
-}
+  // Вычисление всех станций для быстрого поиска
+  const allStationsMap = useMemo(() => {
+    const map = new Map<string, { station: SchematicStation; line: SchematicLine }>();
+    SCHEMATIC_LINES.forEach((line) => {
+      line.stations.forEach((st) => {
+        map.set(st.id, { station: st, line });
+      });
+    });
+    return map;
+  }, []);
 
-/** Час стоянки на станції (відкриті двері), секунд — використовується у фізиці руху. */
-export const DWELL_SEC = 25;
+  // Расчет живых поездов на линиях на основе интервалов и таймингов
+  useEffect(() => {
+    const calculatedTrains: TrainPosition[] = [];
+    const nowSec = currentTime.getHours() * 3600 + currentTime.getMinutes() * 60 + currentTime.getSeconds();
 
-const LINE_1_STATIONS: SchematicStation[] = [
-  { id: 'stop-metro-holodna-gora', name: 'Холодна Гора', point: { x: 60, y: 480 }, arrivalOffsetSec: 0 },
-  { id: 'stop-metro-vokzalna', name: 'Вокзальна', point: { x: 150, y: 460 }, arrivalOffsetSec: 205 },
-  { id: 'stop-metro-tsentralnyi-rynok', name: 'Центральний ринок', point: { x: 230, y: 500 }, arrivalOffsetSec: 345 },
-  {
-    id: 'stop-metro-maidan-konstytutsii',
-    name: 'Майдан Конституції',
-    point: { x: 330, y: 540 },
-    arrivalOffsetSec: 465,
-    interchangeWith: ['stop-metro-istorychnyi-muzei']
-  },
-  { id: 'stop-metro-levada', name: 'Левада', point: { x: 300, y: 620 }, arrivalOffsetSec: 635 },
-  {
-    id: 'stop-metro-sportyvna',
-    name: 'Спортивна',
-    point: { x: 430, y: 660 },
-    arrivalOffsetSec: 790,
-    interchangeWith: ['stop-metro-metrobudivnykiv']
-  },
-  { id: 'stop-metro-zavodska', name: 'Заводська', point: { x: 520, y: 700 }, arrivalOffsetSec: 969 },
-  { id: 'stop-metro-turboatom', name: 'Турбоатом', point: { x: 600, y: 745 }, arrivalOffsetSec: 1154 },
-  { id: 'stop-metro-palats-sportu', name: 'Палац Спорту', point: { x: 670, y: 790 }, arrivalOffsetSec: 1337 },
-  { id: 'stop-metro-armiiska', name: 'Армійська', point: { x: 740, y: 830 }, arrivalOffsetSec: 1535 },
-  { id: 'stop-metro-imeni-o-s-maselskogo', name: 'Імені О. С. Масельського', point: { x: 810, y: 870 }, arrivalOffsetSec: 1690 },
-  { id: 'stop-metro-traktornyi-zavod', name: 'Тракторний завод', point: { x: 900, y: 900 }, arrivalOffsetSec: 1863 },
-  { id: 'stop-metro-industrialna', name: 'Індустріальна', point: { x: 1030, y: 900 }, arrivalOffsetSec: 2053 }
-];
+    SCHEMATIC_LINES.forEach((line) => {
+      const intervalSec = (line.intervalMinutes[dayType] || 10) * 60;
+      const totalLineTime = line.stations[line.stations.length - 1].arrivalOffsetSec;
 
-const LINE_2_STATIONS: SchematicStation[] = [
-  { id: 'stop-metro-saltivska', name: 'Салтівська', point: { x: 990, y: 60 }, arrivalOffsetSec: 0 },
-  { id: 'stop-metro-studentska', name: 'Студентська', point: { x: 930, y: 130 }, arrivalOffsetSec: 126 },
-  { id: 'stop-metro-akademika-pavlova', name: 'Академіка Павлова', point: { x: 870, y: 200 }, arrivalOffsetSec: 271 },
-  { id: 'stop-metro-akademika-barabashova', name: 'Академіка Барабашова', point: { x: 810, y: 270 }, arrivalOffsetSec: 437 },
-  { id: 'stop-metro-kyivska', name: 'Київська', point: { x: 740, y: 340 }, arrivalOffsetSec: 702 },
-  { id: 'stop-metro-iaroslava-mudrogo', name: 'Ярослава Мудрого', point: { x: 650, y: 400 }, arrivalOffsetSec: 897 },
-  {
-    id: 'stop-metro-universytet',
-    name: 'Університет',
-    point: { x: 560, y: 460 },
-    arrivalOffsetSec: 1017,
-    interchangeWith: ['stop-metro-derzhprom']
-  },
-  {
-    id: 'stop-metro-istorychnyi-muzei',
-    name: 'Історичний музей',
-    point: { x: 390, y: 560 },
-    arrivalOffsetSec: 1176,
-    interchangeWith: ['stop-metro-maidan-konstytutsii']
-  }
-];
+      if (totalLineTime === 0) return;
 
-const LINE_3_STATIONS: SchematicStation[] = [
-  { id: 'stop-metro-peremoga', name: 'Перемога', point: { x: 480, y: 60 }, arrivalOffsetSec: 0 },
-  { id: 'stop-metro-oleksiivska', name: 'Олексіївська', point: { x: 450, y: 140 }, arrivalOffsetSec: 147 },
-  { id: 'stop-metro-23-serpnia', name: '23 Серпня', point: { x: 430, y: 220 }, arrivalOffsetSec: 374 },
-  { id: 'stop-metro-botanichnyi-sad', name: 'Ботанічний сад', point: { x: 450, y: 290 }, arrivalOffsetSec: 486 },
-  { id: 'stop-metro-naukova', name: 'Наукова', point: { x: 490, y: 360 }, arrivalOffsetSec: 676 },
-  {
-    id: 'stop-metro-derzhprom',
-    name: 'Держпром',
-    point: { x: 555, y: 430 },
-    arrivalOffsetSec: 788,
-    interchangeWith: ['stop-metro-universytet']
-  },
-  { id: 'stop-metro-arhitektora-beketova', name: 'Архітектора Бекетова', point: { x: 490, y: 520 }, arrivalOffsetSec: 921 },
-  { id: 'stop-metro-zahysnykiv-ukrainy', name: 'Захисників України', point: { x: 450, y: 590 }, arrivalOffsetSec: 1160 },
-  {
-    id: 'stop-metro-metrobudivnykiv',
-    name: 'Метробудівників',
-    point: { x: 420, y: 660 },
-    arrivalOffsetSec: 1301,
-    interchangeWith: ['stop-metro-sportyvna']
-  }
-];
+      // Симуляция поездов для прямого и обратного направления
+      ['forward', 'backward'].forEach((dir) => {
+        const isForward = dir === 'forward';
+        
+        for (let offset = 0; offset < totalLineTime + intervalSec; offset += intervalSec) {
+          const trainProgressSec = (nowSec + offset) % (totalLineTime + intervalSec);
 
-export const SCHEMATIC_LINES: SchematicLine[] = [
-  {
-    id: 'route-metro-1',
-    number: 'М1',
-    name: 'Холодногірсько-Заводська лінія',
-    color: '#E30613',
-    stations: LINE_1_STATIONS,
-    headsignForward: 'Індустріальна',
-    headsignBackward: 'Холодна Гора',
-    firstDepartureForward: { weekday: '05:31', weekend: '05:40' },
-    firstDepartureBackward: { weekday: '05:34', weekend: '05:40' },
-    lastDeparture: '22:00',
-    intervalMinutes: { weekday: 10, weekend: 20 }
-  },
-  {
-    id: 'route-metro-2',
-    number: 'М2',
-    name: 'Салтівська лінія',
-    color: '#0072BC',
-    stations: LINE_2_STATIONS,
-    headsignForward: 'Історичний музей',
-    headsignBackward: 'Салтівська',
-    firstDepartureForward: { weekday: '05:38', weekend: '05:38' },
-    firstDepartureBackward: { weekday: '05:35', weekend: '05:35' },
-    lastDeparture: '22:00',
-    intervalMinutes: { weekday: 10, weekend: 20 }
-  },
-  {
-    id: 'route-metro-3',
-    number: 'М3',
-    name: 'Олексіївська лінія',
-    color: '#009444',
-    stations: LINE_3_STATIONS,
-    headsignForward: 'Метробудівників',
-    headsignBackward: 'Перемога',
-    firstDepartureForward: { weekday: '05:32', weekend: '05:35' },
-    firstDepartureBackward: { weekday: '05:36', weekend: '05:40' },
-    lastDeparture: '22:00',
-    intervalMinutes: { weekday: 10, weekend: 20 }
-  }
-];
+          if (trainProgressSec <= totalLineTime) {
+            // Находим сегмент между двумя станциями
+            for (let i = 0; i < line.stations.length - 1; i++) {
+              const stA = isForward ? line.stations[i] : line.stations[line.stations.length - 1 - i];
+              const stB = isForward ? line.stations[i + 1] : line.stations[line.stations.length - 2 - i];
+
+              const tA = isForward ? stA.arrivalOffsetSec : totalLineTime - stA.arrivalOffsetSec;
+              const tB = isForward ? stB.arrivalOffsetSec : totalLineTime - stB.arrivalOffsetSec;
+
+              const minT = Math.min(tA, tB);
+              const maxT = Math.max(tA, tB);
+
+              if (trainProgressSec >= minT && trainProgressSec <= maxT) {
+                const ratio = maxT === minT ? 0 : (trainProgressSec - minT) / (maxT - minT);
+                const x = stA.point.x + (stB.point.x - stA.point.x) * ratio;
+                const y = stA.point.y + (stB.point.y - stA.point.y) * ratio;
+
+                calculatedTrains.push({
+                  lineId: line.id,
+                  color: line.color,
+                  x,
+                  y,
+                  direction: isForward ? 'forward' : 'backward',
+                  nextStationName: stB.name
+                });
+                break;
+              }
+            }
+          }
+        }
+      });
+    });
+
+    setTrains(calculatedTrains);
+  }, [currentTime, dayType]);
+
+  // Генерация точек для SVG Path линий
+  const getLinePathD = (stations: SchematicStation[]) => {
+    return stations.reduce((acc, st, i) => `${acc} ${i === 0 ? 'M' : 'L'} ${st.point.x} ${st.point.y}`, '');
+  };
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100vh', backgroundColor: '#111827', color: '#fff', overflow: 'hidden', fontFamily: 'sans-serif' }}>
+      
+      {/* ВЕРХНИЙ ЛЕВЫЙ УГОЛ: Логотип и заголовок */}
+      <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 10, display: 'flex', alignItems: 'center', gap: 14, backgroundColor: 'rgba(17, 24, 39, 0.85)', padding: '12px 18px', borderRadius: 12, backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <img 
+          src="/icons/metro-logo.svg" 
+          alt="Логотип Харьковского Метрополитена" 
+          style={{ width: 42, height: 42, objectFit: 'contain' }}
+          onError={(e) => {
+            // Резервная иконка, если SVG еще не добавлен в public/icons
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+        <div>
+          <h1 style={{ margin: 0, fontSize: 18, fontWeight: 'bold', color: '#fff' }}>Харківський Метрополітен</h1>
+          <div style={{ fontSize: 12, color: '#9CA3AF', display: 'flex', gap: 10, marginTop: 2 }}>
+            <span>Живе метро</span>
+            <span>•</span>
+            <span style={{ color: '#3B82F6' }}>
+              {currentTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ПАНЕЛЬ УПРАВЛЕНИЯ И ФИЛЬТРОВ */}
+      <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, display: 'flex', gap: 8 }}>
+        <button
+          onClick={() => setDayType(dayType === 'weekday' ? 'weekend' : 'weekday')}
+          style={{ backgroundColor: '#1F2937', color: '#E5E7EB', border: '1px solid #374151', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}
+        >
+          {dayType === 'weekday' ? '📅 Будні дні' : '🏖 Вихідні дні'}
+        </button>
+        <button
+          onClick={() => setActiveLineId(null)}
+          style={{ backgroundColor: activeLineId === null ? '#3B82F6' : '#1F2937', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}
+        >
+          Усі лінії
+        </button>
+      </div>
+
+      {/* SVG КАРТА (СХЕМА) */}
+      <svg viewBox="0 0 1200 1000" style={{ width: '100%', height: '100%', cursor: 'grab' }}>
+        <defs>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+
+        {/* 1. ПЕРЕСАДОЧНЫЕ УЗЛЫ (Капсулы между связями) */}
+        <g id="interchanges" opacity={0.6}>
+          {/* Держпром <-> Університет */}
+          <line x1={555} y1={430} x2={560} y2={460} stroke="#FFF" strokeWidth={14} strokeLinecap="round" />
+          <line x1={555} y1={430} x2={560} y2={460} stroke="#111827" strokeWidth={8} strokeLinecap="round" />
+
+          {/* Майдан Конституції <-> Історичний музей */}
+          <line x1={330} y1={540} x2={390} y2={560} stroke="#FFF" strokeWidth={14} strokeLinecap="round" />
+          <line x1={330} y1={540} x2={390} y2={560} stroke="#111827" strokeWidth={8} strokeLinecap="round" />
+
+          {/* Спортивна <-> Метробудівників */}
+          <line x1={430} y1={660} x2={420} y2={660} stroke="#FFF" strokeWidth={14} strokeLinecap="round" />
+          <line x1={430} y1={660} x2={420} y2={660} stroke="#111827" strokeWidth={8} strokeLinecap="round" />
+        </g>
+
+        {/* 2. ЛИНИИ МЕТРО */}
+        {SCHEMATIC_LINES.map((line) => {
+          const isDimmed = activeLineId && activeLineId !== line.id;
+          return (
+            <g key={line.id} opacity={isDimmed ? 0.2 : 1} style={{ transition: 'opacity 0.3s' }}>
+              {/* Внешняя подсветка линии */}
+              <path
+                d={getLinePathD(line.stations)}
+                fill="none"
+                stroke={line.color}
+                strokeWidth={12}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={0.3}
+              />
+              {/* Основная линия */}
+              <path
+                d={getLinePathD(line.stations)}
+                fill="none"
+                stroke={line.color}
+                strokeWidth={7}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </g>
+          );
+        })}
+
+        {/* 3. СТАНЦИИ */}
+        {SCHEMATIC_LINES.map((line) => {
+          const isDimmed = activeLineId && activeLineId !== line.id;
+          return line.stations.map((station) => {
+            const isSelected = selectedStation?.id === station.id;
+            const isInterchange = Boolean(station.interchangeWith?.length);
+
+            return (
+              <g
+                key={station.id}
+                transform={`translate(${station.point.x}, ${station.point.y})`}
+                onClick={() => setSelectedStation(station)}
+                style={{ cursor: 'pointer' }}
+                opacity={isDimmed ? 0.2 : 1}
+              >
+                {/* Внешнее кольцо выделения */}
+                {isSelected && <circle r={14} fill="none" stroke="#60A5FA" strokeWidth={3} filter="url(#glow)" />}
+
+                {/* Точка станции */}
+                <circle
+                  r={isInterchange ? 7 : 5}
+                  fill="#FFF"
+                  stroke={line.color}
+                  strokeWidth={isInterchange ? 3 : 2.5}
+                />
+
+                {/* Название станции */}
+                <text
+                  x={12}
+                  y={4}
+                  fill={isSelected ? '#60A5FA' : '#E5E7EB'}
+                  fontSize={12}
+                  fontWeight={isSelected || isInterchange ? 'bold' : 'normal'}
+                  style={{ userSelect: 'none', pointerEvents: 'none' }}
+                >
+                  {station.name}
+                </text>
+              </g>
+            );
+          });
+        })}
+
+        {/* 4. ЖИВЫЕ ПОЕЗДА В РЕАЛЬНОМ ВРЕМЕНИ */}
+        {trains.map((train, idx) => {
+          if (activeLineId && activeLineId !== train.lineId) return null;
+          return (
+            <g key={`train-${idx}`} transform={`translate(${train.x}, ${train.y})`}>
+              <circle r={8} fill="#FFF" filter="url(#glow)" />
+              <circle r={5} fill={train.color} />
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* КАРТОЧКА ВЫБРАННОЙ СТАНЦИИ */}
+      {selectedStation && (
+        <div style={{ position: 'absolute', bottom: 25, left: 25, zIndex: 20, backgroundColor: '#1F2937', padding: '16px 20px', borderRadius: 12, border: '1px solid #374151', minWidth: 280, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ margin: 0, fontSize: 16, color: '#FFF' }}>{selectedStation.name}</h3>
+            <button onClick={() => setSelectedStation(null)} style={{ background: 'none', border: 'none', color: '#9CA3AF', cursor: 'pointer', fontSize: 18 }}>×</button>
+          </div>
+
+          {(() => {
+            const data = allStationsMap.get(selectedStation.id);
+            if (!data) return null;
+            const { line } = data;
+
+            return (
+              <div style={{ marginTop: 12, fontSize: 13, color: '#D1D5DB' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: line.color, display: 'inline-block' }}></span>
+                  <span>{line.name} ({line.number})</span>
+                </div>
+
+                <div style={{ backgroundColor: '#111827', padding: 10, borderRadius: 8, marginTop: 8 }}>
+                  <div>Интервал: <b>{line.intervalMinutes[dayType]} хв</b></div>
+                  <div>Первый рейс: <b>{line.firstDepartureForward[dayType]}</b></div>
+                  <div>Последний рейс: <b>{line.lastDeparture}</b></div>
+                </div>
+
+                {selectedStation.interchangeWith && (
+                  <div style={{ marginTop: 10, color: '#60A5FA', fontSize: 12 }}>
+                    🔄 Пересадка на: {selectedStation.interchangeWith.map(id => allStationsMap.get(id)?.station.name).join(', ')}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+      )}
+    </div>
+  );
+};
