@@ -51,7 +51,9 @@ export const LiveMetroMap: React.FC = () => {
 
     animFrameRef.current = requestAnimationFrame(tick);
     return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (animFrameRef.current !== null) {
+        cancelAnimationFrame(animFrameRef.current);
+      }
     };
   }, []);
 
@@ -81,6 +83,7 @@ export const LiveMetroMap: React.FC = () => {
       case 'accelerating': return 'Розгін';
       case 'cruising': return 'У дорозі';
       case 'braking': return 'Прибуття (гальмування)';
+      default: return '';
     }
   };
 
@@ -118,7 +121,7 @@ export const LiveMetroMap: React.FC = () => {
             alt="Харківський Метрополітен" 
             style={{ width: 40, height: 40, objectFit: 'contain' }}
             onError={(e) => {
-              (e.target as HTMLElement).style.display = 'none';
+              (e.currentTarget as HTMLImageElement).style.display = 'none';
             }}
           />
           <div>
@@ -422,69 +425,67 @@ export const LiveMetroMap: React.FC = () => {
         })}
       </svg>
 
-{/* 5. КАРТКА ОБРАНОЇ СТАНЦІЇ ТА ТАБЛО ПРИБУТТЯ */}
-{selectedStation && (
-  <div style={{
-    position: 'absolute',
-    bottom: 24,
-    left: 24,
-    zIndex: 30,
-    backgroundColor: 'rgba(15, 23, 42, 0.94)',
-    padding: 20,
-    borderRadius: 16,
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    minWidth: 340,
-    maxWidth: 420,
-    backdropFilter: 'blur(16px)',
-    boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
-  }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-      <div>
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#FFF' }}>{selectedStation.name}</h2>
-        <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>Станція метрополітену</div>
-      </div>
-      <button
-        onClick={() => setSelectedStation(null)}
-        style={{ background: 'none', border: 'none', color: '#9CA3AF', cursor: 'pointer', fontSize: 20, padding: 0 }}
-      >
-        ✕
-      </button>
-    </div>
+      {/* 5. КАРТКА ОБРАНОЇ СТАНЦІЇ ТА ТАБЛО ПРИБУТТЯ */}
+      {selectedStation && (
+        <div style={{
+          position: 'absolute',
+          bottom: 24,
+          left: 24,
+          zIndex: 30,
+          backgroundColor: 'rgba(15, 23, 42, 0.94)',
+          padding: 20,
+          borderRadius: 16,
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          minWidth: 340,
+          maxWidth: 420,
+          backdropFilter: 'blur(16px)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#FFF' }}>{selectedStation.name}</h2>
+              <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>Станція метрополітену</div>
+            </div>
+            <button
+              onClick={() => setSelectedStation(null)}
+              style={{ background: 'none', border: 'none', color: '#9CA3AF', cursor: 'pointer', fontSize: 20, padding: 0 }}
+            >
+              ✕
+            </button>
+          </div>
 
-    {/* ВИПРАВЛЕНО: paddingBottom замість pb */}
-    <div style={{ display: 'flex', gap: 6, marginBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 8 }}>
-      <button
-        onClick={() => setShowTimetableTab('arrivals')}
-        style={{
-          background: showTimetableTab === 'arrivals' ? '#3B82F6' : 'transparent',
-          color: '#FFF',
-          border: 'none',
-          padding: '6px 12px',
-          borderRadius: 6,
-          fontSize: 12,
-          cursor: 'pointer',
-          fontWeight: 600
-        }}
-      >
-        ⏱ Найближчі потяги
-      </button>
-      <button
-        onClick={() => setShowTimetableTab('timetable')}
-        style={{
-          background: showTimetableTab === 'timetable' ? '#3B82F6' : 'transparent',
-          color: '#FFF',
-          border: 'none',
-          padding: '6px 12px',
-          borderRadius: 6,
-          fontSize: 12,
-          cursor: 'pointer',
-          fontWeight: 600
-        }}
-      >
-        📅 Повний графік ({isWeekend ? 'Вихідний' : 'Будній'})
-      </button>
-    </div>
-    ...
+          <div style={{ display: 'flex', gap: 6, marginBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 8 }}>
+            <button
+              onClick={() => setShowTimetableTab('arrivals')}
+              style={{
+                background: showTimetableTab === 'arrivals' ? '#3B82F6' : 'transparent',
+                color: '#FFF',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontSize: 12,
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              ⏱ Найближчі потяги
+            </button>
+            <button
+              onClick={() => setShowTimetableTab('timetable')}
+              style={{
+                background: showTimetableTab === 'timetable' ? '#3B82F6' : 'transparent',
+                color: '#FFF',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontSize: 12,
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              📅 Повний графік ({isWeekend ? 'Вихідний' : 'Будній'})
+            </button>
+          </div>
 
           {/* Вкладка 1: Табло найближчих прибуть */}
           {showTimetableTab === 'arrivals' && (
