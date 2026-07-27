@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import { 
   Clock, 
@@ -31,6 +31,7 @@ import { KIND_LABELS_UK } from '@/components/TransportKindIcon';
 import type { TransportKind } from '@/types/transport';
 
 const SUGGESTIONS_LIMIT = 6;
+const STORAGE_PREFIX = 'kharkiv_go_map_state_';
 
 const CHIP_FILTERS: { id: TransportKind | 'favorites' | 'stops'; label: string; icon: typeof Bus }[] = [
   { id: 'bus', label: 'Автобуси', icon: Bus },
@@ -45,11 +46,13 @@ export function MapPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') ?? '';
   const { position, heading, isMoving, isLocating, error, locate } = useGeolocation();
+  
   const storeVisibleKinds = useSettingsStore((s) => s.visibleTransportKinds);
   const showStops = useSettingsStore((s) => s.showStopsOnMap);
   const toggleStopsOnMap = useSettingsStore((s) => s.toggleStopsOnMap);
 
   const [map, setMap] = useState<MapLibreMap | null>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
@@ -59,15 +62,34 @@ export function MapPage() {
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const [activeFilterChips, setActiveFilterChips] = useState<Record<string, boolean>>({
-    bus: true,
-    trolleybus: true,
-    tram: true,
-    metro: true,
-    favorites: false,
-    stops: true,
+  // Відновлення фільтрів з localStorage або дефолтні значення
+  const [activeFilterChips, setActiveFilterChips] = useState<Record<string, boolean>>(() => {
+    try {
+      const cached = localStorage.getItem(`${STORAGE_PREFIX}filters`);
+      if (cached) return JSON.parse(cached);
+    } catch {
+      // fallback
+    }
+    return {
+      bus: true,
+      trolleybus: true,
+      tram: true,
+      metro: true,
+      favorites: false,
+      stops: true,
+    };
   });
 
+  // Зберігаємо фільтри в localStorage при зміні
+  useEffect(() => {
+    try {
+      localStorage.setItem(`${STORAGE_PREFIX}filters`, JSON.stringify(activeFilterChips));
+    } catch {
+      // quota exceeded or private mode
+    }
+  }, [activeFilterChips]);
+
+  // Мемоізовані види транспорту для запобігання зайвим перерахункам дочірніх компонентів
   const visibleKinds = useMemo(() => {
     return storeVisibleKinds.filter((kind) => activeFilterChips[kind] ?? true);
   }, [storeVisibleKinds, activeFilterChips]);
@@ -79,18 +101,19 @@ export function MapPage() {
   const suggestedStops = useMemo(() => (query.trim() ? localStops.search(query).slice(0, SUGGESTIONS_LIMIT) : []), [query]);
   const suggestedRoutes = useMemo(() => (query.trim() ? localRoutes.search(query).slice(0, SUGGESTIONS_LIMIT) : []), [query]);
 
-  function handleSearchSubmit(q: string) {
+  // Оптимізовані обробники подій через useCallback
+  const handleSearchSubmit = useCallback((q: string) => {
     setSearchParams({ q });
     setSuggestionsOpen(false);
-  }
+  }, [setSearchParams]);
 
-  function clearSelection() {
+  const clearSelection = useCallback(() => {
     setSelectedStopId(null);
     setSelectedRouteId(null);
     setSelectedVehicleId(null);
-  }
+  }, []);
 
-  function handleStopSelect(stopId: string) {
+  const handleStopSelect = useCallback((stopId: string) => {
     setSelectedVehicleId(null);
     setSelectedRouteId(null);
     setSelectedStopId(stopId);
@@ -99,9 +122,9 @@ export function MapPage() {
     if (map && stop) {
       map.flyTo({ center: [stop.position.lng, stop.position.lat], zoom: Math.max(map.getZoom(), 15.5), essential: true });
     }
-  }
+  }, [map]);
 
-  function handleRouteSelect(routeId: string) {
+  const handleRouteSelect = useCallback((routeId: string) => {
     setSelectedStopId(null);
     setSelectedVehicleId(null);
     setSelectedRouteId((current) => (current === routeId ? null : routeId));
@@ -120,15 +143,15 @@ export function MapPage() {
         );
       }
     }
-  }
+  }, [map]);
 
-  function handleTrainSelect(trainId: string) {
+  const handleTrainSelect = useCallback((trainId: string) => {
     setSelectedStopId(null);
     setSelectedRouteId(null);
     setSelectedVehicleId((current) => (current === trainId ? null : trainId));
-  }
+  }, []);
 
-  function toggleChip(id: string) {
+  const toggleChip = useCallback((id: string) => {
     setActiveFilterChips((prev) => {
       const next = { ...prev, [id]: !prev[id] };
       if (id === 'stops') {
@@ -136,49 +159,104 @@ export function MapPage() {
       }
       return next;
     });
-  }
+  }, [toggleStopsOnMap]);
 
+  // Зберігання та відновлення позиції й масштабу карти (Debounced state persistence)
+  useEffect(() => {
+    if (!map) return;
+
+    try {
+      const cachedState = localStorage.getItem(`${STORAGE_PREFIX}camera`);
+      if (cachedState) {
+        const { center, zoom } = JSON.parse(cachedState);
+        if (center && typeof zoom === 'number') {
+          map.jumpTo({ center, zoom });
+        }
+      }
+    } catch {
+      // Ignore
+    }
+
+    const handleMoveEnd = () => {
+      try {
+        const center = map.getCenter().toArray();
+        const zoom = map.getZoom();
+        localStorage.setItem(`${STORAGE_PREFIX}camera`, JSON.stringify({ center, zoom }));
+      } catch {
+        // Ignore
+      }
+    };
+
+    map.on('moveend', handleMoveEnd);
+    return () => {
+      map.off('moveend', handleMoveEnd);
+    };
+  }, [map]);
+
+  // Синхронізація рядка пошуку з URL
   useEffect(() => {
     setQuery(initialQuery);
   }, [initialQuery]);
 
+  // Відстеження готовності стилю карти для зняття Skeleton
+  const handleMapReady = useCallback((mapInstance: MapLibreMap) => {
+    setMap(mapInstance);
+    if (mapInstance.isStyleLoaded()) {
+      setIsMapLoaded(true);
+    } else {
+      mapInstance.on('load', () => setIsMapLoaded(true));
+    }
+  }, []);
+
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-slate-900 text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-white">
       
-      {/* 1. КАРТА (MapBase Canvas) */}
+      {/* 1. КАРТА ТА СКЕЛЕТОН (Миттєва первинна отрисовка < 1s) */}
       <div className="absolute inset-0 z-0">
+        {!isMapLoaded && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md animate-pulse">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+                <span className="text-xl">🗺️</span>
+              </div>
+              <span className="text-xs font-bold tracking-wider uppercase text-slate-400">Завантаження карти Харкова...</span>
+            </div>
+          </div>
+        )}
+
         <MapView
           vehicles={[]}
           userPosition={position}
           userHeading={heading}
           userIsMoving={isMoving}
           selectedVehicleId={selectedVehicleId}
-          onVehicleSelect={(id) => {
+          onVehicleSelect={useCallback((id: string | null) => {
             setSelectedStopId(null);
             setSelectedRouteId(null);
             setSelectedVehicleId(id);
-          }}
+          }, [])}
           onStopSelect={handleStopSelect}
           selectedRouteId={selectedRouteId}
           onRouteSelect={handleRouteSelect}
           visibleKinds={visibleKinds}
           showStops={showStops}
-          onMapReady={setMap}
+          onMapReady={handleMapReady}
         />
 
-        {/* Live Metro Layer Simulation */}
-        <MetroLayer
-          map={map}
-          visible={visibleKinds.includes('metro')}
-          selectedTrainId={selectedVehicleId}
-          onTrainSelect={handleTrainSelect}
-        />
+        {/* Шари метро з відкладеним рендерингом */}
+        {isMapLoaded && (
+          <MetroLayer
+            map={map}
+            visible={visibleKinds.includes('metro')}
+            selectedTrainId={selectedVehicleId}
+            onTrainSelect={handleTrainSelect}
+          />
+        )}
       </div>
 
-      {/* 2. ВЕРХНЯ ПАНЕЛЬ (Пошук, Голос, Фільтри) */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2.5 p-4 pt-[max(1rem,env(safe-area-inset-top))]">
+      {/* 2. ВЕРХНЯ ПАНЕЛЬ (Пошук, Фільтри з GPU-акселерацією) */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2.5 p-4 pt-[max(1rem,env(safe-area-inset-top))] will-change-transform">
         
-        {/* Пошуковий рядок з Glassmorphism */}
         <div className="pointer-events-auto flex items-center gap-2.5">
           <div className="relative flex-1 rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/10 transition-all focus-within:ring-2 focus-within:ring-emerald-500/30">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -232,7 +310,7 @@ export function MapPage() {
           </button>
         </div>
 
-        {/* Швидкі фільтри (Filter Chips) */}
+        {/* Швидкі фільтри (Chips) */}
         <div className="pointer-events-auto flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
           {CHIP_FILTERS.map((chip) => {
             const isActive = activeFilterChips[chip.id];
@@ -254,7 +332,7 @@ export function MapPage() {
           })}
         </div>
 
-        {/* Динамічні підказки пошуку */}
+        {/* Підказки пошуку */}
         {suggestionsOpen && query.trim() && (
           <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden bg-white/95 backdrop-blur-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-150">
             <MapSearchSuggestions
@@ -267,8 +345,8 @@ export function MapPage() {
         )}
       </div>
 
-      {/* 3. КНОПКИ КАРТИ */}
-      <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-2.5">
+      {/* 3. КНОПКИ КАРТИ (Floating Buttons 52px) */}
+      <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-2.5 will-change-transform">
         <div className="flex flex-col rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/10 overflow-hidden">
           <button
             onClick={() => map?.zoomIn({ duration: 300 })}
@@ -306,16 +384,16 @@ export function MapPage() {
 
       {/* 4. НИЖНЯ КАРТОЧКА: Маршрут */}
       {selectedRoute && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] will-change-transform">
           <div className="pointer-events-auto mx-auto max-w-md animate-in slide-in-from-bottom-6 duration-300">
             <RouteSheet route={selectedRoute} onClose={clearSelection} onStopSelect={handleStopSelect} />
           </div>
         </div>
       )}
 
-      {/* 5. НИЖНЯ КАРТОЧКА: Зупинка */}
+      {/* 5. НИЖНЯ КАРТОЧКА: Зупинка та прибуття */}
       {selectedStop && !selectedRoute && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] will-change-transform">
           <div className="pointer-events-auto mx-auto max-w-md space-y-3 animate-in slide-in-from-bottom-6 duration-300">
             <div className="relative rounded-[24px] overflow-hidden shadow-2xl bg-white/95 backdrop-blur-2xl border border-white/50">
               <StopCard stop={selectedStop} onClick={() => setSelectedStopId(null)} />
