@@ -11,7 +11,6 @@ import {
   Minus, 
   Compass, 
   Navigation, 
-  Map as MapIcon, 
   Star, 
   Bus, 
   Zap, 
@@ -46,10 +45,9 @@ export function MapPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') ?? '';
   const { position, heading, isMoving, isLocating, error, locate } = useGeolocation();
-  const visibleKinds = useSettingsStore((s) => s.visibleTransportKinds);
+  const storeVisibleKinds = useSettingsStore((s) => s.visibleTransportKinds);
   const showStops = useSettingsStore((s) => s.showStopsOnMap);
-  const setVisibleTransportKinds = useSettingsStore((s) => s.setVisibleTransportKinds);
-  const toggleShowStopsOnMap = useSettingsStore((s) => s.toggleShowStopsOnMap);
+  const toggleStopsOnMap = useSettingsStore((s) => s.toggleStopsOnMap);
 
   const [map, setMap] = useState<MapLibreMap | null>(null);
 
@@ -69,6 +67,10 @@ export function MapPage() {
     favorites: false,
     stops: true,
   });
+
+  const visibleKinds = useMemo(() => {
+    return storeVisibleKinds.filter((kind) => activeFilterChips[kind] ?? true);
+  }, [storeVisibleKinds, activeFilterChips]);
 
   const selectedStop = useMemo(() => (selectedStopId ? localStops.getById(selectedStopId) : undefined), [selectedStopId]);
   const arrivals = useMemo(() => (selectedStopId ? localStops.getArrivals(selectedStopId) : []), [selectedStopId]);
@@ -129,12 +131,8 @@ export function MapPage() {
   function toggleChip(id: string) {
     setActiveFilterChips((prev) => {
       const next = { ...prev, [id]: !prev[id] };
-      // Синхронізуємо з глобальним стейтом налаштувань карти
       if (id === 'stops') {
-        toggleShowStopsOnMap();
-      } else if (['bus', 'trolleybus', 'tram', 'metro'].includes(id)) {
-        const kinds = Object.keys(next).filter((k) => ['bus', 'trolleybus', 'tram', 'metro'].includes(k) && next[k]) as TransportKind[];
-        setVisibleTransportKinds(kinds);
+        toggleStopsOnMap();
       }
       return next;
     });
@@ -204,7 +202,6 @@ export function MapPage() {
               className="w-full bg-transparent py-3.5 pl-11 pr-24 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none"
             />
             
-            {/* Кнопка голосового пошуку (заглушка) та фільтрів праворуч всередині рядка */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
               {query && (
                 <button
@@ -226,7 +223,6 @@ export function MapPage() {
             </div>
           </div>
 
-          {/* Кнопка розгорнутих фільтрів */}
           <button
             onClick={() => alert('Меню фільтрів')}
             className="pointer-events-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 text-slate-700 shadow-xl shadow-black/10 transition-all hover:bg-white active:scale-95"
@@ -271,10 +267,8 @@ export function MapPage() {
         )}
       </div>
 
-      {/* 3. КНОПКИ КАРТИ (Floating Buttons 52px з Glassmorphism) */}
+      {/* 3. КНОПКИ КАРТИ */}
       <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-2.5">
-        
-        {/* Zoom In / Zoom Out */}
         <div className="flex flex-col rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/10 overflow-hidden">
           <button
             onClick={() => map?.zoomIn({ duration: 300 })}
@@ -292,7 +286,6 @@ export function MapPage() {
           </button>
         </div>
 
-        {/* Слідкувати за користувачем / Compass */}
         <button
           onClick={() => map?.resetNorthPitch({ duration: 400 })}
           className="flex h-[52px] w-[52px] items-center justify-center rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 text-slate-700 shadow-xl shadow-black/10 hover:bg-white active:scale-95 transition-all"
@@ -302,18 +295,16 @@ export function MapPage() {
           <Compass size={21} />
         </button>
 
-        {/* Перемикач типу карти */}
         <div className="rounded-[24px] overflow-hidden shadow-xl shadow-black/10">
           <MapModeButton />
         </div>
 
-        {/* Моє місцезнаходження (GPS) */}
         <div className="rounded-[24px] overflow-hidden shadow-xl shadow-black/10">
           <GpsButton onClick={locate} isLocating={isLocating} hasError={!!error} />
         </div>
       </div>
 
-      {/* 4. НИЖНЯ КАРТОЧКА: Маршрут (Bottom Sheet) */}
+      {/* 4. НИЖНЯ КАРТОЧКА: Маршрут */}
       {selectedRoute && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="pointer-events-auto mx-auto max-w-md animate-in slide-in-from-bottom-6 duration-300">
@@ -322,12 +313,10 @@ export function MapPage() {
         </div>
       )}
 
-      {/* 5. НИЖНЯ КАРТОЧКА: Зупинка та прибуття в реальному часі (Bottom Sheet) */}
+      {/* 5. НИЖНЯ КАРТОЧКА: Зупинка */}
       {selectedStop && !selectedRoute && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="pointer-events-auto mx-auto max-w-md space-y-3 animate-in slide-in-from-bottom-6 duration-300">
-            
-            {/* Зупинка */}
             <div className="relative rounded-[24px] overflow-hidden shadow-2xl bg-white/95 backdrop-blur-2xl border border-white/50">
               <StopCard stop={selectedStop} onClick={() => setSelectedStopId(null)} />
               <button
@@ -339,7 +328,6 @@ export function MapPage() {
               </button>
             </div>
 
-            {/* Live Arrivals */}
             {arrivals.length > 0 && (
               <div className="overflow-hidden rounded-[24px] border border-white/50 bg-white/95 backdrop-blur-2xl p-4 shadow-2xl">
                 <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 px-1">
