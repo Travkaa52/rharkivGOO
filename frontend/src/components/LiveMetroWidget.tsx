@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BUILT_LINES, formatEtaCountdown, getActiveTrains, getUpcomingArrivalsForStation } from '@/liveMetro/liveMetroEngine';
+import {
+  BUILT_LINES,
+  formatEtaCountdown,
+  getActiveTrains,
+  getUpcomingArrivalsForStation
+} from '@/liveMetro/liveMetroEngine';
 import { localStops } from '@/data/localData';
 import type { GeoPoint } from '@/types/transport';
 
@@ -15,14 +20,32 @@ function formatDistance(meters: number): string {
 }
 
 /**
- * Ультраверсія віджета "Живе метро" для головної сторінки.
+ * Обчислення відсоткової позиції потяга на візуальній колії (0% ... 100%).
+ * 50% — потяг прямо на станції.
+ * < 50% — під'їжджає (від 0% до 50% за 180 сек).
+ * > 50% — від'їжджає від станції.
  */
+function calculateTrainPositionOnTrack(etaSec: number): number {
+  if (etaSec <= 0 && etaSec >= -20) {
+    // На станції (у межах 20 сек)
+    return 50;
+  }
+  if (etaSec > 0) {
+    // Під'їжджає: за 3 хв (180с) знаходиться на 5%, при 0s — на 50%
+    const progress = Math.max(0, 1 - etaSec / 180);
+    return 5 + progress * 45;
+  }
+  // Від'їжджає
+  const departProgress = Math.min(1, Math.abs(etaSec) / 60);
+  return 50 + departProgress * 45;
+}
+
 export function LiveMetroWidget({ userPosition }: LiveMetroWidgetProps) {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    // Оновлення кожні 5 секунд для точного зворотного відліку
-    const id = window.setInterval(() => setNow(new Date()), 5000);
+    // Оновлення щосекунди для плавної анімації руху потяга на колії
+    const id = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -42,35 +65,55 @@ export function LiveMetroWidget({ userPosition }: LiveMetroWidgetProps) {
 
   const isServiceRunning = activeTrains.length > 0;
 
+  // Пошук найближчої станції метро
   const nearestMetroStation = useMemo(() => {
     if (!userPosition) return null;
 
-    const allStationIds = new Set<string>();
+    let best: { id: string; name: string; distM: number; lineId?: string; lineColor?: string } | null = null;
+
     for (const { line } of BUILT_LINES) {
-      for (const s of line.stations) allStationIds.add(s.id);
-    }
+      for (const s of line.stations) {
+        const stop = localStops.getById(s.id);
+        if (!stop) continue;
 
-    let best: { id: string; name: string; distM: number } | null = null;
-    for (const id of allStationIds) {
-      const stop = localStops.getById(id);
-      if (!stop) continue;
+        const dLat = ((stop.position.lat - userPosition.lat) * Math.PI) / 180;
+        const dLng = ((stop.position.lng - userPosition.lng) * Math.PI) / 180;
+        const lat1 = (userPosition.lat * Math.PI) / 180;
+        const lat2 = (stop.position.lat * Math.PI) / 180;
+        const h =
+          Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+        const distM = 2 * 6371000 * Math.asin(Math.min(1, Math.sqrt(h)));
 
-      const dLat = ((stop.position.lat - userPosition.lat) * Math.PI) / 180;
-      const dLng = ((stop.position.lng - userPosition.lng) * Math.PI) / 180;
-      const lat1 = (userPosition.lat * Math.PI) / 180;
-      const lat2 = (stop.position.lat * Math.PI) / 180;
-      const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
-      const distM = 2 * 6371000 * Math.asin(Math.min(1, Math.sqrt(h)));
-
-      if (!best || distM < best.distM) best = { id, name: stop.name, distM };
+        if (!best || distM < best.distM) {
+          best = {
+            id: s.id,
+            name: stop.name,
+            distM,
+            lineId: line.id,
+            lineColor: line.color
+          };
+        }
+      }
     }
     return best;
   }, [userPosition]);
 
-  const nextArrivals = useMemo(() => {
+  // Найближчі рейси для найближчої станції
+  const upcomingArrivals = useMemo(() => {
     if (!nearestMetroStation) return [];
-    return getUpcomingArrivalsForStation(nearestMetroStation.id, now, 1).slice(0, 3);
+    return getUpcomingArrivalsForStation(nearestMetroStation.id, now, 2);
   }, [nearestMetroStation, now]);
+
+  // Розподіл прибувань за 2 напрямками руху (Колія 1 та Колія 2)
+  const trackArrivals = useMemo(() => {
+    if (upcomingArrivals.length === 0) return { dir0: null, dir1: null };
+
+    // Групуємо за напрямками direction 0 та direction 1
+    const dir0 = upcomingArrivals.find((a) => a.direction === 0) ?? upcomingArrivals[0] ?? null;
+    const dir1 = upcomingArrivals.find((a) => a.direction === 1 && a !== dir0) ?? null;
+
+    return { dir0, dir1 };
+  }, [upcomingArrivals]);
 
   const nowSec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
 
@@ -111,18 +154,13 @@ export function LiveMetroWidget({ userPosition }: LiveMetroWidgetProps) {
         </Link>
       </div>
 
-      {/* Лічильники поїздів на лініях */}
-      {!isServiceRunning ? (
-        <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center backdrop-blur-md">
-          <p className="text-xs font-medium text-white/70">🌙 Нічна перерва у метрополітені</p>
-          <p className="mt-0.5 text-[11px] text-white/40">Перші потяги відправляються о 05:30</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-2">
+      {/* Статистика активних потягів на лініях */}
+      {isServiceRunning && (
+        <div className="mb-3.5 grid grid-cols-3 gap-2">
           {lineCounts.map((l) => (
             <div
               key={l.id}
-              className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-2.5 backdrop-blur-md transition-all hover:bg-white/[0.08]"
+              className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-2 backdrop-blur-md transition-all hover:bg-white/[0.08]"
             >
               <div
                 className="absolute left-0 top-0 h-full w-1 rounded-r"
@@ -135,9 +173,9 @@ export function LiveMetroWidget({ userPosition }: LiveMetroWidgetProps) {
                   </span>
                   <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: l.color }} />
                 </div>
-                <div className="mt-1 flex items-baseline justify-between">
-                  <span className="text-base font-black tabular-nums text-white">{l.count}</span>
-                  <span className="text-[10px] text-white/40">поїзд.</span>
+                <div className="mt-0.5 flex items-baseline justify-between">
+                  <span className="text-sm font-black tabular-nums text-white">{l.count}</span>
+                  <span className="text-[9px] text-white/40">поїзд.</span>
                 </div>
               </div>
             </div>
@@ -145,55 +183,129 @@ export function LiveMetroWidget({ userPosition }: LiveMetroWidgetProps) {
         </div>
       )}
 
-      {/* Блок найближчої станції та прибуття */}
-      <div className="mt-3.5 border-t border-white/10 pt-3">
-        {nearestMetroStation ? (
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <div className="flex items-center gap-1.5 truncate text-[11px] font-bold text-white/90">
-                <span className="text-neon">📍</span>
-                <span className="truncate">{nearestMetroStation.name}</span>
-              </div>
-              <span className="shrink-0 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold text-white/70">
-                {formatDistance(nearestMetroStation.distM)}
+      {/* Візуальний двоколійний модуль метрополітену */}
+      {!isServiceRunning ? (
+        <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4 text-center backdrop-blur-md">
+          <p className="text-xs font-medium text-white/70">🌙 Нічна перерва у метрополітені</p>
+          <p className="mt-0.5 text-[11px] text-white/40">Перші потяги відправляються о 05:30</p>
+        </div>
+      ) : nearestMetroStation ? (
+        <div className="relative rounded-xl border border-white/10 bg-black/40 p-3 backdrop-blur-md">
+          {/* Індикатор колії 1 (Верхній напрямок) */}
+          <TrackLine
+            label="Колія 1"
+            arrival={trackArrivals.dir0}
+            nowSec={nowSec}
+            directionName={trackArrivals.dir0?.headsign ?? 'Напрямок А'}
+          />
+
+          {/* Центральний платформений модуль станції */}
+          <div className="my-2.5 flex items-center justify-between rounded-lg border border-white/15 bg-white/10 px-3 py-1.5 shadow-inner backdrop-blur-md">
+            <div className="flex items-center gap-2 truncate">
+              <span
+                className="h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white/20"
+                style={{ backgroundColor: nearestMetroStation.lineColor ?? '#C9A24B' }}
+              />
+              <span className="truncate font-display text-xs font-bold text-white">
+                ст. {nearestMetroStation.name}
               </span>
             </div>
-
-            {nextArrivals.length > 0 ? (
-              <ul className="flex flex-col gap-1.5">
-                {nextArrivals.map((a, i) => (
-                  <li
-                    key={`${a.lineId}-${a.direction}-${i}`}
-                    className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.03] px-2.5 py-1.5 text-xs backdrop-blur-sm transition-colors hover:bg-white/[0.06]"
-                  >
-                    <div className="flex min-w-0 items-center gap-2 pr-2">
-                      <span
-                        className="h-2 w-2 shrink-0 rounded-full ring-2 ring-white/10"
-                        style={{ backgroundColor: a.lineColor }}
-                      />
-                      <span className="truncate font-medium text-white/80">{a.headsign}</span>
-                    </div>
-                    <span className="shrink-0 rounded-md border border-mint/20 bg-mint/10 px-2 py-0.5 text-[11px] font-bold tabular-nums text-mint">
-                      {formatEtaCountdown(a.etaSec, nowSec)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-[11px] italic text-white/40">Рейси очікуються незабаром...</p>
-            )}
-          </div>
-        ) : (
-          <div className="flex items-center justify-between text-[11px] text-white/50">
-            <span className="flex items-center gap-1.5">
-              <span>📍</span> Увімкніть геопозицію
+            <span className="shrink-0 rounded-md bg-white/15 px-2 py-0.5 text-[10px] font-semibold text-white/80">
+              {formatDistance(nearestMetroStation.distM)}
             </span>
-            <Link to="/metro/live" className="font-semibold text-neon hover:underline">
-              Обрати станцію →
-            </Link>
           </div>
-        )}
-      </div>
+
+          {/* Індикатор колії 2 (Нижній напрямок) */}
+          <TrackLine
+            label="Колія 2"
+            arrival={trackArrivals.dir1}
+            nowSec={nowSec}
+            directionName={trackArrivals.dir1?.headsign ?? 'Напрямок Б'}
+            reverse
+          />
+        </div>
+      ) : (
+        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-3 text-[11px] text-white/60">
+          <span className="flex items-center gap-1.5">
+            <span>📍</span> Увімкніть геопозицію для відстеження
+          </span>
+          <Link to="/metro/live" className="font-semibold text-neon hover:underline">
+            Обрати станцію →
+          </Link>
+        </div>
+      )}
     </section>
+  );
+}
+
+interface TrackLineProps {
+  label: string;
+  arrival: ReturnType<typeof getUpcomingArrivalsForStation>[number] | null;
+  nowSec: number;
+  directionName: string;
+  reverse?: boolean;
+}
+
+/**
+ * Окрема полоса руху (колія) з анімованим спрайтом потяга.
+ */
+function TrackLine({ label, arrival, nowSec, directionName, reverse = false }: TrackLineProps) {
+  if (!arrival) {
+    return (
+      <div className="relative my-1 flex items-center justify-between px-1 text-[10px] text-white/30">
+        <span>{label}</span>
+        <span className="italic">Рейсів не очікується</span>
+      </div>
+    );
+  }
+
+  const posX = calculateTrainPositionOnTrack(arrival.etaSec);
+  const displayPos = reverse ? 100 - posX : posX;
+  const isAtStation = arrival.etaSec <= 5 && arrival.etaSec >= -15;
+
+  return (
+    <div className="relative py-1">
+      {/* Назва напрямку та час */}
+      <div className="mb-1 flex items-center justify-between text-[10px] text-white/70">
+        <span className="flex items-center gap-1 font-semibold truncate">
+          <span className="text-white/40">{label}:</span>
+          <span className="truncate">→ {directionName}</span>
+        </span>
+        <span className="shrink-0 font-bold text-mint tabular-nums">
+          {formatEtaCountdown(arrival.etaSec, nowSec)}
+        </span>
+      </div>
+
+      {/* Рейки колії */}
+      <div className="relative flex h-6 w-full items-center rounded-md bg-white/5 px-2 border border-white/5 overflow-hidden">
+        {/* Лінія колії */}
+        <div className="absolute inset-x-2 h-0.5 bg-gradient-to-r from-white/10 via-white/30 to-white/10" />
+
+        {/* Штрихи шпал */}
+        <div className="absolute inset-x-0 h-full bg-[repeating-linear-gradient(90deg,transparent,transparent_6px,rgba(255,255,255,0.08)_6px,rgba(255,255,255,0.08)_8px)]" />
+
+        {/* Спрайт потяга, що рухається */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-1000 ease-linear"
+          style={{ left: `${displayPos}%` }}
+        >
+          <div
+            className={`flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold text-white shadow-lg transition-transform ${
+              isAtStation ? 'scale-110 animate-pulse' : ''
+            }`}
+            style={{
+              backgroundColor: arrival.lineColor,
+              boxShadow: `0 0 10px ${arrival.lineColor}aa`
+            }}
+          >
+            {/* Спрайт / Іконка потяга */}
+            <span className="text-xs">🚈</span>
+            <span className="text-[9px] whitespace-nowrap">
+              {isAtStation ? 'На станції' : `${Math.ceil(arrival.etaSec / 60)} хв`}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
