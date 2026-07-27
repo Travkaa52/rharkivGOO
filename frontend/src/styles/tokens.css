@@ -1,13 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /**
  * Kharkiv GO — єдина дизайн-система.
- * Всі кольори визначені як CSS-змінні, щоб theme (light/dark/system)
- * перемикався миттєво без перезбірки Tailwind-класів.
- * Tailwind config посилається на ці змінні (colors.*.DEFAULT: 'rgb(var(--x) / <alpha-value>)').
+ * Всі кольори визначені як CSS-змінні для миттєвого перемикання тем.
  */
 
 :root {
-  /* Brand — узгоджено з гербом і прапором Харкова: соковитий зелений щит
-     та золотий ріг достатку. Неоновий акцент для тактичного вигляду. */
+  /* Brand — узгоджено з гербом і прапором Харкова */
   --color-forest: 8 168 92;
   --color-forest-light: 52 224 138;
   --color-forest-dark: 4 56 32;
@@ -17,38 +18,35 @@
   --color-mint: 173 230 200;
   --color-blue: 62 140 240;
   --color-graphite: 27 31 29;
-  /* Неоновий зелений акцент — світіння, підсвітка активних елементів */
+  /* Неоновий зелений акцент — підсвітка та активний стан */
   --color-neon: 57 255 148;
 
-  /* Surfaces — темна тема за замовчуванням: увесь застосунок тактичний/нічний,
-     як на референсному мокапі — жодних світлих "вікон". */
+  /* Primary Brand Dynamic Variable */
+  --color-primary: var(--color-forest-light);
+
+  /* Surfaces — Темна тема за замовчуванням */
   --color-bg: 6 10 9;
   --color-surface: 11 16 14;
   --color-surface-soft: 9 13 12;
   --color-surface-raised: 17 24 21;
-  --color-border: 255 255 255 / 0.08;
+  
+  /* Borders & Text Channels (чисті RGB значення для сумісності з альфа-каналами) */
+  --color-border: 255 255 255;
+  --color-border-alpha: 0.08;
   --color-text: 255 255 255;
-  --color-text-muted: 255 255 255 / 0.6;
+  --color-text-muted: 255 255 255;
+  --color-text-muted-alpha: 0.6;
   --color-text-inverted: 8 12 10;
 
-  /* Аліаси "ink" — використовуються по всьому застосунку (BottomNav, HomePage,
-     картки-оверлеї на карті) як синонім поверхонь темної теми. */
+  /* Аліаси "ink" */
   --color-ink: var(--color-bg);
   --color-ink-surface: var(--color-surface-raised);
-  --color-ink-border: var(--color-border);
+  --color-ink-border: 255 255 255 / 0.08;
 
+  /* Shadows & Glassmorphic Effects */
   --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
   --shadow-glass-lg: 0 12px 48px 0 rgba(0, 0, 0, 0.6);
   --shadow-glass-dark: 0 8px 28px 0 rgba(0, 0, 0, 0.5);
-
-  /* Spacing scale (8pt grid) — reference only, Tailwind spacing already matches */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
 
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -56,33 +54,139 @@
   --radius-xl: 32px;
 }
 
-/* Світла тема — тепер опційна, вмикається явним вибором у Налаштуваннях
-   (раніше вона була дефолтом, звідси й "вилазили" світлі картки/панелі
-   поверх темного тла на решті екранів). */
+/* Світла тема — опційна, вмикається в Налаштуваннях */
 [data-theme='light'] {
+  --color-primary: var(--color-forest);
+
   --color-bg: 246 248 245;
   --color-surface: 255 255 255;
-  --color-surface-soft: 246 248 245;
+  --color-surface-soft: 240 244 241;
   --color-surface-raised: 255 255 255;
-  --color-border: 14 20 18 / 0.08;
+
+  --color-border: 14 20 18;
+  --color-border-alpha: 0.08;
   --color-text: 27 31 29;
-  --color-text-muted: 27 31 29 / 0.6;
+  --color-text-muted: 27 31 29;
+  --color-text-muted-alpha: 0.6;
   --color-text-inverted: 255 255 255;
 
   --color-ink: var(--color-bg);
   --color-ink-surface: var(--color-surface-raised);
-  --color-ink-border: var(--color-border);
+  --color-ink-border: 14 20 18 / 0.08;
 
-  --shadow-glass: 0 8px 32px 0 rgba(6, 66, 38, 0.12);
-  --shadow-glass-lg: 0 12px 48px 0 rgba(6, 66, 38, 0.18);
-  --shadow-glass-dark: 0 8px 32px 0 rgba(6, 66, 38, 0.12);
+  --shadow-glass: 0 8px 32px 0 rgba(6, 66, 38, 0.08);
+  --shadow-glass-lg: 0 12px 48px 0 rgba(6, 66, 38, 0.12);
+  --shadow-glass-dark: 0 8px 32px 0 rgba(6, 66, 38, 0.08);
 }
 
-/* Typography scale — one set of styles used everywhere, no per-screen overrides */
-.text-display-xl { font-family: theme('fontFamily.display'); font-weight: 800; font-size: 2rem; line-height: 2.25rem; letter-spacing: -0.02em; }
-.text-display-lg { font-family: theme('fontFamily.display'); font-weight: 800; font-size: 1.5rem; line-height: 1.875rem; letter-spacing: -0.01em; }
-.text-display-md { font-family: theme('fontFamily.display'); font-weight: 700; font-size: 1.25rem; line-height: 1.625rem; }
-.text-title      { font-family: theme('fontFamily.display'); font-weight: 700; font-size: 1.0625rem; line-height: 1.375rem; }
-.text-body        { font-family: theme('fontFamily.body'); font-weight: 400; font-size: 0.9375rem; line-height: 1.375rem; }
-.text-body-sm     { font-family: theme('fontFamily.body'); font-weight: 400; font-size: 0.8125rem; line-height: 1.125rem; }
-.text-caption     { font-family: theme('fontFamily.body'); font-weight: 600; font-size: 0.6875rem; line-height: 0.875rem; letter-spacing: 0.04em; text-transform: uppercase; }
+/* Base resets & Mobile UX optimizations */
+@layer base {
+  * {
+    border-color: rgb(var(--color-border) / var(--color-border-alpha, 0.08));
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+    font-family: theme('fontFamily.body', system-ui, -apple-system, sans-serif);
+    overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom Utility Classes & Design System Typography */
+@layer utilities {
+  /* Typography Scale */
+  .text-display-xl {
+    font-family: theme('fontFamily.display', sans-serif);
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 2.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  .text-display-lg {
+    font-family: theme('fontFamily.display', sans-serif);
+    font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
+    letter-spacing: -0.01em;
+  }
+
+  .text-display-md {
+    font-family: theme('fontFamily.display', sans-serif);
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.625rem;
+  }
+
+  .text-title {
+    font-family: theme('fontFamily.display', sans-serif);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    line-height: 1.375rem;
+  }
+
+  .text-body {
+    font-family: theme('fontFamily.body', sans-serif);
+    font-weight: 400;
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+  }
+
+  .text-body-sm {
+    font-family: theme('fontFamily.body', sans-serif);
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+  }
+
+  .text-caption {
+    font-family: theme('fontFamily.body', sans-serif);
+    font-weight: 600;
+    font-size: 0.6875rem;
+    line-height: 0.875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Glassmorphic Cards & Panels */
+  .glass-panel {
+    background-color: rgb(var(--color-surface) / 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgb(var(--color-border) / var(--color-border-alpha, 0.08));
+  }
+
+  .glass-card {
+    background-color: rgb(var(--color-surface-raised) / 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgb(var(--color-border) / var(--color-border-alpha, 0.08));
+  }
+
+  /* Tactical Glow Effects */
+  .glow-neon {
+    box-shadow: 0 0 20px -3px rgb(var(--color-neon) / 0.35);
+  }
+
+  .glow-forest {
+    box-shadow: 0 0 24px -4px rgb(var(--color-forest-light) / 0.3);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 20px -3px rgb(var(--color-gold) / 0.35);
+  }
+
+  /* Utility: Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
