@@ -1,27 +1,50 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { getActiveTrains, type LiveMetroTrain } from '@/liveMetro/liveMetroEngine';
 
-/**
- * Підписка на "живий" стан потягів метро: кожен кадр (requestAnimationFrame)
- * бере поточний реальний час і аналітично перераховує позицію/швидкість/фазу
- * всіх активних потягів (getActiveTrains — чиста функція часу, без GPS і
- * випадковості). Дає плавний рух на 60 FPS без додаткової інтерполяції між
- * "тіками" — оскільки кожен кадр рахує точну позицію на актуальну мить.
- */
-export function useLiveMetroTrains(): LiveMetroTrain[] {
-  const [trains, setTrains] = useState<LiveMetroTrain[]>(() => getActiveTrains(new Date()));
-  const rafRef = useRef<number | null>(null);
+export interface UseLiveMetroTrainsReturn {
+  /** Активний список потягів для React UI (оновлюється раз на секунду) */
+  trains: LiveMetroTrain[];
+  /** Мутабельне посилання на актуальний список для rAF-петлі MapLibre / Canvas */
+  trainsRef: React.RefObject<LiveMetroTrain[]>;
+  /** Отримати миттєвий стан потягів без перерендеру React */
+  getLatestTrains: () => LiveMetroTrain[];
+}
 
-  useEffect(() => {
-    const loop = () => {
-      setTrains(getActiveTrains(new Date()));
-      rafRef.current = requestAnimationFrame(loop);
-    };
-    rafRef.current = requestAnimationFrame(loop);
-    return () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-    };
+/**
+ * Хук підписки на стан потягів метро.
+ * 
+ * Відокремлює оновлення React-стану (для UI) від високочастотного розрахунку 
+ * позицій (для 120 FPS анімацій на карті).
+ */
+export function useLiveMetroTrains(pollIntervalMs = 1000): UseLiveMetroTrainsReturn {
+  const [trains, setTrains] = useState<LiveMetroTrain[]>(() => getActiveTrains(new Date()));
+  const trainsRef = useRef<LiveMetroTrain[]>(trains);
+
+  /**
+   * Чистий розрахунок поточних координат без виклику setState.
+   */
+  const getLatestTrains = useCallback(() => {
+    const latest = getActiveTrains(new Date());
+    trainsRef.current = latest;
+    return latest;
   }, []);
 
-  return trains;
+  useEffect(() => {
+    // Початкова синхронізація
+    getLatestTrains();
+
+    // Оновлюємо React UI за розкладом (наприклад, щосекунди)
+    const intervalId = window.setInterval(() => {
+      const latest = getLatestTrains();
+      setTrains(latest);
+    }, pollIntervalMs);
+
+    return () => window.clearInterval(intervalId);
+  }, [pollIntervalMs, getLatestTrains]);
+
+  return {
+    trains,
+    trainsRef,
+    getLatestTrains,
+  };
 }
