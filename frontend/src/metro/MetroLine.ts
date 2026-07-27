@@ -8,11 +8,6 @@ export type MetroStationLookup = (stopId: string) => MetroStationData | undefine
 
 /**
  * Одна лінія метро: id/номер/назва/колір + два напрямки руху (MetroRoute).
- *
- * Оптимізована реалізація:
- * - Розрахунок усіх рейсів на добу робиться 1 раз у конструкторі.
- * - Фільтрація активних потягів у `getActiveTrains` виконується за швидким
- *   числовим інтервалом без зайвого навантаження на Garbage Collector.
  */
 export class MetroLine {
   readonly id: string;
@@ -65,26 +60,14 @@ export class MetroLine {
     };
   }
 
-  /**
-   * Отримати маршрут лінії для обраного напрямку.
-   */
   getRoute(direction: MetroDirection): MetroRoute {
     return direction === 'forward' ? this.forwardRoute : this.backwardRoute;
   }
 
-  /**
-   * Список усіх станцій лінії (у напрямку "прямо").
-   */
   get stations(): readonly MetroStation[] {
     return this.forwardRoute.stations;
   }
 
-  /**
-   * Усі потяги, що мають перебувати на лінії (в обох напрямках) у момент nowSec.
-   *
-   * Оптимізація: перевіряємо часовий діапазон рейсу ДО інстанціювання `MetroTrain`,
-   * що повністю усуває затримки та витоки пам'яті під час анімацій симулятора.
-   */
   getActiveTrains(nowSec: number, dayType: MetroDayType): MetroTrain[] {
     const context = {
       lineId: this.id,
@@ -115,9 +98,6 @@ export class MetroLine {
     return trains;
   }
 
-  /**
-   * Повертає найближчий рейс з кінцевої станції для обраного напрямку.
-   */
   getNextDeparture(
     nowSec: number,
     dayType: MetroDayType,
@@ -127,9 +107,6 @@ export class MetroLine {
     return list.find((dep) => dep.departureAtSec > nowSec);
   }
 
-  /**
-   * Внутрішній приватний метод для швидкого збору активних потягів.
-   */
   private collectActiveTrainsForRoute(
     route: MetroRoute,
     departures: readonly ResolvedDeparture[],
@@ -137,19 +114,11 @@ export class MetroLine {
     context: { lineId: string; lineNumber: string; lineName: string; lineColor: string },
     outTrains: MetroTrain[]
   ): void {
-    const durationSec = route.totalDurationSec;
-
     for (let i = 0; i < departures.length; i++) {
       const dep = departures[i];
-      const startSec = dep.departureAtSec;
-      const endSec = startSec + durationSec;
-
-      // Швидка числова перевірка активності у часі
-      if (nowSec >= startSec && nowSec <= endSec) {
-        const train = new MetroTrain(route, startSec, context);
-        if (train.isActiveAt(nowSec)) {
-          outTrains.push(train);
-        }
+      const train = new MetroTrain(route, dep.departureAtSec, context);
+      if (train.isActiveAt(nowSec)) {
+        outTrains.push(train);
       }
     }
   }
