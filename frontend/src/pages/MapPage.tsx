@@ -62,7 +62,6 @@ export function MapPage() {
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Відновлення фільтрів з localStorage або дефолтні значення
   const [activeFilterChips, setActiveFilterChips] = useState<Record<string, boolean>>(() => {
     try {
       const cached = localStorage.getItem(`${STORAGE_PREFIX}filters`);
@@ -80,7 +79,6 @@ export function MapPage() {
     };
   });
 
-  // Зберігаємо фільтри в localStorage при зміні
   useEffect(() => {
     try {
       localStorage.setItem(`${STORAGE_PREFIX}filters`, JSON.stringify(activeFilterChips));
@@ -89,7 +87,6 @@ export function MapPage() {
     }
   }, [activeFilterChips]);
 
-  // Мемоізовані види транспорту для запобігання зайвим перерахункам дочірніх компонентів
   const visibleKinds = useMemo(() => {
     return storeVisibleKinds.filter((kind) => activeFilterChips[kind] ?? true);
   }, [storeVisibleKinds, activeFilterChips]);
@@ -101,7 +98,6 @@ export function MapPage() {
   const suggestedStops = useMemo(() => (query.trim() ? localStops.search(query).slice(0, SUGGESTIONS_LIMIT) : []), [query]);
   const suggestedRoutes = useMemo(() => (query.trim() ? localRoutes.search(query).slice(0, SUGGESTIONS_LIMIT) : []), [query]);
 
-  // Оптимізовані обробники подій через useCallback
   const handleSearchSubmit = useCallback((q: string) => {
     setSearchParams({ q });
     setSuggestionsOpen(false);
@@ -161,7 +157,6 @@ export function MapPage() {
     });
   }, [toggleStopsOnMap]);
 
-  // Зберігання та відновлення позиції й масштабу карти (Debounced state persistence)
   useEffect(() => {
     if (!map) return;
 
@@ -193,13 +188,12 @@ export function MapPage() {
     };
   }, [map]);
 
-  // Синхронізація рядка пошуку з URL
   useEffect(() => {
     setQuery(initialQuery);
   }, [initialQuery]);
 
-  // Відстеження готовності стилю карти для зняття Skeleton
-  const handleMapReady = useCallback((mapInstance: MapLibreMap) => {
+  const handleMapReady = useCallback((mapInstance: MapLibreMap | null) => {
+    if (!mapInstance) return;
     setMap(mapInstance);
     if (mapInstance.isStyleLoaded()) {
       setIsMapLoaded(true);
@@ -211,7 +205,7 @@ export function MapPage() {
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-slate-900 text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-white">
       
-      {/* 1. КАРТА ТА СКЕЛЕТОН (Миттєва первинна отрисовка < 1s) */}
+      {/* 1. КАРТА ТА СКЕЛЕТОН */}
       <div className="absolute inset-0 z-0">
         {!isMapLoaded && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md animate-pulse">
@@ -243,7 +237,6 @@ export function MapPage() {
           onMapReady={handleMapReady}
         />
 
-        {/* Шари метро з відкладеним рендерингом */}
         {isMapLoaded && (
           <MetroLayer
             map={map}
@@ -254,7 +247,7 @@ export function MapPage() {
         )}
       </div>
 
-      {/* 2. ВЕРХНЯ ПАНЕЛЬ (Пошук, Фільтри з GPU-акселерацією) */}
+      {/* 2. ВЕРХНЯ ПАНЕЛЬ */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2.5 p-4 pt-[max(1rem,env(safe-area-inset-top))] will-change-transform">
         
         <div className="pointer-events-auto flex items-center gap-2.5">
@@ -310,7 +303,7 @@ export function MapPage() {
           </button>
         </div>
 
-        {/* Швидкі фільтри (Chips) */}
+        {/* Швидкі фільтри */}
         <div className="pointer-events-auto flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
           {CHIP_FILTERS.map((chip) => {
             const isActive = activeFilterChips[chip.id];
@@ -332,7 +325,6 @@ export function MapPage() {
           })}
         </div>
 
-        {/* Підказки пошуку */}
         {suggestionsOpen && query.trim() && (
           <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden bg-white/95 backdrop-blur-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-150">
             <MapSearchSuggestions
@@ -345,7 +337,7 @@ export function MapPage() {
         )}
       </div>
 
-      {/* 3. КНОПКИ КАРТИ (Floating Buttons 52px) */}
+      {/* 3. КНОПКИ КАРТИ */}
       <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-2.5 will-change-transform">
         <div className="flex flex-col rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/10 overflow-hidden">
           <button
@@ -391,7 +383,7 @@ export function MapPage() {
         </div>
       )}
 
-      {/* 5. НИЖНЯ КАРТОЧКА: Зупинка та прибуття */}
+      {/* 5. НИЖНЯ КАРТОЧКА: Зупинка */}
       {selectedStop && !selectedRoute && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] will-change-transform">
           <div className="pointer-events-auto mx-auto max-w-md space-y-3 animate-in slide-in-from-bottom-6 duration-300">
