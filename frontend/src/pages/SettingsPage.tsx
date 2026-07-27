@@ -247,16 +247,18 @@ export function SettingsPage() {
           />
         </Section>
 
-        {/* Пам'ять та кеш */}
+        {/* Пам'ять та дані */}
         <Section title="Пам'ять та дані" icon={<Database className="h-4 w-4" />}>
           <div className="p-3.5">
             <Button 
-              variant={clearingState === 'done' ? 'success' : 'secondary'} 
-              size="md" 
+              variant="secondary" 
+              size="sm" 
               fullWidth 
               onClick={handleClearCache} 
               disabled={clearingState !== 'idle'}
-              className="relative overflow-hidden transition-all duration-300 font-medium"
+              className={`relative overflow-hidden transition-all duration-300 font-medium ${
+                clearingState === 'done' ? 'border-emerald-500/50 text-emerald-500 bg-emerald-500/10' : ''
+              }`}
             >
               <div className="flex items-center justify-center gap-2">
                 {clearingState === 'loading' && (
