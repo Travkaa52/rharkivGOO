@@ -4,8 +4,6 @@ import {
   Star, 
   ChevronRight, 
   Map as MapIcon, 
-  Train, 
-  Bus, 
   Navigation, 
   Bell, 
   Settings, 
@@ -283,13 +281,13 @@ export function HomePage() {
                                 addHistoryEntry({ query: s.name, type: 'stop' });
                               }}
                               className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
-                          >
+                            >
                               <div className="flex items-center gap-2.5">
                                 <span className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">🚏</span>
                                 <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900">{s.name}</span>
                               </div>
                               <ChevronRight size={14} className="text-slate-400" />
-                          </Link>
+                            </Link>
                           ))}
                         </div>
                       </div>
@@ -307,32 +305,33 @@ export function HomePage() {
                               onClick={() => {
                                 setIsSearchFocused(false);
                                 addHistoryEntry({ query: m.name, type: 'route' });
-                            }}
-                            className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
-                          >
-                            <div className="flex items-center gap-2.5">
-                              <img src={metroIcon} alt="Метро" className="w-6 h-6 rounded-lg object-contain bg-amber-100 p-0.5" />
-                              <div>
-                                <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900 block">{m.name}</span>
-                                {m.lineName && <span className="text-[10px] text-slate-400">{m.lineName}</span>}
+                              }}
+                              className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <img src={metroIcon} alt="Метро" className="w-6 h-6 rounded-lg object-contain bg-amber-100 p-0.5" />
+                                <div>
+                                  <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900 block">{m.name}</span>
+                                  {m.lineName && <span className="text-[10px] text-slate-400">{m.lineName}</span>}
+                                </div>
                               </div>
-                            </div>
-                            <ChevronRight size={14} className="text-slate-400" />
-                          </Link>
-                        ))}
+                              <ChevronRight size={14} className="text-slate-400" />
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
 
         {/* 3. QUICK ACTIONS GRID (2x2) */}
         <section className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
-            { label: 'Маршрути', icon: Bus, to: '/routes', color: 'bg-blue-50 text-blue-600 border-blue-100', isImage: false },
+            { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-blue-50 text-blue-600 border-blue-100', isImage: false },
             { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-emerald-50 text-emerald-600 border-emerald-100', isImage: false },
             { label: 'Метро', icon: null, to: '/metro/live', color: 'bg-amber-50 text-amber-600 border-amber-100', isImage: true },
             { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-purple-50 text-purple-600 border-purple-100', isImage: false },
@@ -414,7 +413,7 @@ export function HomePage() {
           {!position ? (
             <div className="flex flex-col items-center justify-center py-6 text-center bg-slate-50 rounded-[18px] border border-dashed border-slate-200 px-4">
               <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
-                <Compass size={20} className="animate-spin-slow" />
+                <Compass size={20} className="animate-spin" />
               </div>
               <p className="text-xs font-bold text-slate-800 mb-1">Геолокація вимкнена або не дозволена</p>
               <p className="text-[11px] text-slate-400 mb-3 max-w-[240px]">Увімкніть доступ до GPS, щоб бачити зупинки поруч з вами</p>
