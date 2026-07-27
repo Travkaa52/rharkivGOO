@@ -3,20 +3,23 @@ import { useMemo } from 'react';
 import {
   Star,
   MapPin,
-  Clock,
   ChevronRight,
-  ArrowRight,
   Search,
   Map as MapIcon,
   Train,
-  Sparkles,
-  Navigation
+  Bus,
+  Navigation,
+  Bell,
+  Settings,
+  Plus,
+  Activity,
+  ArrowUpRight,
+  AlertCircle
 } from 'lucide-react';
 import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { LiveMetroWidget } from '@/components/LiveMetroWidget';
 import type { TransportKind } from '@/types/transport';
 
 const KIND_ICON: Record<TransportKind, string> = {
@@ -25,7 +28,6 @@ const KIND_ICON: Record<TransportKind, string> = {
   trolleybus: '🚎',
   bus: '🚌'
 };
-
 
 /** Форматування відстані в метрах чи кілометрах */
 function formatDistance(m: number): string {
@@ -50,7 +52,6 @@ function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2:
 
 export function HomePage() {
   const favoriteRoutes = useFavoritesStore((s) => s.routes);
-  const historyEntries = useHistoryStore((s) => s.entries);
   const { position } = useGeolocation();
 
   const favoriteRouteDetails = useMemo(
@@ -65,224 +66,232 @@ export function HomePage() {
   // Найближчі зупинки з розрахованою точною відстанню
   const nearbyStopsWithDistance = useMemo(() => {
     if (!position) return [];
-    const stops = localStops.getNearby(position.lat, position.lng, 900).slice(0, 3);
+    const stops = localStops.getNearby(position.lat, position.lng, 900).slice(0, 4);
     return stops.map((stop) => ({
       ...stop,
       distance: calculateDistanceMeters(position.lat, position.lng, stop.position.lat, stop.position.lng)
     }));
   }, [position]);
 
-  const lastEntry = historyEntries[0];
-
   const hour = new Date().getHours();
   const greeting =
     hour < 6 ? 'Доброї ночі' : hour < 12 ? 'Доброго ранку' : hour < 18 ? 'Доброго дня' : 'Доброго вечора';
 
   return (
-    <div className="relative min-h-dvh bg-bg pb-28 pt-[max(1rem,env(safe-area-inset-top))] text-ink-text overflow-hidden">
-      {/* Ambient background glows */}
-      <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-20 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
+    <div className="relative min-h-dvh bg-slate-50 pb-28 pt-[max(0.75rem,env(safe-area-inset-top))] text-slate-900 overflow-x-hidden font-sans antialiased selection:bg-emerald-500 selection:text-white">
+      
+      {/* Декоративне м'яке світло (Glassmorphism / Ambient Glow) */}
+      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
 
       <div className="relative z-10 mx-auto max-w-md px-4 space-y-4">
-        {/* Header Greeting */}
-        <header className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex items-center gap-2 text-caption font-bold uppercase tracking-wider text-primary">
-            <Sparkles className="h-4 w-4" />
-            <span>Харківський транспорт</span>
+        
+        {/* 1. КОМПАКТНА ШАПКА */}
+        <header className="flex items-center justify-between pt-1 pb-1 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-base tracking-tight text-slate-900">
+                Kharkiv <span className="text-emerald-600">GO</span>
+              </span>
+              <span className="px-2 py-0.5 text-[9px] font-bold bg-emerald-100 text-emerald-700 rounded-full">
+                BETA
+              </span>
+            </div>
+            <h1 className="text-xl font-bold text-slate-900 mt-0.5 tracking-tight">{greeting} 👋</h1>
+            <p className="text-[11px] text-slate-500 font-medium">Навігація громадським транспортом Харкова</p>
           </div>
-          <h1 className="font-display text-2xl font-extrabold tracking-tight mt-0.5">{greeting}! 👋</h1>
-          <p className="mt-1 text-body-sm text-ink-muted">
-            Твоя зручна навігація містом у реальному часі.
-          </p>
+
+          <div className="flex items-center gap-2">
+            <button 
+              aria-label="Сповіщення"
+              className="p-2.5 rounded-full bg-white border border-slate-100 hover:bg-slate-100 transition-all active:scale-95 text-slate-700 shadow-sm"
+            >
+              <Bell size={17} />
+            </button>
+            <button 
+              aria-label="Налаштування"
+              className="p-2.5 rounded-full bg-white border border-slate-100 hover:bg-slate-100 transition-all active:scale-95 text-slate-700 shadow-sm"
+            >
+              <Settings size={17} />
+            </button>
+          </div>
         </header>
 
-        {/* Live Metro Widget Frame */}
-        <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="overflow-hidden rounded-2xl border border-border/60 bg-surface/80 backdrop-blur-xl shadow-xl transition-all">
-            <LiveMetroWidget userPosition={position} />
+        {/* 2. КАРТОЧКА "МЕТРО ОНЛАЙН" (Головний акцент) */}
+        <section className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-5 shadow-lg shadow-emerald-900/10 transition-transform duration-300 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          {/* Декоративний фон */}
+          <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 bg-white/15 px-3 py-1 rounded-full backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+              <span className="text-xs font-semibold tracking-wide uppercase">🚇 Метро онлайн</span>
+            </div>
+            <Activity size={16} className="text-emerald-200" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10">
+              <div className="text-2xl font-black tracking-tight">18</div>
+              <div className="text-[11px] text-emerald-100 font-medium">поїздів зараз</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10">
+              <div className="text-2xl font-black tracking-tight">3</div>
+              <div className="text-[11px] text-emerald-100 font-medium">діючі лінії</div>
+            </div>
+          </div>
+
+          <Link
+            to="/metro/live"
+            className="w-full py-3 px-4 bg-white text-emerald-800 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:bg-emerald-50 active:scale-[0.98] transition-all duration-200"
+          >
+            <Train size={18} />
+            <span>Відкрити карту метро</span>
+            <ArrowUpRight size={16} className="text-emerald-700" />
+          </Link>
+        </section>
+
+        {/* 3. ШВИДКІ ДІЇ (Сітка 2×2) */}
+        <section className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-3 duration-400">
+          {[
+            { label: 'Маршрути', icon: Bus, to: '/routes', color: 'bg-blue-50 text-blue-600' },
+            { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-emerald-50 text-emerald-600' },
+            { label: 'Метро', icon: Train, to: '/metro/live', color: 'bg-amber-50 text-amber-600' },
+            { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-purple-50 text-purple-600' },
+          ].map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={index}
+                to={item.to}
+                className="bg-white rounded-[22px] p-4 flex items-center gap-3.5 border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200 active:scale-[0.97] transition-all duration-200 group"
+              >
+                <div className={`w-11 h-11 rounded-2xl ${item.color} flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
+                  <Icon size={21} />
+                </div>
+                <span className="font-bold text-slate-800 text-sm">{item.label}</span>
+              </Link>
+            );
+          })}
+        </section>
+
+        {/* 4. БЛИЖАЙШИЕ ОСТАНОВКИ */}
+        <section className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-xl">
+                <Navigation size={16} />
+              </div>
+              <h2 className="font-bold text-slate-900 text-sm">📍 Поруч</h2>
+            </div>
+            <Link 
+              to="/map"
+              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 active:scale-95 transition-transform"
+            >
+              <span>Показати всі</span>
+              <ChevronRight size={14} />
+            </Link>
+          </div>
+
+          {nearbyStopsWithDistance.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 px-3">
+              <Navigation className="h-5 w-5 text-slate-400 mb-1 animate-bounce" />
+              <p className="text-xs font-medium text-slate-600">Увімкніть GPS для пошуку зупинок поруч</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {nearbyStopsWithDistance.map((stop) => (
+                <Link
+                  key={stop.id}
+                  to={`/map?q=${encodeURIComponent(stop.name)}`}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50/50 transition-colors border border-transparent hover:border-emerald-100 group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-white shadow-xs flex items-center justify-center text-emerald-600 font-bold text-xs shrink-0">
+                      🚏
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-slate-800 text-xs truncate group-hover:text-emerald-900">{stop.name}</div>
+                      <div className="text-[10px] text-slate-400">Зупинка транспорту</div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-100/70 px-2.5 py-0.5 rounded-full shrink-0">
+                    {formatDistance(stop.distance)}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 5. ИЗБРАННОЕ */}
+        <section className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-amber-50 text-amber-600 rounded-xl">
+                <Star size={16} className="fill-amber-400 text-amber-400" />
+              </div>
+              <h2 className="font-bold text-slate-900 text-sm">Обране</h2>
+            </div>
+            {favoriteRouteDetails.length > 0 && (
+              <Link to="/favorites" className="text-xs font-bold text-amber-600 hover:text-amber-700">
+                Усі
+              </Link>
+            )}
+          </div>
+
+          {favoriteRouteDetails.length === 0 ? (
+            <div className="text-center py-5 px-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              <div className="text-2xl mb-1">⭐</div>
+              <p className="text-xs font-bold text-slate-700 mb-1">У вас ще немає обраного</p>
+              <p className="text-[11px] text-slate-400 mb-3">Закріплюйте маршрути та зупинки для швидкого доступу</p>
+              <Link 
+                to="/routes"
+                className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-emerald-700 active:scale-95 transition-all inline-flex items-center gap-1.5"
+              >
+                <Plus size={14} />
+                <span>Додати</span>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {favoriteRouteDetails.map((r) => (
+                <Link
+                  key={r.id}
+                  to={`/routes/${r.id}`}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-100"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-sm">{KIND_ICON[r.kind]}</span>
+                    <span className="font-bold text-slate-800 text-xs truncate">{r.number}</span>
+                  </div>
+                  <ChevronRight size={14} className="text-slate-400" />
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 6. ПОЛЕЗНАЯ ИНФОРМАЦИЯ / НОВОСТИ */}
+        <section className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-xl">
+              <AlertCircle size={16} />
+            </div>
+            <h2 className="font-bold text-slate-900 text-sm">Новини транспорту</h2>
+          </div>
+
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+            <p className="text-xs font-medium text-slate-500">Актуальних повідомлень немає</p>
           </div>
         </section>
 
-        {/* Dashboard Grid: Favorites & Nearby */}
-        <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-3 duration-400">
-          {/* Favorite Routes */}
-          <section className="flex flex-col justify-between rounded-2xl border border-border/60 bg-surface/70 p-3.5 backdrop-blur-xl shadow-lg transition-all hover:border-border">
-            <div>
-              <div className="mb-2.5 flex items-center justify-between">
-                <h2 className="flex items-center gap-1.5 text-caption font-bold uppercase tracking-wider text-amber-400">
-                  <Star className="h-3.5 w-3.5 fill-amber-400" />
-                  <span>Улюблені</span>
-                </h2>
-                <span className="text-[10px] font-semibold text-ink-muted/60">{favoriteRouteDetails.length}</span>
-              </div>
+        {/* 7. НИЖНЯЯ ЧАСТЬ / ФУТЕР */}
+        <footer className="text-center py-2 space-y-0.5">
+          <p className="text-[11px] font-medium text-slate-400">Kharkiv GO • Версія 1.3.0 Beta</p>
+          <p className="text-[10px] text-slate-400">Останнє оновлення даних: щойно</p>
+        </footer>
 
-              {favoriteRouteDetails.length === 0 ? (
-                <p className="text-body-sm text-ink-muted/70 py-2">Ще немає доданих маршрутів.</p>
-              ) : (
-                <ul className="space-y-1.5">
-                  {favoriteRouteDetails.map((r) => (
-                    <li key={r.id}>
-                      <Link
-                        to={`/routes/${r.id}`}
-                        className="flex items-center justify-between rounded-xl border border-border/30 bg-surface/60 px-2.5 py-1.5 text-body-sm transition-all hover:bg-surface active:scale-98"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-xs">{KIND_ICON[r.kind]}</span>
-                          <span className="font-bold text-ink-text">{r.number}</span>
-                        </div>
-                        <ChevronRight className="h-3.5 w-3.5 text-ink-muted/60" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <Link
-              to="/favorites"
-              className="mt-3 flex items-center justify-center gap-1 rounded-xl border border-border/40 bg-surface/40 py-2 text-caption font-bold text-ink-text transition-all hover:bg-surface active:scale-95"
-            >
-              <span>Усі улюблені</span>
-              <ChevronRight className="h-3 w-3" />
-            </Link>
-          </section>
-
-          {/* Nearby Stops */}
-          <section className="flex flex-col justify-between rounded-2xl border border-border/60 bg-surface/70 p-3.5 backdrop-blur-xl shadow-lg transition-all hover:border-border">
-            <div>
-              <div className="mb-2.5 flex items-center justify-between">
-                <h2 className="flex items-center gap-1.5 text-caption font-bold uppercase tracking-wider text-emerald-400">
-                  <MapPin className="h-3.5 w-3.5" />
-                  <span>Поруч</span>
-                </h2>
-                {position && (
-                  <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                )}
-              </div>
-
-              {nearbyStopsWithDistance.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-3 text-center">
-                  <Navigation className="h-5 w-5 text-ink-muted/40 mb-1 animate-bounce" />
-                  <p className="text-caption text-ink-muted">Увімкніть GPS для пошуку зупинок поруч</p>
-                </div>
-              ) : (
-                <ul className="space-y-1.5">
-                  {nearbyStopsWithDistance.map((s) => (
-                    <li key={s.id}>
-                      <Link
-                        to={`/map?q=${encodeURIComponent(s.name)}`}
-                        className="flex items-center justify-between gap-1.5 rounded-xl border border-border/30 bg-surface/60 px-2.5 py-1.5 text-body-sm transition-all hover:bg-surface active:scale-98"
-                      >
-                        <span className="truncate text-ink-text font-medium">{s.name}</span>
-                        <span className="shrink-0 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-md border border-emerald-500/20">
-                          {formatDistance(s.distance)}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <Link
-              to="/map"
-              className="mt-3 flex items-center justify-center gap-1 rounded-xl border border-border/40 bg-surface/40 py-2 text-caption font-bold text-ink-text transition-all hover:bg-surface active:scale-95"
-            >
-              <span>Показати на карті</span>
-              <ChevronRight className="h-3 w-3" />
-            </Link>
-          </section>
-        </div>
-
-        {/* Continue Last Action Banner */}
-        {lastEntry && (
-          <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Link
-              to={lastEntry.type === 'route' && lastEntry.resultId ? `/routes/${lastEntry.resultId}` : '/map'}
-              className="group flex items-center justify-between rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/15 via-surface/80 to-surface/90 p-3.5 backdrop-blur-xl shadow-lg transition-all hover:border-primary/60 active:scale-98"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary border border-primary/30 shadow-xs">
-                  <Clock className="h-4 w-4" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                    Остання переглянута дія
-                  </span>
-                  <span className="truncate text-body-sm font-bold text-ink-text group-hover:text-primary transition-colors">
-                    {lastEntry.query}
-                  </span>
-                </div>
-              </div>
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface/80 text-ink-muted group-hover:text-ink-text group-hover:translate-x-0.5 transition-all">
-                <ArrowRight className="h-4 w-4" />
-              </div>
-            </Link>
-          </section>
-        )}
-
-        {/* Quick Actions Grid */}
-        <section className="pt-1 animate-in fade-in slide-in-from-bottom-5 duration-600">
-          <h2 className="mb-2.5 text-caption font-bold uppercase tracking-wider text-ink-muted px-1">
-            Швидкий доступ
-          </h2>
-          <div className="grid grid-cols-4 gap-2.5">
-            <QuickAction
-              to="/metro/live"
-              icon={<Train className="h-5 w-5 text-red-400" />}
-              label="Метро"
-              color="group-hover:border-red-500/40"
-            />
-            <QuickAction
-              to="/routes"
-              icon={<Search className="h-5 w-5 text-blue-400" />}
-              label="Пошук"
-              color="group-hover:border-blue-500/40"
-            />
-            <QuickAction
-              to="/favorites"
-              icon={<Star className="h-5 w-5 text-amber-400 fill-amber-400/20" />}
-              label="Улюблене"
-              color="group-hover:border-amber-500/40"
-            />
-            <QuickAction
-              to="/map"
-              icon={<MapIcon className="h-5 w-5 text-emerald-400" />}
-              label="Карта"
-              color="group-hover:border-emerald-500/40"
-            />
-          </div>
-        </section>
       </div>
     </div>
-  );
-}
-
-function QuickAction({
-  to,
-  icon,
-  label,
-  color
-}: {
-  to: string;
-  icon: React.ReactNode;
-  label: string;
-  color?: string;
-}) {
-  return (
-    <Link
-      to={to}
-      className={`group flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-border/50 bg-surface/70 py-3.5 px-1 text-center backdrop-blur-xl shadow-md transition-all hover:bg-surface hover:shadow-xl active:scale-92 ${
-        color || ''
-      }`}
-    >
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface/80 border border-border/40 shadow-2xs group-hover:scale-110 transition-transform">
-        {icon}
-      </div>
-      <span className="text-caption font-bold text-ink-text/90 group-hover:text-ink-text">
-        {label}
-      </span>
-    </Link>
   );
 }
