@@ -7,8 +7,8 @@ export interface RouteItem {
   name: string;
   color: string;
   stopIds: string[];
-  headsignForward?: string;
-  headsignBackward?: string;
+  headsignForward: string;
+  headsignBackward: string;
   schedule?: unknown;
   firstDeparture?: string;
   lastDeparture?: string;
@@ -34,6 +34,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №1 Харьков (Жд вокзал - Ивановка)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "Жд вокзал",
+    "headsignBackward": "Ивановка",
     "intervalMinutes": 10
   },
   {
@@ -43,6 +45,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №12 Харьков (Жд вокзал - Центральный парк)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "Жд вокзал",
+    "headsignBackward": "Центральный парк",
     "intervalMinutes": 10
   },
   {
@@ -52,6 +56,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №16 Харьков (Салтовская - Гидропарк - Салтовская)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "Салтовская",
+    "headsignBackward": "Гидропарк",
     "intervalMinutes": 10
   },
   {
@@ -61,6 +67,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №20 Харьков (пр. Победы - Жд вокзал)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "пр. Победы",
+    "headsignBackward": "Жд вокзал",
     "intervalMinutes": 10
   },
   {
@@ -70,6 +78,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №23 Харьков (Салтовская - 602 мр)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "Салтовская",
+    "headsignBackward": "602 мр",
     "intervalMinutes": 10
   },
   {
@@ -79,6 +89,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №27 Харьков (Салтовская  - Новожаново)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "Салтовская",
+    "headsignBackward": "Новожаново",
     "intervalMinutes": 10
   },
   {
@@ -88,6 +100,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №3 Харьков (Залютино - Новожаново)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "Залютино",
+    "headsignBackward": "Новожаново",
     "intervalMinutes": 10
   },
   {
@@ -97,6 +111,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №6 Харьков (602 мр - Жд вокзал)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "602 мр",
+    "headsignBackward": "Жд вокзал",
     "intervalMinutes": 10
   },
   {
@@ -106,6 +122,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №7 Харьков (Новоселовка - Жд вокзал)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "Новоселовка",
+    "headsignBackward": "Жд вокзал",
     "intervalMinutes": 10
   },
   {
@@ -115,6 +133,8 @@ const routesData: RouteItem[] = [
     "name": "Трамвайный маршрут №8 Харьков (602 мр - ул. Одесская)",
     "color": "#e74c3c",
     "stopIds": [],
+    "headsignForward": "602 мр",
+    "headsignBackward": "ул. Одесская",
     "intervalMinutes": 10
   },
   {
@@ -124,6 +144,8 @@ const routesData: RouteItem[] = [
     "name": "Троллебусный маршрут №11 Харьков (метро Площадь Конституции - пр. Дзюбы)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "метро Площадь Конституции",
+    "headsignBackward": "пр. Дзюбы",
     "intervalMinutes": 10
   },
   {
@@ -133,6 +155,8 @@ const routesData: RouteItem[] = [
     "name": "Троллебусный маршрут №12. Харьков (ул. Рудика - ул. Клочковская)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. Рудика",
+    "headsignBackward": "ул. Клочковская",
     "intervalMinutes": 10
   },
   {
@@ -142,6 +166,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №1 Харьков (м. Дворец Спорта-28 микрорайон)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "м. Дворец Спорта",
+    "headsignBackward": "28 микрорайон",
     "intervalMinutes": 10
   },
   {
@@ -151,6 +177,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №13 Харьков (метро Защитников Украины - парк Зустрич)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "метро Защитников Украины",
+    "headsignBackward": "парк Зустрич",
     "intervalMinutes": 10
   },
   {
@@ -160,6 +188,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №18 Харьков (метро Госпром - Больница неотложной помощи)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "метро Госпром",
+    "headsignBackward": "Больница неотложной помощи",
     "intervalMinutes": 10
   },
   {
@@ -169,6 +199,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №19 Харьков (ул. Одесская - 602 мр)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. Одесская",
+    "headsignBackward": "602 мр",
     "intervalMinutes": 10
   },
   {
@@ -178,6 +210,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №2 Харьков (пр. Жуковского - пр. Победы)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "пр. Жуковского",
+    "headsignBackward": "пр. Победы",
     "intervalMinutes": 10
   },
   {
@@ -187,6 +221,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №20 Харьков (метро Защитников Украины - 602 мр)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "метро Защитников Украины",
+    "headsignBackward": "602 мр",
     "intervalMinutes": 10
   },
   {
@@ -196,6 +232,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №24. Харьков (метро Академика Барабашова - 602 мр)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "метро Академика Барабашова",
+    "headsignBackward": "602 мр",
     "intervalMinutes": 10
   },
   {
@@ -205,6 +243,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №25 Харьков (метро Дворец Спорта - бул. Богдана Хмельницкого)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "метро Дворец Спорта",
+    "headsignBackward": "бул. Богдана Хмельницкого",
     "intervalMinutes": 10
   },
   {
@@ -214,6 +254,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №3 Харьков (ул. Университетская - ул. 12 Апреля)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. Университетская",
+    "headsignBackward": "ул. 12 Апреля",
     "intervalMinutes": 10
   },
   {
@@ -223,6 +265,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №31 Харьков (метро Турбоатом - Северная Салтовка)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "метро Турбоатом",
+    "headsignBackward": "Северная Салтовка",
     "intervalMinutes": 10
   },
   {
@@ -232,6 +276,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №34 Харьков (Восточная Салтовка - ул. Непокоренных)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "Восточная Салтовка",
+    "headsignBackward": "ул. Непокоренных",
     "intervalMinutes": 10
   },
   {
@@ -241,6 +287,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №35 Харьков (ул. Одесская - Северная Салтовка)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. Одесская",
+    "headsignBackward": "Северная Салтовка",
     "intervalMinutes": 10
   },
   {
@@ -250,6 +298,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №40 Харьков (метро Площадь Конституции - пр. Победы)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "метро Площадь Конституции",
+    "headsignBackward": "пр. Победы",
     "intervalMinutes": 10
   },
   {
@@ -259,6 +309,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №45 Харьков (ул. 12 апреля - ул. Роганская)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. 12 апреля",
+    "headsignBackward": "ул. Роганская",
     "intervalMinutes": 10
   },
   {
@@ -268,6 +320,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №46 Харьков (мр Горизонт - ул. 12 Апреля)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "мр Горизонт",
+    "headsignBackward": "ул. 12 Апреля",
     "intervalMinutes": 10
   },
   {
@@ -277,6 +331,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №49 Харьков (ул. Университенская - пос. Жихарь)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. Университетская",
+    "headsignBackward": "пос. Жихарь",
     "intervalMinutes": 10
   },
   {
@@ -286,6 +342,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №51 Харьков (ул. 12 апреля - ул. Зубарева)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. 12 апреля",
+    "headsignBackward": "ул. Зубарева",
     "intervalMinutes": 10
   },
   {
@@ -295,6 +353,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №52 Харьков (ул. 12 Апреля - 759 мр)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. 12 Апреля",
+    "headsignBackward": "759 мр",
     "intervalMinutes": 10
   },
   {
@@ -304,6 +364,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №53. Харьков (ул. 12 Апреля - мн  Горизонт)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. 12 Апреля",
+    "headsignBackward": "мн Горизонт",
     "intervalMinutes": 10
   },
   {
@@ -313,6 +375,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №55 Харьков (м. Площадь Конституции - пр. Жуковского)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "м. Площадь Конституции",
+    "headsignBackward": "пр. Жуковского",
     "intervalMinutes": 10
   },
   {
@@ -322,6 +386,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №56 Харьков (м. Академика Барабашова - Восточная Салтовка)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "м. Академика Барабашова",
+    "headsignBackward": "Восточная Салтовка",
     "intervalMinutes": 10
   },
   {
@@ -331,6 +397,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №57 Харьков (парк Зустрич - метро Академика Барабашова)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "парк Зустрич",
+    "headsignBackward": "метро Академика Барабашова",
     "intervalMinutes": 10
   },
   {
@@ -340,6 +408,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №58 Харьков (Аэропорт - пр. Победы)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "Аэропорт",
+    "headsignBackward": "пр. Победы",
     "intervalMinutes": 10
   },
   {
@@ -349,6 +419,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №59 Харьков (Станция Рогань - ул. Университетская)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "Станция Рогань",
+    "headsignBackward": "ул. Университетская",
     "intervalMinutes": 10
   },
   {
@@ -358,6 +430,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №6 Харьков (ул. Университетская - Станция Основа)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. Университетская",
+    "headsignBackward": "Станция Основа",
     "intervalMinutes": 10
   },
   {
@@ -367,6 +441,8 @@ const routesData: RouteItem[] = [
     "name": "Троллейбусный маршрут №7 Харьков (ул. 12 Апреля - метро Армейская)",
     "color": "#3498db",
     "stopIds": [],
+    "headsignForward": "ул. 12 Апреля",
+    "headsignBackward": "метро Армейская",
     "intervalMinutes": 10
   }
 ];
