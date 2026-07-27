@@ -109,8 +109,8 @@ export function LiveMetroWidget({ userPosition }: LiveMetroWidgetProps) {
     if (upcomingArrivals.length === 0) return { dir0: null, dir1: null };
 
     // Групуємо за напрямками direction 0 та direction 1
-    const dir0 = upcomingArrivals.find((a) => a.direction === 0) ?? upcomingArrivals[0] ?? null;
-    const dir1 = upcomingArrivals.find((a) => a.direction === 1 && a !== dir0) ?? null;
+    const dir0 = upcomingArrivals.find((a) => String(a.direction) === '0') ?? upcomingArrivals[0] ?? null;
+const dir1 = upcomingArrivals.find((a) => String(a.direction) === '1' && a !== dir0) ?? null;
 
     return { dir0, dir1 };
   }, [upcomingArrivals]);
