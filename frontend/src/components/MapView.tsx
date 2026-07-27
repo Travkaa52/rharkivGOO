@@ -6,6 +6,7 @@ import { useSettingsStore } from '@/store/useSettingsStore';
 import { useVehicleAnimation } from '@/hooks/useVehicleAnimation';
 import { TransportSprite } from '@/components/TransportSprite';
 import { buildRouteLinesGeoJson, buildStopsGeoJson } from '@/lib/mapLayers';
+import { assetUrl } from '@/lib/assetUrl';
 import { localRoutes } from '@/data/localData';
 import type { TransportKind, Vehicle } from '@/types/transport';
 
@@ -196,6 +197,10 @@ function updateStaticTransitLayers(
 interface MapViewProps {
   vehicles: Vehicle[];
   userPosition?: { lat: number; lng: number } | null;
+  /** Курс руху користувача в градусах (0 = північ) — обертає іконку-стрілку в потрібний бік. */
+  userHeading?: number | null;
+  /** true, коли користувач реально йде/їде — маркер перемикається з PNG-іконки на відеопетлю ходьби. */
+  userIsMoving?: boolean;
   onVehicleSelect?: (vehicleId: string) => void;
   selectedVehicleId?: string | null;
   onStopSelect?: (stopId: string) => void;
@@ -219,6 +224,8 @@ interface ScreenVehicle {
 export function MapView({
   vehicles,
   userPosition,
+  userHeading = null,
+  userIsMoving = false,
   onVehicleSelect,
   selectedVehicleId,
   onStopSelect,
@@ -338,19 +345,55 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRouteId, mapReady]);
 
-  // Маркер користувача
+  // Маркер користувача: створюється один раз (img + video всередині), далі лише
+  // рухається/перемикається — так video не перестворюється (і не блимає) на кожен
+  // GPS-семпл.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !userPosition) return;
 
     if (!userMarkerRef.current) {
       const el = document.createElement('div');
-      el.className = 'h-4 w-4 rounded-full bg-gold border-2 border-white shadow-glass animate-pulse-soft';
-      userMarkerRef.current = new maplibregl.Marker({ element: el }).setLngLat([userPosition.lng, userPosition.lat]).addTo(map);
+      el.className = 'kg-user-marker relative h-11 w-11';
+      el.innerHTML = `
+        <div class="absolute inset-0 rounded-full bg-neon/25 animate-pulse-soft"></div>
+        <div class="kg-user-marker-rotate absolute inset-0 flex items-center justify-center transition-transform duration-300 ease-out">
+          <img class="kg-user-marker-icon h-11 w-11 select-none" src="${assetUrl('markers/user-location.png')}" alt="" draggable="false" />
+          <video class="kg-user-marker-video absolute inset-0 hidden h-11 w-11 rounded-full object-cover" src="${assetUrl('markers/walking.mp4')}" muted loop playsinline preload="none"></video>
+        </div>
+      `;
+      userMarkerRef.current = new maplibregl.Marker({ element: el, rotationAlignment: 'map' })
+        .setLngLat([userPosition.lng, userPosition.lat])
+        .addTo(map);
     } else {
       userMarkerRef.current.setLngLat([userPosition.lng, userPosition.lat]);
     }
   }, [userPosition]);
+
+  // Перемикання іконка⇄відео і поворот за курсом — окремий ефект, щоб не чіпати
+  // маркер (і не рестартити відео) на кожну зміну координат.
+  useEffect(() => {
+    const el = userMarkerRef.current?.getElement();
+    if (!el) return;
+    const img = el.querySelector<HTMLImageElement>('.kg-user-marker-icon');
+    const video = el.querySelector<HTMLVideoElement>('.kg-user-marker-video');
+    const rotor = el.querySelector<HTMLElement>('.kg-user-marker-rotate');
+    if (!img || !video || !rotor) return;
+
+    if (userIsMoving) {
+      img.classList.add('hidden');
+      video.classList.remove('hidden');
+      if (video.paused) void video.play().catch(() => {});
+      // У русі курс дає GPS-компас — стрілку/бейдж більше не крутимо вручну по heading,
+      // відео ходьби вже само по собі не напрямлене, лишаємо нейтральну орієнтацію.
+      rotor.style.transform = 'rotate(0deg)';
+    } else {
+      video.classList.add('hidden');
+      video.pause();
+      img.classList.remove('hidden');
+      rotor.style.transform = typeof userHeading === 'number' ? `rotate(${userHeading}deg)` : 'rotate(0deg)';
+    }
+  }, [userIsMoving, userHeading]);
 
   // Перерахунок екранних координат транспорту на кожен кадр анімації + рух карти
   useEffect(() => {

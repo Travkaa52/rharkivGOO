@@ -21,7 +21,7 @@ const SUGGESTIONS_LIMIT = 6;
 export function MapPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') ?? '';
-  const { position, isLocating, error, locate } = useGeolocation();
+  const { position, heading, isMoving, isLocating, error, locate } = useGeolocation();
   const visibleKinds = useSettingsStore((s) => s.visibleTransportKinds);
   const showStops = useSettingsStore((s) => s.showStopsOnMap);
 
@@ -105,6 +105,8 @@ export function MapPage() {
       <MapView
         vehicles={[]}
         userPosition={position}
+        userHeading={heading}
+        userIsMoving={isMoving}
         selectedVehicleId={selectedVehicleId}
         onVehicleSelect={(id) => {
           setSelectedStopId(null);

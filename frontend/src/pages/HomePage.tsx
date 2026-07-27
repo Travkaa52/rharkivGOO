@@ -4,6 +4,7 @@ import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { LiveMetroWidget } from '@/components/LiveMetroWidget';
 import type { TransportKind } from '@/types/transport';
 
 const KIND_ICON: Record<TransportKind, string> = { metro: '🚇', tram: '🚊', trolleybus: '🚎', bus: '🚌' };
@@ -14,10 +15,11 @@ function formatDistance(m: number): string {
 }
 
 /**
- * Головна — дашборд застосунку (окремо від карти, як у мокапі):
- * привітання, обрані маршрути/зупинки, найближчі зупинки, продовження
- * останньої дії з історії, і сітка швидких дій. Карта лишається окремим
- * повноекранним екраном за вкладкою "Карта".
+ * Головна — дашборд застосунку (окремо від карти, як у мокапі): привітання,
+ * прев'ю живого метро (замість прев'ю карти — головний акцент екрана),
+ * обрані маршрути/зупинки, найближчі зупинки, продовження останньої дії
+ * з історії, і сітка швидких дій. Карта лишається окремим повноекранним
+ * екраном за вкладкою "Карта" (тепер трохи менш пріоритетним пунктом меню).
  */
 export function HomePage() {
   const favoriteRoutes = useFavoritesStore((s) => s.routes);
@@ -44,6 +46,12 @@ export function HomePage() {
           <h1 className="font-display text-2xl font-extrabold">{greeting}! 👋</h1>
           <p className="mt-1 text-sm text-white/50">Ваш персональний помічник у громадському транспорті Харкова.</p>
         </header>
+
+        {/* Живе метро — головний акцент екрана замість прев'ю карти: реальний
+            стан руху потягів по розкладу і найближчі прибуття поруч. */}
+        <div className="mb-3">
+          <LiveMetroWidget userPosition={position} />
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
           <section className="rounded-xl2 border border-ink-border bg-ink-surface p-3 shadow-glass-dark">
@@ -104,10 +112,10 @@ export function HomePage() {
         <section className="mt-3">
           <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-white/50">Швидкі дії</h2>
           <div className="grid grid-cols-4 gap-2">
-            <QuickAction to="/map" icon="🗺️" label="Карта" />
+            <QuickAction to="/metro/live" icon="🚇" label="Живе метро" />
             <QuickAction to="/routes" icon="🔍" label="Пошук" />
-            <QuickAction to="/metro" icon="🚇" label="Метро" />
             <QuickAction to="/favorites" icon="⭐" label="Улюблене" />
+            <QuickAction to="/map" icon="🗺️" label="Карта" />
           </div>
         </section>
       </div>
