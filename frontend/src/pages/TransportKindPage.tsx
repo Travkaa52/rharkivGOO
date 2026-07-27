@@ -13,8 +13,7 @@ import {
   Compass,
   SlidersHorizontal,
   ArrowUpDown,
-  Star,
-  Plus
+  Star
 } from 'lucide-react';
 import { RouteCard } from '@/components/RouteCard';
 import { routesApi } from '@/api/routes';
@@ -111,7 +110,6 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
   const filteredRoutes = useMemo(() => {
     let result = routes;
     
-    // Пошук
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       result = result.filter((r) => {
@@ -127,12 +125,10 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
   return (
     <div className="min-h-dvh bg-slate-50 pb-28 pt-[max(0.75rem,env(safe-area-inset-top))] text-slate-900 selection:bg-emerald-500 selection:text-white font-sans antialiased">
       
-      {/* Декоративний розсіяний світловий ефект */}
       <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
 
       <div className="mx-auto max-w-md space-y-4 px-4 relative z-10">
         
-        {/* ВЕРХНЯ ЧАСТИНА: Великий заголовок та кнопки фільтрації/сортування */}
         <header className="flex items-start justify-between pt-1 animate-in fade-in slide-in-from-top-2 duration-300">
           <div>
             <div className="flex items-center gap-2">
@@ -161,7 +157,6 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           </div>
         </header>
 
-        {/* Метро Live Банер (якщо це розділ метро) */}
         {kind === 'metro' && (
           <div className="relative group overflow-hidden rounded-[22px] bg-gradient-to-r from-emerald-600 to-emerald-800 p-4 text-white shadow-lg shadow-emerald-900/10 transition-transform active:scale-[0.99]">
             <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
@@ -194,7 +189,6 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           </div>
         )}
 
-        {/* ПОШУКОВА СТРОКА */}
         {!loading && !errorMsg && routes.length > 0 && (
           <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-300">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -216,7 +210,6 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           </div>
         )}
 
-        {/* ФІЛЬТРИ (Filter Chips) */}
         {!loading && !errorMsg && routes.length > 0 && (
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
             <button
@@ -243,7 +236,6 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           </div>
         )}
 
-        {/* СПИСОК МАРШРУТІВ / SKELETON / СТАНИ */}
         <div className="flex flex-col gap-2.5">
           {loading && (
             <>
@@ -299,7 +291,6 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
             </div>
           )}
 
-          {/* Сам список за допомогою існуючого оптимізованого компонента RouteCard з новими контейнерами */}
           {!loading &&
             !errorMsg &&
             filteredRoutes.map((route) => (
