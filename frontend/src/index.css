@@ -8,11 +8,7 @@ html, body, #root {
   margin: 0;
   overscroll-behavior: none;
   /* Прибирає нативний pinch-to-zoom/double-tap-zoom браузера на всій сторінці.
-     Без цього мобільний Safari/Chrome іноді "перехоплює" двопальцевий жест
-     від MapLibre на середині руху: сторінка масштабується як growserver-zoom,
-     canvas карти лишається старого розміру відносно нового devicePixelRatio,
-     WebGL-контекст губить прив'язку до drawingBuffer — і карта на мить/назавжди
-     стає чорною, поки не станеться ще один resize. */
+     Запобігає розриву WebGL-контексту карти MapLibre на мобільних пристроях. */
   touch-action: pan-x pan-y;
 }
 
@@ -22,41 +18,108 @@ body {
   font-family: theme('fontFamily.body');
   transition: background-color 0.2s ease, color 0.2s ease;
   overscroll-behavior: none;
+  /* Підтримка плавного скролінгу на iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Сам контейнер карти отримує touch-action: none — жест повністю віддається
-   MapLibre (яка сама коректно обробляє pinch-zoom/rotate/pitch через canvas),
-   а не браузеру. Це і є основний фікс чорного екрана при масштабуванні
-   двома пальцями. */
+/* Контейнер карти отримує touch-action: none — жест повністю належить MapLibre */
 .maplibregl-map,
 .maplibregl-canvas-container,
 .maplibregl-canvas {
   touch-action: none !important;
 }
 
+/* Скидання виділення при тапах для мобільного UI */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Стилізація фокусу для клавіатурної навігації та доступності */
 :focus-visible {
   outline: 2px solid rgb(var(--color-mint));
   outline-offset: 2px;
   border-radius: 0.5rem;
 }
 
+/* ==========================================================================
+   Преміальні адаптації для MapLibre GL UI
+   ========================================================================== */
+
 .maplibregl-ctrl-group {
   border-radius: 1rem !important;
   overflow: hidden;
   box-shadow: var(--shadow-glass) !important;
+  background-color: rgb(var(--color-surface-raised) / 0.8) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgb(var(--color-border)) !important;
 }
 
-/* Єдина "скляна" поверхня, що використовується для карток, шторок, панелей на всіх екранах */
+.maplibregl-ctrl-group button {
+  background-color: transparent !important;
+  border-bottom: 1px solid rgb(var(--color-border)) !important;
+}
+
+.maplibregl-ctrl-group button:last-child {
+  border-bottom: none !important;
+}
+
+/* Попапи на карті у фірмовому скляному стилі */
+.maplibregl-popup-content {
+  background-color: rgb(var(--color-surface-raised) / 0.85) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgb(var(--color-border));
+  border-radius: 1.25rem !important;
+  padding: 1rem !important;
+  box-shadow: var(--shadow-glass) !important;
+  color: rgb(var(--color-text)) !important;
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: rgb(var(--color-surface-raised) / 0.85) !important;
+}
+
+/* ==========================================================================
+   Дизайн-система Glassmorphism & Утиліти
+   ========================================================================== */
+
+/* Єдина "скляна" поверхня для карток, шторок та панелей */
 .glass-surface {
   background-color: rgb(var(--color-surface-raised) / 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgb(var(--color-border));
 }
+
+/* Фолбек для браузерів без підтримки backdrop-filter */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-surface {
+    background-color: rgb(var(--color-surface-raised) / 0.95);
+  }
+}
+
+/* Мобільні утиліти для Safe Areas (виріз екрана та домашня смуга Telegram Mini App / iOS) */
+@utility pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@utility pt-safe {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+/* Приховування стандартного скролбару для горизонтальних та вертикальних списків */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Доступність (Reduced Motion)
+   ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
   * {
