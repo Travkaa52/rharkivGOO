@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main] # Перевірте, чи ваша головна гілка називається main (або master)
   workflow_dispatch:
 
 permissions:
@@ -24,20 +24,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          node-version: 22
 
       - name: Install dependencies
-        working-directory: frontend
-        run: npm ci
+        run: npm install
 
       - name: Build
-        working-directory: frontend
-        # BASE_PATH = /<назва-репозиторію>/ — саме такий шлях буде мати сайт на
-        # username.github.io/<repo>/. Якщо репозиторій називається саме
-        # <username>.github.io (кореневий user-сайт), приберіть цей рядок
-        # або задайте BASE_PATH=/ .
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
         run: npm run build
@@ -45,7 +37,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist
+          path: ./dist
 
   deploy:
     needs: build
