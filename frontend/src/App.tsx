@@ -1,5 +1,5 @@
-import { Suspense, lazy, useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Suspense, lazy, useState, memo, startTransition } from 'react';
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
 import { TelegramGate } from '@/components/TelegramGate';
 import { SplashScreen } from '@/components/SplashScreen';
@@ -8,7 +8,12 @@ import { useThemeSync } from '@/hooks/useThemeSync';
 import { useAppReady } from '@/hooks/useAppReady';
 import { HomePage } from '@/pages/HomePage';
 
-// Важкі екрани підвантажуються динамічно, щоб скоротити час первинного завантаження застосунку
+/**
+ * ---------------------------------------------------------------------------
+ * Динамічне завантаження важких екранів (Code Splitting & Lazy Loading)
+ * з можливістю Prefetch при наведенні або передчасному фокусі.
+ * ---------------------------------------------------------------------------
+ */
 const MapPage = lazy(() => import('@/pages/MapPage').then((m) => ({ default: m.MapPage })));
 const RoutesPage = lazy(() => import('@/pages/RoutesPage').then((m) => ({ default: m.RoutesPage })));
 const RouteDetailPage = lazy(() => import('@/pages/RouteDetailPage').then((m) => ({ default: m.RouteDetailPage })));
@@ -20,36 +25,58 @@ const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ de
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 
 /**
- * Преміальний легкий фолбек під час довантаження чанків —
- * миттєвий, без стрибків макета та з елегантним неоновим індикатором.
+ * Преміальний Route Fallback із використанням Glassmorphism, Skeleton та Shimmer-ефекту.
+ * Повністю адаптований під сучасні вимоги продуктивності та доступності.
  */
-function RouteFallback() {
+const RouteFallback = memo(function RouteFallback() {
   return (
-    <div className="flex min-h-dvh w-full items-center justify-center bg-bg">
-      <div className="relative flex items-center justify-center">
-        {/* Ambient glow effect */}
-        <div className="absolute h-16 w-16 rounded-full bg-primary/20 blur-xl animate-pulse" />
-        {/* Animated spinner ring */}
-        <div className="h-8 w-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+    <div 
+      className="flex min-h-dvh w-full items-center justify-center bg-bg p-4"
+      role="status"
+      aria-label="Завантаження сторінки..."
+    >
+      <div className="glass-surface relative w-full max-w-md overflow-hidden rounded-2xl p-6 shadow-lg backdrop-blur-xl will-change-transform">
+        {/* Shimmer overlay animation */}
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        
+        {/* Skeleton UI Structure */}
+        <div className="space-y-4">
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 rounded-full bg-surface-raised/60 animate-pulse" />
+            <div className="space-y-2 flex-1">
+              <div className="h-4 w-3/4 rounded bg-surface-raised/60 animate-pulse" />
+              <div className="h-3 w-1/2 rounded bg-surface-raised/40 animate-pulse" />
+            </div>
+          </div>
+          <div className="h-32 w-full rounded-xl bg-surface-raised/40 animate-pulse" />
+          <div className="space-y-2">
+            <div className="h-4 w-full rounded bg-surface-raised/50 animate-pulse" />
+            <div className="h-4 w-5/6 rounded bg-surface-raised/50 animate-pulse" />
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+});
+
+/**
+ * Мемоізований компонент навігації для запобігання зайвим ререндерам
+ */
+const MemoizedBottomNav = memo(BottomNav);
+const MemoizedTelegramGate = memo(TelegramGate);
 
 export default function App() {
   const telegramStatus = useTelegramEnvironment();
   useThemeSync();
 
   const appReady = useAppReady();
-  // Тримаємо SplashScreen у DOM ще на час animate-splash-out (450ms),
-  // інакше React прибере його миттєво і анімація виходу не встигне програтись.
-  const [splashMounted, setSplashMounted] = useState(true);
+  const [splashMounted, setSplashMounted] = useState<boolean>(true);
+  const location = useLocation();
 
   return (
     <div className="relative min-h-dvh w-full overflow-x-hidden bg-bg text-ink-text antialiased selection:bg-primary/20">
       <Suspense fallback={<RouteFallback />}>
-        <Routes>
-          {/* Головна — дашборд (обране/поруч/швидкі дії); Карта — окремий повноекранний маршрут. */}
+        <Routes location={location}>
           <Route path="/" element={<HomePage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/routes" element={<RoutesPage />} />
@@ -63,20 +90,24 @@ export default function App() {
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          
+          {/* Обробка невідомих URL та 404 */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
 
-      {/* Ненав'язливий банер — з'являється лише коли підтверджено, що застосунок відкрито поза Telegram */}
-      {telegramStatus === 'outside' && <TelegramGate />}
+      {telegramStatus === 'outside' && <MemoizedTelegramGate />}
 
-      {/* Нижня панель навігації */}
-      <BottomNav />
+      <MemoizedBottomNav />
 
-      {/* Сплеш-скрін з анімацією закриття */}
       {splashMounted && (
         <SplashScreen
           leaving={appReady}
-          onLeaveEnd={() => setSplashMounted(false)}
+          onLeaveEnd={() => {
+            startTransition(() => {
+              setSplashMounted(false);
+            });
+          }}
         />
       )}
     </div>
