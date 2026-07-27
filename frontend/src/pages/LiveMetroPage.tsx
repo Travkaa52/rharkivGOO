@@ -1,8 +1,76 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { getStationPhoto } from '@/data/stationPhotos';
+import { TIMETABLES } from '@/liveMetro/timetableData';
+import { localStops } from '@/data/localData';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { Navigation, Loader2 } from 'lucide-react';
 
 export { getStationPhoto };
+
+// =============================================================================
+// ЗВʼЯЗОК ЗІ СПРАВЖНІМИ ДАНИМИ
+// =============================================================================
+// Станції на цій схемі використовують короткі id (наприклад 'kholodna-hora'),
+// а реальні джерела даних — `liveMetro/timetableData.ts` (розклади, розібрані
+// з фотографій табло на станціях) і `data/stops.json` (реальна геолокація) —
+// використовують канонічний id вигляду `stop-metro-<slug>`. Це відображення
+// з'єднує схему з обома джерелами один раз, а не мапить кожен виклик окремо.
+const TIMETABLE_STATION_ID: Record<string, string> = {
+  'kholodna-hora': 'stop-metro-holodna-gora',
+  vokzalna: 'stop-metro-vokzalna',
+  'tsentralnyi-rynok': 'stop-metro-tsentralnyi-rynok',
+  'maidan-konstytutsii': 'stop-metro-maidan-konstytutsii',
+  levada: 'stop-metro-levada',
+  sportyvna: 'stop-metro-sportyvna',
+  zavodska: 'stop-metro-zavodska',
+  turboatom: 'stop-metro-turboatom',
+  'palats-sportu': 'stop-metro-palats-sportu',
+  armiiska: 'stop-metro-armiiska',
+  'imeni-maselskoho': 'stop-metro-imeni-o-s-maselskogo',
+  'traktornyi-zavod': 'stop-metro-traktornyi-zavod',
+  industrialna: 'stop-metro-industrialna',
+  saltivska: 'stop-metro-saltivska',
+  studentska: 'stop-metro-studentska',
+  'akademika-pavlova': 'stop-metro-akademika-pavlova',
+  'akademika-barabashova': 'stop-metro-akademika-barabashova',
+  kyivska: 'stop-metro-kyivska',
+  'yaroslava-mudroho': 'stop-metro-iaroslava-mudrogo',
+  universytet: 'stop-metro-universytet',
+  'istorychnyi-muzei': 'stop-metro-istorychnyi-muzei',
+  peremoha: 'stop-metro-peremoga',
+  oleksiivska: 'stop-metro-oleksiivska',
+  '23-serpnia': 'stop-metro-23-serpnia',
+  'botanichnyi-sad': 'stop-metro-botanichnyi-sad',
+  naukova: 'stop-metro-naukova',
+  derzhprom: 'stop-metro-derzhprom',
+  'arkhitektora-beketova': 'stop-metro-arhitektora-beketova',
+  'zakhysnykiv-ukrainy': 'stop-metro-zahysnykiv-ukrainy',
+  metrobudivnykiv: 'stop-metro-metrobudivnykiv',
+};
+
+function realStationId(schematicStationId: string): string {
+  return TIMETABLE_STATION_ID[schematicStationId] ?? schematicStationId;
+}
+
+/** "HH:MM" -> секунди від півночі. */
+function timeStrToSec(time: string): number {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(time.trim());
+  if (!m) return 0;
+  return Number(m[1]) * 3600 + Number(m[2]) * 60;
+}
+
+function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const R = 6371000;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const lat1 = (a.lat * Math.PI) / 180;
+  const lat2 = (b.lat * Math.PI) / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+const WALK_SPEED_MPS = 1.35; // ~4.8 км/год — та сама константа, що й у data/localData.ts
 
 // =============================================================================
 // ТИПИ ДАНИХ
@@ -92,7 +160,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'kholodna-hora',
     name: 'Холодна Гора',
     nameEn: 'Kholodna Hora',
-    point: { x: 120, y: 500 },
+    point: { x: 412, y: 377 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1975-08-23',
@@ -103,7 +171,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'vokzalna',
     name: 'Вокзальна',
     nameEn: 'Vokzalna',
-    point: { x: 220, y: 500 },
+    point: { x: 492, y: 377 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1975-08-23',
@@ -114,7 +182,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'tsentralnyi-rynok',
     name: 'Центральний ринок',
     nameEn: 'Tsentralnyi Rynok',
-    point: { x: 320, y: 500 },
+    point: { x: 571, y: 377 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1975-08-23',
@@ -125,7 +193,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'maidan-konstytutsii',
     name: 'Майдан Конституції',
     nameEn: 'Maidan Konstytutsii',
-    point: { x: 420, y: 500 },
+    point: { x: 636, y: 428 },
     labelOffset: { x: 0, y: -18 },
     interchangeWith: ['istorychnyi-muzei'],
     lineId: 'route-metro-1',
@@ -137,7 +205,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'levada',
     name: 'Левада',
     nameEn: 'Levada',
-    point: { x: 520, y: 500 },
+    point: { x: 672, y: 486 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1975-08-23',
@@ -148,7 +216,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'sportyvna',
     name: 'Спортивна',
     nameEn: 'Sportyvna',
-    point: { x: 620, y: 500 },
+    point: { x: 716, y: 543 },
     labelOffset: { x: 0, y: -18 },
     interchangeWith: ['metrobudivnykiv'],
     lineId: 'route-metro-1',
@@ -160,7 +228,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'zavodska',
     name: 'Заводська',
     nameEn: 'Zavodska',
-    point: { x: 720, y: 500 },
+    point: { x: 781, y: 608 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1975-08-23',
@@ -171,7 +239,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'turboatom',
     name: 'Турбоатом',
     nameEn: 'Turboatom',
-    point: { x: 820, y: 500 },
+    point: { x: 824, y: 652 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1975-08-23',
@@ -182,7 +250,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'palats-sportu',
     name: 'Палац Спорту',
     nameEn: 'Palats Sportu',
-    point: { x: 920, y: 500 },
+    point: { x: 868, y: 695 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1978-05-11',
@@ -193,7 +261,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'armiiska',
     name: 'Армійська',
     nameEn: 'Armiiska',
-    point: { x: 1020, y: 500 },
+    point: { x: 911, y: 738 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1978-05-11',
@@ -204,7 +272,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'imeni-maselskoho',
     name: 'Імені О.С. Масельського',
     nameEn: 'Imeni O.S. Maselskoho',
-    point: { x: 1120, y: 500 },
+    point: { x: 983, y: 760 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1978-05-11',
@@ -215,7 +283,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'traktornyi-zavod',
     name: 'Тракторний завод',
     nameEn: 'Traktornyi Zavod',
-    point: { x: 1220, y: 500 },
+    point: { x: 1055, y: 760 },
     labelOffset: { x: 0, y: -18 },
     lineId: 'route-metro-1',
     opened: '1978-05-11',
@@ -226,7 +294,7 @@ const LINE1_STATIONS: SchematicStation[] = [
     id: 'industrialna',
     name: 'Індустріальна',
     nameEn: 'Industrialna',
-    point: { x: 1320, y: 500 },
+    point: { x: 1128, y: 760 },
     labelOffset: { x: 10, y: -18 },
     lineId: 'route-metro-1',
     opened: '1978-05-11',
@@ -244,7 +312,7 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'saltivska',
     name: 'Салтівська',
     nameEn: 'Saltivska',
-    point: { x: 670, y: 30 },
+    point: { x: 961, y: 110 },
     labelOffset: { x: 0, y: -20 },
     lineId: 'route-metro-2',
     opened: '1986-10-26',
@@ -255,7 +323,7 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'studentska',
     name: 'Студентська',
     nameEn: 'Studentska',
-    point: { x: 635, y: 120 },
+    point: { x: 925, y: 153 },
     labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1986-10-26',
@@ -266,7 +334,7 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'akademika-pavlova',
     name: 'Академіка Павлова',
     nameEn: 'Akademika Pavlova',
-    point: { x: 600, y: 210 },
+    point: { x: 889, y: 197 },
     labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1986-10-26',
@@ -277,7 +345,7 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'akademika-barabashova',
     name: 'Академіка Барабашова',
     nameEn: 'Akademika Barabashova',
-    point: { x: 565, y: 300 },
+    point: { x: 853, y: 240 },
     labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1984-08-11',
@@ -288,7 +356,7 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'kyivska',
     name: 'Київська',
     nameEn: 'Kyivska',
-    point: { x: 530, y: 390 },
+    point: { x: 817, y: 283 },
     labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1984-08-11',
@@ -299,7 +367,7 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'yaroslava-mudroho',
     name: 'Ярослава Мудрого',
     nameEn: 'Yaroslava Mudroho',
-    point: { x: 495, y: 480 },
+    point: { x: 781, y: 327 },
     labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1984-08-11',
@@ -310,7 +378,7 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'universytet',
     name: 'Університет',
     nameEn: 'Universytet',
-    point: { x: 460, y: 570 },
+    point: { x: 723, y: 348 },
     labelOffset: { x: 18, y: 4 },
     interchangeWith: ['derzhprom'],
     lineId: 'route-metro-2',
@@ -322,7 +390,7 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'istorychnyi-muzei',
     name: 'Історичний музей',
     nameEn: 'Istorychnyi Muzei',
-    point: { x: 420, y: 660 },
+    point: { x: 680, y: 413 },
     labelOffset: { x: 0, y: 22 },
     interchangeWith: ['maidan-konstytutsii'],
     lineId: 'route-metro-2',
@@ -341,7 +409,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'peremoha',
     name: 'Перемога',
     nameEn: 'Peremoha',
-    point: { x: 400, y: 30 },
+    point: { x: 564, y: 110 },
     labelOffset: { x: 0, y: -20 },
     lineId: 'route-metro-3',
     opened: '2016-08-19',
@@ -352,7 +420,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'oleksiivska',
     name: 'Олексіївська',
     nameEn: 'Oleksiivska',
-    point: { x: 430, y: 110 },
+    point: { x: 593, y: 153 },
     labelOffset: { x: -16, y: -14 },
     lineId: 'route-metro-3',
     opened: '2010-12-21',
@@ -363,7 +431,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: '23-serpnia',
     name: '23 Серпня',
     nameEn: '23 Serpnia',
-    point: { x: 460, y: 190 },
+    point: { x: 622, y: 197 },
     labelOffset: { x: -16, y: -14 },
     lineId: 'route-metro-3',
     opened: '2004-08-21',
@@ -374,7 +442,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'botanichnyi-sad',
     name: 'Ботанічний сад',
     nameEn: 'Botanichnyi Sad',
-    point: { x: 490, y: 270 },
+    point: { x: 651, y: 240 },
     labelOffset: { x: -16, y: -14 },
     lineId: 'route-metro-3',
     opened: '2004-08-21',
@@ -385,7 +453,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'naukova',
     name: 'Наукова',
     nameEn: 'Naukova',
-    point: { x: 520, y: 350 },
+    point: { x: 680, y: 283 },
     labelOffset: { x: -16, y: -14 },
     lineId: 'route-metro-3',
     opened: '1995-05-06',
@@ -396,7 +464,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'derzhprom',
     name: 'Держпром',
     nameEn: 'Derzhprom',
-    point: { x: 555, y: 430 },
+    point: { x: 694, y: 348 },
     labelOffset: { x: -18, y: 4 },
     interchangeWith: ['universytet'],
     lineId: 'route-metro-3',
@@ -408,7 +476,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'arkhitektora-beketova',
     name: 'Архітектора Бекетова',
     nameEn: 'Arkhitektora Beketova',
-    point: { x: 595, y: 500 },
+    point: { x: 752, y: 406 },
     labelOffset: { x: -16, y: 14 },
     lineId: 'route-metro-3',
     opened: '1995-05-06',
@@ -419,7 +487,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'zakhysnykiv-ukrainy',
     name: 'Захисників України',
     nameEn: 'Zakhysnykiv Ukrainy',
-    point: { x: 630, y: 575 },
+    point: { x: 738, y: 478 },
     labelOffset: { x: -16, y: 14 },
     lineId: 'route-metro-3',
     opened: '1995-05-06',
@@ -430,7 +498,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'metrobudivnykiv',
     name: 'Метробудівників',
     nameEn: 'Metrobudivnykiv',
-    point: { x: 660, y: 650 },
+    point: { x: 694, y: 536 },
     labelOffset: { x: 0, y: 22 },
     interchangeWith: ['sportyvna'],
     lineId: 'route-metro-3',
@@ -512,72 +580,55 @@ function angleBetween(a: SchematicPoint, b: SchematicPoint): number {
   return Math.atan2(b.y - a.y, b.x - a.x) * (180 / Math.PI);
 }
 
-function distance(a: SchematicPoint, b: SchematicPoint): number {
-  return Math.hypot(b.x - a.x, b.y - a.y);
-}
-
 // =============================================================================
 // ГЕНЕРАЦІЯ РОЗКЛАДУ
 // =============================================================================
 
-function generateTimetableForLine(
-  lineId: string,
-  stations: SchematicStation[],
-  dayType: LiveMetroDayType,
-  direction: 'forward' | 'backward'
-): StationDayTimetableEntry[] {
-  const lineNumber = LINE_NUMBERS[lineId];
-  const lineColor = LINE_COLORS[lineId];
-  const headsign = direction === 'forward' ? stations[stations.length - 1].name : stations[0].name;
-  const dirLabel = direction === 'forward' ? stations[stations.length - 1].nameEn : stations[0].nameEn;
-
-  const entries: StationDayTimetableEntry[] = [];
-
-  for (let i = 0; i < stations.length; i++) {
-    const times: string[] = [];
-    const baseStart = 5 * 3600 + 30 * 60; // 5:30
-    const baseEnd = 23 * 3600 + 55 * 60; // 23:55
-    const interval = dayType === 'weekday' ? 180 : 240; // 3 хв / 4 хв
-
-    const travelOffset = i * 120; // ~2 хв на станцію
-
-    for (let t = baseStart + travelOffset; t <= baseEnd; t += interval) {
-      const h = Math.floor(t / 3600);
-      const m = Math.floor((t % 3600) / 60);
-      times.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-    }
-
-    entries.push({
-      lineId,
-      lineNumber,
-      lineColor,
-      headsign,
-      direction: dirLabel,
-      times: times.slice(0, 20),
-    });
-  }
-
-  return entries;
-}
-
+/**
+ * Реальний графік станції (обидва напрямки, усі лінії, що через неї проходять) —
+ * бере фактичні відправлення з `TIMETABLES` (розібрані з фото табло на станціях),
+ * а не згенеровані значення. Якщо для станції немає розібраних даних (не мало б
+ * траплятись — дані є по всіх 30 станціях), напрямок просто не показується.
+ */
 export function getStationDayTimetable(
   stationId: string,
   dayType: LiveMetroDayType
 ): StationDayTimetableEntry[] {
   const result: StationDayTimetableEntry[] = [];
+  const realId = realStationId(stationId);
+  const perStation = TIMETABLES[dayType]?.[realId];
+  if (!perStation) return result;
 
   for (const { line } of BUILT_LINES) {
     const idx = line.stations.findIndex((s) => s.id === stationId);
     if (idx === -1) continue;
 
-    const forward = generateTimetableForLine(line.id, line.stations, dayType, 'forward');
-    const backward = generateTimetableForLine(line.id, line.stations, dayType, 'backward');
+    const entry = perStation[line.id];
+    if (!entry) continue;
 
-    const fwdEntry = forward[idx];
-    const bwdEntry = backward[idx];
+    const lineNumber = LINE_NUMBERS[line.id];
+    const lineColor = LINE_COLORS[line.id];
 
-    if (fwdEntry) result.push(fwdEntry);
-    if (bwdEntry) result.push(bwdEntry);
+    if (entry.forward.length) {
+      result.push({
+        lineId: line.id,
+        lineNumber,
+        lineColor,
+        headsign: line.stations[line.stations.length - 1].name,
+        direction: line.stations[line.stations.length - 1].nameEn,
+        times: entry.forward,
+      });
+    }
+    if (entry.backward.length) {
+      result.push({
+        lineId: line.id,
+        lineNumber,
+        lineColor,
+        headsign: line.stations[0].name,
+        direction: line.stations[0].nameEn,
+        times: entry.backward,
+      });
+    }
   }
 
   return result;
@@ -587,6 +638,10 @@ export function getStationDayTimetable(
 // ПОЇЗДИ У РЕАЛЬНОМУ ЧАСІ
 // =============================================================================
 
+/**
+ * Найближчі прибуття на станцію — з реального графіка цієї станції
+ * (`TIMETABLES`), а не з випадкової генерації.
+ */
 export function getUpcomingArrivalsForStation(
   stationId: string,
   _date: Date,
@@ -599,47 +654,40 @@ export function getUpcomingArrivalsForStation(
   etaSec: number;
 }> {
   const nowSec = secOfDay(new Date());
-  const arrivals: Array<{
-    lineId: string;
-    lineNumber: number;
-    lineColor: string;
-    headsign: string;
-    etaSec: number;
-  }> = [];
+  const realId = realStationId(stationId);
+  const perStation = TIMETABLES[dayTypeOf(new Date())]?.[realId];
+  const arrivals: Array<{ lineId: string; lineNumber: number; lineColor: string; headsign: string; etaSec: number }> = [];
 
-  for (const { line } of BUILT_LINES) {
-    const idx = line.stations.findIndex((s) => s.id === stationId);
-    if (idx === -1) continue;
+  if (perStation) {
+    for (const { line } of BUILT_LINES) {
+      const idx = line.stations.findIndex((s) => s.id === stationId);
+      if (idx === -1) continue;
+      const entry = perStation[line.id];
+      if (!entry) continue;
 
-    const baseStart = 5 * 3600 + 30 * 60;
-
-    // Forward direction
-    for (let run = 0; run < 3; run++) {
-      const runStart = baseStart + run * 1200;
-      const eta = runStart + idx * 120;
-      if (eta > nowSec && eta < nowSec + 3600) {
-        arrivals.push({
-          lineId: line.id,
-          lineNumber: line.number,
-          lineColor: line.color,
-          headsign: line.stations[line.stations.length - 1].name,
-          etaSec: eta,
-        });
+      for (const t of entry.forward) {
+        const eta = timeStrToSec(t);
+        if (eta > nowSec && eta < nowSec + 3600) {
+          arrivals.push({
+            lineId: line.id,
+            lineNumber: LINE_NUMBERS[line.id],
+            lineColor: LINE_COLORS[line.id],
+            headsign: line.stations[line.stations.length - 1].name,
+            etaSec: eta,
+          });
+        }
       }
-    }
-
-    // Backward direction
-    for (let run = 0; run < 3; run++) {
-      const runStart = baseStart + run * 1200 + 600;
-      const eta = runStart + (line.stations.length - 1 - idx) * 120;
-      if (eta > nowSec && eta < nowSec + 3600) {
-        arrivals.push({
-          lineId: line.id,
-          lineNumber: line.number,
-          lineColor: line.color,
-          headsign: line.stations[0].name,
-          etaSec: eta,
-        });
+      for (const t of entry.backward) {
+        const eta = timeStrToSec(t);
+        if (eta > nowSec && eta < nowSec + 3600) {
+          arrivals.push({
+            lineId: line.id,
+            lineNumber: LINE_NUMBERS[line.id],
+            lineColor: LINE_COLORS[line.id],
+            headsign: line.stations[0].name,
+            etaSec: eta,
+          });
+        }
       }
     }
   }
@@ -648,137 +696,123 @@ export function getUpcomingArrivalsForStation(
 }
 
 // =============================================================================
-// ХУК: useLiveMetroTrains
+// ХУК: useLiveMetroTrains — позиції поїздів рахуються з реального графіка
+// відправлень (TIMETABLES), а не випадковою симуляцією.
 // =============================================================================
 
+/** Кеш профілів часу прибуття на кожну станцію напрямку, по кожному рейсу дня. */
+const runProfileCache = new Map<string, { times: number[][]; stations: SchematicStation[] }>();
+
+function getRunProfile(
+  lineId: string,
+  stations: SchematicStation[],
+  direction: 'forward' | 'backward',
+  dayType: LiveMetroDayType
+): { times: number[][]; stations: SchematicStation[] } {
+  const key = `${lineId}:${direction}:${dayType}`;
+  const cached = runProfileCache.get(key);
+  if (cached) return cached;
+
+  // Для кожної станції маршруту — реальний список відправлень (сек. від півночі), відсортований.
+  const perStationTimes = stations.map((s) => {
+    const realId = realStationId(s.id);
+    const entry = TIMETABLES[dayType]?.[realId]?.[lineId];
+    const list = entry?.[direction] ?? [];
+    return list.map(timeStrToSec).sort((a, b) => a - b);
+  });
+
+  const maxRuns = Math.max(0, ...perStationTimes.map((t) => t.length));
+  // times[k] = масив часів (по станціях, у порядку маршруту) для k-го рейсу дня.
+  const times: number[][] = [];
+  for (let k = 0; k < maxRuns; k++) {
+    const row = perStationTimes.map((list) => (list.length ? list[Math.min(k, list.length - 1)] : NaN));
+    // Рейс валідний, лише якщо часи не спадають вздовж маршруту (захист від зіпсованих даних).
+    let valid = !row.some((v) => Number.isNaN(v));
+    for (let i = 1; valid && i < row.length; i++) {
+      if (row[i] < row[i - 1]) valid = false;
+    }
+    if (valid) times.push(row);
+  }
+
+  const result = { times, stations };
+  runProfileCache.set(key, result);
+  return result;
+}
+
+function computeActiveTrains(nowSec: number, dayType: LiveMetroDayType): LiveMetroTrain[] {
+  const trains: LiveMetroTrain[] = [];
+
+  for (const { line } of BUILT_LINES) {
+    const directions: Array<{ dir: 'forward' | 'backward'; stations: SchematicStation[] }> = [
+      { dir: 'forward', stations: line.stations },
+      { dir: 'backward', stations: [...line.stations].reverse() },
+    ];
+
+    for (const { dir, stations } of directions) {
+      const { times } = getRunProfile(line.id, stations, dir, dayType);
+      const headsign = dir === 'forward' ? stations[stations.length - 1].name : stations[0].name;
+
+      for (let k = 0; k < times.length; k++) {
+        const row = times[k];
+        const first = row[0];
+        const last = row[row.length - 1];
+        if (nowSec < first || nowSec > last + DWELL_HOLD_SEC) continue;
+
+        // Знаходимо сегмент [i, i+1], у якому зараз перебуває потяг.
+        let i = 0;
+        while (i < row.length - 2 && nowSec >= row[i + 1]) i++;
+        const tFrom = row[i];
+        const tTo = row[i + 1];
+        const segDur = Math.max(1, tTo - tFrom);
+        const rawProgress = (nowSec - tFrom) / segDur;
+        const progress = Math.min(1, Math.max(0, rawProgress));
+
+        const from = stations[i];
+        const to = stations[i + 1];
+        const point = lerpPoint(from.point, to.point, progress);
+        const heading = angleBetween(from.point, to.point);
+        const isLastLeg = i === row.length - 2;
+        const phase: 'moving' | 'dwell' =
+          progress >= 1 || (isLastLeg && nowSec > row[row.length - 1]) ? 'dwell' : progress < 0.06 ? 'dwell' : 'moving';
+
+        trains.push({
+          id: `${line.id}-${dir}-${k}`,
+          lineId: line.id,
+          lineNumber: LINE_NUMBERS[line.id],
+          lineColor: LINE_COLORS[line.id],
+          headsign,
+          point,
+          headingDeg: heading,
+          speedRatio: 0.55,
+          phase,
+          previousStation: from,
+          nextStation: to,
+          etaNextStationSec: tTo,
+          progress,
+        });
+      }
+    }
+  }
+
+  return trains;
+}
+
+const DWELL_HOLD_SEC = 45; // тримаємо потяг на кінцевій станції ще трохи після останнього відправлення в профілі
+
 export function useLiveMetroTrains(): LiveMetroTrain[] {
-  const [trains, setTrains] = useState<LiveMetroTrain[]>(() => generateTrains());
-  const trainsRef = useRef(trains);
-  trainsRef.current = trains;
+  const [trains, setTrains] = useState<LiveMetroTrain[]>(() =>
+    computeActiveTrains(secOfDay(new Date()), dayTypeOf(new Date()))
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTrains((prev) => updateTrains(prev));
+      const now = new Date();
+      setTrains(computeActiveTrains(secOfDay(now), dayTypeOf(now)));
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
   return trains;
-}
-
-function generateTrains(): LiveMetroTrain[] {
-  const allTrains: LiveMetroTrain[] = [];
-  let trainId = 0;
-
-  for (const { line } of BUILT_LINES) {
-    const stations = line.stations;
-    const numTrains = Math.max(3, Math.floor(stations.length / 3));
-
-    for (let i = 0; i < numTrains; i++) {
-      const progress = i / numTrains;
-      const segIndex = Math.floor(progress * (stations.length - 1));
-      const segProgress = (progress * (stations.length - 1)) % 1;
-
-      const from = stations[Math.min(segIndex, stations.length - 1)];
-      const to = stations[Math.min(segIndex + 1, stations.length - 1)];
-
-      const point = lerpPoint(from.point, to.point, segProgress);
-      const heading = angleBetween(from.point, to.point);
-      const dist = distance(from.point, to.point);
-      const speedRatio = 0.3 + Math.random() * 0.5;
-      const etaNext = Math.max(10, Math.floor((dist / (speedRatio * 40 + 20)) * 3600 / 100));
-
-      allTrains.push({
-        id: `train-${line.id}-${trainId++}`,
-        lineId: line.id,
-        lineNumber: line.number,
-        lineColor: line.color,
-        headsign: to.name,
-        point,
-        headingDeg: heading,
-        speedRatio,
-        phase: segProgress > 0.85 ? 'dwell' : 'moving',
-        previousStation: from,
-        nextStation: to,
-        etaNextStationSec: secOfDay(new Date()) + etaNext,
-        progress: segProgress,
-      });
-    }
-  }
-
-  return allTrains;
-}
-
-function updateTrains(prev: LiveMetroTrain[]): LiveMetroTrain[] {
-  return prev.map((train) => {
-    const line = BUILT_LINES.find((l) => l.line.id === train.lineId)?.line;
-    if (!line) return train;
-
-    const stations = line.stations;
-    const fromIdx = stations.findIndex((s) => s.id === train.previousStation.id);
-    const toIdx = stations.findIndex((s) => s.id === train.nextStation.id);
-
-    if (fromIdx === -1 || toIdx === -1) return train;
-
-    const dist = distance(train.previousStation.point, train.nextStation.point);
-    const speed = train.speedRatio * 40; // км/год
-    const speedPxPerSec = (speed * 1000 / 3600) * 0.05; // масштаб
-    const segDuration = dist / speedPxPerSec;
-
-    const newProgress = train.progress + 1 / segDuration;
-
-    if (newProgress >= 1) {
-      // Досягли наступної станції
-      const newFrom = train.nextStation;
-      const direction = toIdx > fromIdx ? 1 : -1;
-      const newToIdx = toIdx + direction;
-
-      if (newToIdx < 0 || newToIdx >= stations.length) {
-        // Розворот
-        const reverseToIdx = toIdx - direction;
-        if (reverseToIdx >= 0 && reverseToIdx < stations.length) {
-          const reverseTo = stations[reverseToIdx];
-          return {
-            ...train,
-            previousStation: newFrom,
-            nextStation: reverseTo,
-            point: newFrom.point,
-            headingDeg: angleBetween(newFrom.point, reverseTo.point),
-            progress: 0,
-            phase: 'dwell' as const,
-            etaNextStationSec: secOfDay(new Date()) + 30,
-            headsign: reverseTo.name,
-          };
-        }
-        return train;
-      }
-
-      const newTo = stations[newToIdx];
-      return {
-        ...train,
-        previousStation: newFrom,
-        nextStation: newTo,
-        point: newFrom.point,
-        headingDeg: angleBetween(newFrom.point, newTo.point),
-        progress: 0,
-        phase: 'dwell' as const,
-        etaNextStationSec: secOfDay(new Date()) + 30,
-        headsign: newTo.name,
-      };
-    }
-
-    const point = lerpPoint(train.previousStation.point, train.nextStation.point, newProgress);
-    const remainingDist = dist * (1 - newProgress);
-    const eta = Math.max(5, Math.floor(remainingDist / speedPxPerSec));
-
-    return {
-      ...train,
-      point,
-      progress: newProgress,
-      phase: newProgress > 0.9 ? 'dwell' : 'moving',
-      etaNextStationSec: secOfDay(new Date()) + eta,
-    };
-  });
 }
 
 // =============================================================================
