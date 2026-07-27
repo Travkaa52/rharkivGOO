@@ -4,7 +4,7 @@ export interface RouteItem {
   id: string;
   kind: TransportKind;
   number: string;
-  name?: string;
+  name: string;
   color?: string;
   stopIds: string[];
   headsignForward?: string;
@@ -342,7 +342,7 @@ export const localRoutes = {
   search: (query: string): RouteItem[] => {
     const q = query.toLowerCase();
     return routesData.filter(
-      (r) => r.number.toLowerCase().includes(q) || (r.name && r.name.toLowerCase().includes(q))
+      (r) => r.number.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)
     );
   },
   buildTrip: (..._args: unknown[]) => ({ routeId: _args[0] as string, segments: [] })
