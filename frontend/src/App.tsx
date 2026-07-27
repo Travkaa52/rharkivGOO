@@ -8,10 +8,7 @@ import { useThemeSync } from '@/hooks/useThemeSync';
 import { useAppReady } from '@/hooks/useAppReady';
 import { HomePage } from '@/pages/HomePage';
 
-// Важкі екрани (карта тягне за собою maplibre-gl ~800кб, живе метро — власний
-// SVG-рушій) підвантажуються лише при переході на них — на мобільному
-// з'єднанні це помітно скорочує перше завантаження застосунку (Home більше
-// не чекає на завантаження бандла карти).
+// Важкі екрани підвантажуються динамічно, щоб скоротити час первинного завантаження застосунку
 const MapPage = lazy(() => import('@/pages/MapPage').then((m) => ({ default: m.MapPage })));
 const RoutesPage = lazy(() => import('@/pages/RoutesPage').then((m) => ({ default: m.RoutesPage })));
 const RouteDetailPage = lazy(() => import('@/pages/RouteDetailPage').then((m) => ({ default: m.RouteDetailPage })));
@@ -22,9 +19,21 @@ const HistoryPage = lazy(() => import('@/pages/HistoryPage').then((m) => ({ defa
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 
-/** Легкий фолбек під час довантаження екрана — миттєвий, без стрибків макета. */
+/**
+ * Преміальний легкий фолбек під час довантаження чанків —
+ * миттєвий, без стрибків макета та з елегантним неоновим індикатором.
+ */
 function RouteFallback() {
-  return <div className="min-h-dvh bg-bg" />;
+  return (
+    <div className="flex min-h-dvh w-full items-center justify-center bg-bg">
+      <div className="relative flex items-center justify-center">
+        {/* Ambient glow effect */}
+        <div className="absolute h-16 w-16 rounded-full bg-primary/20 blur-xl animate-pulse" />
+        {/* Animated spinner ring */}
+        <div className="h-8 w-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+      </div>
+    </div>
+  );
 }
 
 export default function App() {
@@ -37,7 +46,7 @@ export default function App() {
   const [splashMounted, setSplashMounted] = useState(true);
 
   return (
-    <div className="relative">
+    <div className="relative min-h-dvh w-full overflow-x-hidden bg-bg text-ink-text antialiased selection:bg-primary/20">
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           {/* Головна — дашборд (обране/поруч/швидкі дії); Карта — окремий повноекранний маршрут. */}
@@ -56,10 +65,14 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </Suspense>
-      {/* Ненав'язливий банер (не блокує UI) — з'являється лише коли підтверджено, що застосунок відкрито поза Telegram. */}
+
+      {/* Ненав'язливий банер — з'являється лише коли підтверджено, що застосунок відкрито поза Telegram */}
       {telegramStatus === 'outside' && <TelegramGate />}
+
+      {/* Нижня панель навігації */}
       <BottomNav />
 
+      {/* Сплеш-скрін з анімацією закриття */}
       {splashMounted && (
         <SplashScreen
           leaving={appReady}
