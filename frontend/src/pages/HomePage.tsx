@@ -26,12 +26,6 @@ const KIND_ICON: Record<TransportKind, string> = {
   bus: '🚌'
 };
 
-const KIND_COLORS: Record<TransportKind, string> = {
-  metro: 'bg-red-500/20 text-red-400 border-red-500/30',
-  tram: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  trolleybus: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  bus: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-};
 
 /** Форматування відстані в метрах чи кілометрах */
 function formatDistance(m: number): string {
