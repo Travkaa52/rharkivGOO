@@ -531,7 +531,6 @@ function generateTimetableForLine(
   const entries: StationDayTimetableEntry[] = [];
 
   for (let i = 0; i < stations.length; i++) {
-    const station = stations[i];
     const times: string[] = [];
     const baseStart = 5 * 3600 + 30 * 60; // 5:30
     const baseEnd = 23 * 3600 + 55 * 60; // 23:55
@@ -609,7 +608,6 @@ export function getUpcomingArrivalsForStation(
     const idx = line.stations.findIndex((s) => s.id === stationId);
     if (idx === -1) continue;
 
-    const interval = 180;
     const baseStart = 5 * 3600 + 30 * 60;
 
     // Forward direction
