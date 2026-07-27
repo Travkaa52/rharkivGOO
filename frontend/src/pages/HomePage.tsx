@@ -2,9 +2,7 @@ import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 import {
   Star,
-  MapPin,
   ChevronRight,
-  Search,
   Map as MapIcon,
   Train,
   Bus,
@@ -18,7 +16,6 @@ import {
 } from 'lucide-react';
 import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
-import { useHistoryStore } from '@/store/useHistoryStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import type { TransportKind } from '@/types/transport';
 
@@ -118,7 +115,6 @@ export function HomePage() {
 
         {/* 2. КАРТОЧКА "МЕТРО ОНЛАЙН" (Головний акцент) */}
         <section className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-5 shadow-lg shadow-emerald-900/10 transition-transform duration-300 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          {/* Декоративний фон */}
           <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
 
           <div className="flex items-center justify-between mb-3">
