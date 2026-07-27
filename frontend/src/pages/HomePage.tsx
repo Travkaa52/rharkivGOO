@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   Star, 
   ChevronRight, 
@@ -10,21 +10,18 @@ import {
   Bell, 
   Settings, 
   Plus, 
-  Activity, 
   ArrowUpRight, 
   AlertCircle,
   Search as SearchIcon,
   X,
   History,
-  Trash2,
   Clock,
-  Sparkles,
   MapPin,
   Compass,
   CheckCircle2,
   ExternalLink
 } from 'lucide-react';
-import { localRoutes, localStops, localMetro } from '@/data/localData';
+import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
@@ -58,15 +55,13 @@ function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2:
 }
 
 export function HomePage() {
-  const navigate = useNavigate();
   const profile = useAuthStore((s) => s.profile);
   const favoriteRoutes = useFavoritesStore((s) => s.routes);
   const favoriteStops = useFavoritesStore((s) => s.stops);
-  const { position, error: geoError, requestPosition } = useGeolocation();
+  const { position, locate } = useGeolocation();
   
   const historyEntries = useHistoryStore((s) => s.entries);
   const addHistoryEntry = useHistoryStore((s) => s.addEntry);
-  const clearHistory = useHistoryStore((s) => s.clearEntries);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -103,17 +98,17 @@ export function HomePage() {
     const matchedRoutes = localRoutes.search(q).slice(0, 4);
     const matchedStops = localStops.search(q).slice(0, 4);
     
-    // Search metro stations
+    // Search metro stations from routes/stops where kind is metro
     const matchedMetro: Array<{ id: string; name: string; lineName?: string }> = [];
     try {
-      const allStations = localMetro.getAllStations?.() || [];
-      for (const st of allStations) {
-        if (st.name.toLowerCase().includes(q)) {
-          matchedMetro.push({ id: st.id, name: st.name, lineName: st.lineName });
+      const allRoutes = localRoutes.search(q) || [];
+      for (const r of allRoutes) {
+        if (r.kind === 'metro') {
+          matchedMetro.push({ id: r.id, name: r.name, lineName: r.number });
         }
       }
     } catch {
-      // fallback if method differs
+      // fallback
     }
 
     return {
@@ -258,7 +253,7 @@ export function HomePage() {
                               to={`/routes/${r.id}`}
                               onClick={() => {
                                 setIsSearchFocused(false);
-                                addHistoryEntry({ id: r.id, title: `Маршрут ${r.number}`, type: 'route' });
+                                addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
                               }}
                               className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
                             >
@@ -284,7 +279,7 @@ export function HomePage() {
                               to={`/map?q=${encodeURIComponent(s.name)}`}
                               onClick={() => {
                                 setIsSearchFocused(false);
-                                addHistoryEntry({ id: s.id, title: s.name, type: 'stop' });
+                                addHistoryEntry({ query: s.name, type: 'stop' });
                               }}
                               className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
                             >
@@ -310,7 +305,7 @@ export function HomePage() {
                               to={`/metro/live`}
                               onClick={() => {
                                 setIsSearchFocused(false);
-                                addHistoryEntry({ id: m.id, title: m.name, type: 'metro' });
+                                addHistoryEntry({ query: m.name, type: 'route' });
                               }}
                               className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
                             >
@@ -420,7 +415,7 @@ export function HomePage() {
               <p className="text-xs font-bold text-slate-800 mb-1">Геолокація вимкнена або не дозволена</p>
               <p className="text-[11px] text-slate-400 mb-3 max-w-[240px]">Увімкніть доступ до GPS, щоб бачити зупинки поруч з вами</p>
               <button
-                onClick={() => requestPosition()}
+                onClick={() => locate()}
                 className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-emerald-700 active:scale-95 transition-all inline-flex items-center gap-1.5"
               >
                 <MapPin size={14} />
@@ -437,7 +432,7 @@ export function HomePage() {
                 <Link
                   key={stop.id}
                   to={`/map?q=${encodeURIComponent(stop.name)}`}
-                  onClick={() => addHistoryEntry({ id: stop.id, title: stop.name, type: 'stop' })}
+                  onClick={() => addHistoryEntry({ query: stop.name, type: 'stop' })}
                   className="flex items-center justify-between p-3 rounded-[18px] bg-slate-50 hover:bg-emerald-50/50 transition-colors border border-transparent hover:border-emerald-100 group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -494,7 +489,7 @@ export function HomePage() {
                 <Link
                   key={r.id}
                   to={`/routes/${r.id}`}
-                  onClick={() => addHistoryEntry({ id: r.id, title: `Маршрут ${r.number}`, type: 'route' })}
+                  onClick={() => addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' })}
                   className="flex items-center justify-between p-3 rounded-[18px] bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-100"
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -511,7 +506,7 @@ export function HomePage() {
                 <Link
                   key={s.id}
                   to={`/map?q=${encodeURIComponent(s.name)}`}
-                  onClick={() => addHistoryEntry({ id: s.id, title: s.name, type: 'stop' })}
+                  onClick={() => addHistoryEntry({ query: s.name, type: 'stop' })}
                   className="flex items-center justify-between p-3 rounded-[18px] bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-100"
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -535,13 +530,6 @@ export function HomePage() {
                 </div>
                 <h2 className="font-extrabold text-slate-900 text-xs">Останні переглянуті</h2>
               </div>
-              <button
-                onClick={clearHistory}
-                className="text-[11px] font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1 active:scale-95 transition-transform"
-              >
-                <Trash2 size={13} />
-                <span>Очистити</span>
-              </button>
             </div>
 
             <div className="space-y-1.5 max-h-52 overflow-y-auto no-scrollbar">
@@ -549,7 +537,7 @@ export function HomePage() {
                 <div key={idx} className="flex items-center justify-between p-2.5 rounded-[16px] bg-slate-50 hover:bg-slate-100 transition-colors">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Clock size={14} className="text-slate-400 shrink-0" />
-                    <span className="font-bold text-xs text-slate-800 truncate">{entry.title}</span>
+                    <span className="font-bold text-xs text-slate-800 truncate">{entry.query}</span>
                   </div>
                   <span className="text-[10px] text-slate-400 font-medium">Щойно</span>
                 </div>
