@@ -17,9 +17,10 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={clsx(
-        'rounded-lg bg-surface-raised border border-border shadow-glass',
+        'glass-card rounded-lg shadow-glass',
         paddings[padding],
-        interactive && 'transition-all duration-150 active:scale-[0.98] cursor-pointer hover:border-gold/40',
+        interactive &&
+          'transition-all duration-150 active:scale-[0.98] cursor-pointer hover:border-gold/40 hover:brightness-[1.04]',
         className
       )}
       {...rest}

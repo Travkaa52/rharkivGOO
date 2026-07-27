@@ -23,11 +23,8 @@ const NAV_ITEMS: NavItem[] = [
  */
 export function BottomNav() {
   return (
-    <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border/40 bg-surface/80 pb-safe backdrop-blur-xl shadow-2xl transition-colors"
-      aria-label="Основна навігація"
-    >
-      <div className="mx-auto flex max-w-md items-center justify-between px-2 py-1.5">
+    <nav className="fixed inset-x-0 bottom-0 z-40 pb-safe px-3" aria-label="Основна навігація">
+      <div className="glass-surface mx-auto mb-2 flex max-w-md items-center justify-between rounded-full px-2 py-1.5 shadow-glass-lg">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           return (
@@ -37,23 +34,20 @@ export function BottomNav() {
               end={item.exact}
               className={({ isActive }) =>
                 clsx(
-                  'group relative flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-1.5 transition-all duration-200 active:scale-95',
-                  isActive ? 'text-primary font-bold' : 'text-ink-muted hover:text-ink-text'
+                  'group relative z-[2] flex flex-1 flex-col items-center justify-center gap-1 rounded-full py-1.5 transition-all duration-200 active:scale-95',
+                  isActive
+                    ? 'text-primary font-bold [box-shadow:inset_0_1px_0.5px_rgb(255_255_255_/_0.5)] bg-gradient-to-b from-white/70 to-white/30 dark:from-white/25 dark:to-white/5'
+                    : 'text-ink-muted hover:text-ink-text'
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  {/* Активний неоновий індикатор зверху */}
-                  {isActive && (
-                    <span className="absolute -top-1.5 h-1 w-7 rounded-full bg-primary shadow-[0_0_10px_rgba(20,184,166,0.8)]" />
-                  )}
-
                   <Icon
                     className={clsx(
                       'h-5 w-5 transition-all duration-200',
                       isActive
-                        ? '-translate-y-0.5 stroke-[2.25] text-primary drop-shadow-[0_0_8px_rgba(20,184,166,0.5)]'
+                        ? '-translate-y-0.5 stroke-[2.25] text-primary'
                         : 'stroke-[1.75] group-hover:scale-105'
                     )}
                   />

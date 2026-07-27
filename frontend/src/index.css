@@ -46,33 +46,39 @@ body {
    ========================================================================== */
 
 .maplibregl-ctrl-group {
-  border-radius: 1rem !important;
+  border-radius: 1.25rem !important;
   overflow: hidden;
-  box-shadow: var(--shadow-glass) !important;
-  background-color: rgb(var(--color-surface-raised) / 0.8) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgb(var(--color-border)) !important;
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 0.5px rgb(var(--glass-sheen) / var(--glass-sheen-strong)) !important;
+  background:
+    linear-gradient(165deg, rgb(var(--color-surface-raised) / 0.55), rgb(var(--color-surface-raised) / 0.85)) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid rgb(var(--glass-sheen) / var(--glass-border-alpha)) !important;
 }
 
 .maplibregl-ctrl-group button {
   background-color: transparent !important;
-  border-bottom: 1px solid rgb(var(--color-border)) !important;
+  border-bottom: 1px solid rgb(var(--color-border) / 0.5) !important;
 }
 
 .maplibregl-ctrl-group button:last-child {
   border-bottom: none !important;
 }
 
-/* Попапи на карті у фірмовому скляному стилі */
+/* Попапи на карті у фірмовому стилі "рідкого скла" */
 .maplibregl-popup-content {
-  background-color: rgb(var(--color-surface-raised) / 0.85) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgb(var(--color-border));
+  background:
+    linear-gradient(165deg, rgb(var(--color-surface-raised) / 0.6), rgb(var(--color-surface-raised) / 0.9)) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid rgb(var(--glass-sheen) / var(--glass-border-alpha));
   border-radius: 1.25rem !important;
   padding: 1rem !important;
-  box-shadow: var(--shadow-glass) !important;
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 0.5px rgb(var(--glass-sheen) / var(--glass-sheen-strong)) !important;
   color: rgb(var(--color-text)) !important;
 }
 
@@ -84,18 +90,53 @@ body {
    Дизайн-система Glassmorphism & Утиліти
    ========================================================================== */
 
-/* Єдина "скляна" поверхня для карток, шторок та панелей */
+/* Єдина "рідке скло" поверхня для карток, шторок та панелей —
+   специфічна відповідь на бриф: шар світла зверху (specular highlight),
+   легке заломлення знизу (inset shadow) і підняте насичення кольорів під склом,
+   як у сучасних iOS-інтерфейсах. */
 .glass-surface {
-  background-color: rgb(var(--color-surface-raised) / 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgb(var(--color-border));
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(165deg, rgb(var(--color-surface-raised) / 0.52), rgb(var(--color-surface-raised) / 0.82)),
+    radial-gradient(130% 160% at 18% -25%, rgb(var(--glass-sheen) / var(--glass-tint-top-alpha)), transparent 58%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid rgb(var(--glass-sheen) / var(--glass-border-alpha));
+  box-shadow:
+    inset 0 1px 0.5px rgb(var(--glass-sheen) / var(--glass-sheen-strong)),
+    inset 0 1px 14px rgb(var(--glass-sheen) / var(--glass-sheen-soft)),
+    inset 0 -16px 22px -16px rgb(0 0 0 / 0.16);
+}
+
+/* Тонка риска-відблиск по верхньому краю — те, що відрізняє "рідке скло" від звичайного розмиття */
+.glass-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    120deg,
+    rgb(var(--glass-sheen) / 0.55) 0%,
+    rgb(var(--glass-sheen) / 0) 22%,
+    rgb(var(--glass-sheen) / 0) 78%,
+    rgb(var(--glass-sheen) / 0.28) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Фолбек для браузерів без підтримки backdrop-filter */
 @supports not (backdrop-filter: blur(1px)) {
   .glass-surface {
-    background-color: rgb(var(--color-surface-raised) / 0.95);
+    background: rgb(var(--color-surface-raised) / 0.95);
+  }
+  .glass-surface::before {
+    display: none;
   }
 }
 

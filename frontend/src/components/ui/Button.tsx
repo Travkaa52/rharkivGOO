@@ -19,13 +19,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    'bg-forest text-white shadow-glass hover:bg-forest-light active:bg-forest-dark focus-visible:ring-forest',
+    'relative bg-gradient-to-b from-forest-light to-forest text-white shadow-glass border border-white/25 [box-shadow:inset_0_1px_0.5px_rgb(255_255_255_/_0.45),inset_0_-10px_16px_-12px_rgb(0_0_0_/_0.25),var(--shadow-glass)] hover:brightness-[1.06] active:brightness-95 focus-visible:ring-forest',
   secondary:
-    'bg-surface-raised text-ink-text border border-border/80 hover:border-gold/50 hover:bg-surface-soft active:bg-surface-raised focus-visible:ring-gold',
+    'glass-surface text-ink-text hover:border-gold/50 hover:brightness-[1.05] active:brightness-95 focus-visible:ring-gold',
   ghost:
-    'bg-transparent text-ink-text hover:bg-surface-soft active:bg-surface-raised focus-visible:ring-primary',
+    'bg-transparent text-ink-text hover:bg-surface-soft/60 active:bg-surface-raised/60 focus-visible:ring-primary',
   danger:
-    'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 active:bg-red-500/30 focus-visible:ring-red-500'
+    'bg-red-500/10 text-red-500 border border-red-500/20 backdrop-blur-md hover:bg-red-500/20 active:bg-red-500/30 focus-visible:ring-red-500'
 };
 
 const sizeClasses: Record<Size, string> = {

@@ -18,13 +18,16 @@ export function Switch({ checked, onChange, label, disabled }: SwitchProps) {
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={clsx(
-        'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors duration-200 disabled:opacity-40',
-        checked ? 'bg-forest' : 'bg-ink-text/15'
+        'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border transition-colors duration-200 disabled:opacity-40',
+        '[box-shadow:inset_0_1px_3px_rgb(0_0_0_/_0.25)]',
+        checked
+          ? 'border-white/25 bg-gradient-to-b from-forest-light to-forest'
+          : 'border-white/10 bg-ink-text/15 backdrop-blur-sm'
       )}
     >
       <span
         className={clsx(
-          'inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200 ease-out',
+          'inline-block h-5 w-5 transform rounded-full bg-gradient-to-b from-white to-white/90 [box-shadow:inset_0_1px_0.5px_rgb(255_255_255_/_0.9),0_1px_3px_rgb(0_0_0_/_0.35)] transition-transform duration-200 ease-out',
           checked ? 'translate-x-6' : 'translate-x-1'
         )}
       />
