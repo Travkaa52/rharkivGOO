@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
-import { Clock, X, ChevronRight, Navigation } from 'lucide-react';
+import { Clock, X, ChevronRight } from 'lucide-react
 import { MapView } from '@/components/MapView';
 import { MetroLayer } from '@/components/MetroLayer';
 import { SearchBar } from '@/components/SearchBar';
