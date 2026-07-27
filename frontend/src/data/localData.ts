@@ -10,8 +10,8 @@ export interface RouteItem {
   headsignForward: string;
   headsignBackward: string;
   schedule: any[];
-  firstDeparture?: string;
-  lastDeparture?: string;
+  firstDeparture: string;
+  lastDeparture: string;
   intervalMinutes?: number;
 }
 
@@ -37,6 +37,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Жд вокзал",
     "headsignBackward": "Ивановка",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -49,6 +51,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Жд вокзал",
     "headsignBackward": "Центральный парк",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -61,6 +65,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Салтовская",
     "headsignBackward": "Гидропарк",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -73,6 +79,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "пр. Победы",
     "headsignBackward": "Жд вокзал",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -85,6 +93,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Салтовская",
     "headsignBackward": "602 мр",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -97,6 +107,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Салтовская",
     "headsignBackward": "Новожаново",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -109,6 +121,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Залютино",
     "headsignBackward": "Новожаново",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -121,6 +135,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "602 мр",
     "headsignBackward": "Жд вокзал",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -133,6 +149,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Новоселовка",
     "headsignBackward": "Жд вокзал",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -145,6 +163,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "602 мр",
     "headsignBackward": "ул. Одесская",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -157,6 +177,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "метро Площадь Конституции",
     "headsignBackward": "пр. Дзюбы",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -169,6 +191,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. Рудика",
     "headsignBackward": "ул. Клочковская",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -181,6 +205,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "м. Дворец Спорта",
     "headsignBackward": "28 микрорайон",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -193,6 +219,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "метро Защитников Украины",
     "headsignBackward": "парк Зустрич",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -205,6 +233,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "метро Госпром",
     "headsignBackward": "Больница неотложной помощи",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -217,6 +247,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. Одесская",
     "headsignBackward": "602 мр",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -229,6 +261,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "пр. Жуковского",
     "headsignBackward": "пр. Победы",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -241,6 +275,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "метро Защитников Украины",
     "headsignBackward": "602 мр",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -253,6 +289,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "метро Академика Барабашова",
     "headsignBackward": "602 мр",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -265,6 +303,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "метро Дворец Спорта",
     "headsignBackward": "бул. Богдана Хмельницкого",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -277,6 +317,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. Университетская",
     "headsignBackward": "ул. 12 Апреля",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -289,6 +331,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "метро Турбоатом",
     "headsignBackward": "Северная Салтовка",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -301,6 +345,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Восточная Салтовка",
     "headsignBackward": "ул. Непокоренных",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -313,6 +359,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. Одесская",
     "headsignBackward": "Северная Салтовка",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -325,6 +373,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "метро Площадь Конституции",
     "headsignBackward": "пр. Победы",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -337,6 +387,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. 12 апреля",
     "headsignBackward": "ул. Роганская",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -349,6 +401,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "мр Горизонт",
     "headsignBackward": "ул. 12 Апреля",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -361,6 +415,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. Университетская",
     "headsignBackward": "пос. Жихарь",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -373,6 +429,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. 12 апреля",
     "headsignBackward": "ул. Зубарева",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -385,6 +443,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. 12 Апреля",
     "headsignBackward": "759 мр",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -397,6 +457,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. 12 Апреля",
     "headsignBackward": "мн Горизонт",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -409,6 +471,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "м. Площадь Конституции",
     "headsignBackward": "пр. Жуковского",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -421,6 +485,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "м. Академика Барабашова",
     "headsignBackward": "Восточная Салтовка",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -433,6 +499,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "парк Зустрич",
     "headsignBackward": "метро Академика Барабашова",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -445,6 +513,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Аэропорт",
     "headsignBackward": "пр. Победы",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -457,6 +527,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "Станция Рогань",
     "headsignBackward": "ул. Университетская",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -469,6 +541,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. Университетская",
     "headsignBackward": "Станция Основа",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   },
   {
@@ -481,6 +555,8 @@ const routesData: RouteItem[] = [
     "headsignForward": "ул. 12 Апреля",
     "headsignBackward": "метро Армейская",
     "schedule": [],
+    "firstDeparture": "06:00",
+    "lastDeparture": "22:00",
     "intervalMinutes": 10
   }
 ];
