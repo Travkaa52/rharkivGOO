@@ -11,7 +11,7 @@ import type { TransportKind } from '@/types/transport';
  * Якщо для маршруту немає реальної геометрії (наприклад автобуси), карта
  * повертається до прямих ліній між зупинками (fallback нижче).
  */
-const ROUTE_GEOMETRIES = routeGeometriesJson as Record<string, [number, number][][]>;
+const ROUTE_GEOMETRIES = routeGeometriesJson as unknown as Record<string, [number, number][][]>;
 
 function geometryKey(kind: TransportKind, number: string): string {
   return `${kind}-${number}`;
