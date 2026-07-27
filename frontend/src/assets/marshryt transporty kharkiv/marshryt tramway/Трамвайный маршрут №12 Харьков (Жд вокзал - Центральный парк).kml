@@ -1,0 +1,1024 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Трамвайный маршрут №12 Харьков (Ж/д вокзал - Центральный парк)</name>
+    <description>Подробно https://kharkiv.inform.city/-ru/-tr/tr_city/tr_city_tr/ </description>
+    <Style id="icon-1499-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1499-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1499-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1499-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1499-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1499-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1499-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1499-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1499-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1499-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1626-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1626-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1626-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1626-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1626-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1626-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1626-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1626-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1626-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1626-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1670-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1670-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1670-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1670-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1670-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1670-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1670-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1670-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1670-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1670-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1718-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1718-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1718-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1718-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1718-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1718-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1718-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1718-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1718-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1718-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-000000-3519-nodesc-normal">
+      <LineStyle>
+        <color>ff000000</color>
+        <width>3.519</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-000000-3519-nodesc-highlight">
+      <LineStyle>
+        <color>ff000000</color>
+        <width>5.2785</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-000000-3519-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-000000-3519-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-000000-3519-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-F57C00-3325-nodesc-normal">
+      <LineStyle>
+        <color>ff007cf5</color>
+        <width>3.325</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-F57C00-3325-nodesc-highlight">
+      <LineStyle>
+        <color>ff007cf5</color>
+        <width>4.9875</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-F57C00-3325-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-F57C00-3325-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-F57C00-3325-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Folder>
+      <name>Маршрут туда</name>
+      <Placemark>
+        <name>Линия маршрута</name>
+        <styleUrl>#line-F57C00-3325-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.2058831,49.9876606,0
+            36.2060279,49.9875813,0
+            36.206103,49.9875537,0
+            36.2062264,49.9875537,0
+            36.2063391,49.9875882,0
+            36.2064625,49.9876399,0
+            36.2065376,49.9877192,0
+            36.2066502,49.9878503,0
+            36.2067307,49.9879538,0
+            36.2068272,49.988009,0
+            36.2069935,49.9880676,0
+            36.207192,49.9881159,0
+            36.2074763,49.9881366,0
+            36.2076373,49.9881642,0
+            36.2077016,49.9882332,0
+            36.2076694,49.9884263,0
+            36.2073529,49.9901473,0
+            36.2073047,49.9907509,0
+            36.2072242,49.9910199,0
+            36.2070525,49.9921373,0
+            36.2067682,49.9938237,0
+            36.2067468,49.9939789,0
+            36.2067575,49.9941306,0
+            36.2067843,49.9948065,0
+            36.2067682,49.9963791,0
+            36.2067575,49.9967515,0
+            36.206779,49.9969998,0
+            36.2068487,49.9971032,0
+            36.2070311,49.9971687,0
+            36.2072027,49.9971929,0
+            36.2074227,49.9972032,0
+            36.2078357,49.9971377,0
+            36.208973,49.9969963,0
+            36.2097723,49.9969274,0
+            36.2102926,49.9968722,0
+            36.2109954,49.9968067,0
+            36.2116445,49.996748,0
+            36.2119717,49.996686,0
+            36.2121219,49.9966273,0
+            36.2122668,49.9965239,0
+            36.2127978,49.9960756,0
+            36.2135757,49.9953824,0
+            36.2138332,49.9951411,0
+            36.2140102,49.9949997,0
+            36.2141658,49.9948893,0
+            36.2143374,49.994841,0
+            36.214493,49.9948514,0
+            36.2146056,49.9948893,0
+            36.2148524,49.9950238,0
+            36.2151474,49.9952066,0
+            36.2154103,49.9953307,0
+            36.215582,49.9953514,0
+            36.2158287,49.9953514,0
+            36.2161291,49.9952686,0
+            36.2167621,49.9950204,0
+            36.2171913,49.9948479,0
+            36.2174381,49.9947686,0
+            36.2177331,49.9946996,0
+            36.2179852,49.994672,0
+            36.2181462,49.9946996,0
+            36.2183178,49.9947927,0
+            36.2183983,49.994879,0
+            36.2185646,49.9951066,0
+            36.2191386,49.9960549,0
+            36.2201203,49.9978101,0
+            36.221161,49.9997136,0
+            36.2212039,49.9998584,0
+            36.221161,49.999955,0
+            36.2210429,50.000055,0
+            36.2207747,50.0001687,0
+            36.2202866,50.0003653,0
+            36.2199164,50.0005343,0
+            36.2196965,50.0006549,0
+            36.2194122,50.0008101,0
+            36.2192298,50.0009446,0
+            36.2190635,50.0011101,0
+            36.2187953,50.0013721,0
+            36.2183983,50.0018928,0
+            36.2181783,50.0022342,0
+            36.2181032,50.0024169,0
+            36.218055,50.002579,0
+            36.2180389,50.0027514,0
+            36.2180389,50.0030824,0
+            36.2180335,50.0032341,0
+            36.2181086,50.0032927,0
+            36.2187463,50.0034406,0
+            36.2190474,50.0035202,0
+            36.219439,50.0036099,0
+            36.2199003,50.0036995,0
+            36.2205172,50.0038547,0
+            36.2238754,50.0046029,0
+            36.2244225,50.0047305,0
+            36.2248141,50.0048132,0
+            36.2251306,50.0048925,0
+            36.2252916,50.004958,0
+            36.2253828,50.0050304,0
+            36.2254471,50.0051235,0
+            36.2254793,50.0052545,0
+            36.2254471,50.0055821,0
+            36.2254257,50.0058096,0
+            36.2254471,50.0060372,0
+            36.22549,50.0061992,0
+            36.225592,50.0064578,0
+            36.2256778,50.006644,0
+            36.2258387,50.0068198,0
+            36.2259836,50.0070094,0
+            36.2261338,50.0071508,0
+            36.2263269,50.0073094,0
+            36.2265951,50.0074749,0
+            36.2269009,50.0076335,0
+            36.227389,50.0078472,0
+            36.2278075,50.0079748,0
+            36.2280972,50.0080437,0
+            36.2283117,50.0080816,0
+            36.2286229,50.0080989,0
+            36.2288696,50.0081265,0
+            36.2293739,50.0081437,0
+            36.2297333,50.0081334,0
+            36.2300498,50.0081127,0
+            36.2303609,50.008061,0
+            36.230774,50.007961,0
+            36.2313104,50.0077817,0
+            36.2317825,50.0075438,0
+            36.2324692,50.0072197,0
+            36.2328286,50.007068,0
+            36.2332255,50.0068888,0
+            36.2333865,50.0068026,0
+            36.2335367,50.0067474,0
+            36.2336976,50.0067371,0
+            36.2338639,50.0067888,0
+            36.2342233,50.0071266,0
+            36.23469,50.0075335,0
+            36.2354947,50.0082402,0
+            36.2362833,50.0089297,0
+            36.2377263,50.0101984,0
+            36.2386436,50.011012,0
+            36.2387294,50.0111292,0
+            36.2387723,50.0112568,0
+            36.2388582,50.0113843,0
+            36.2389869,50.0114429,0
+            36.2391049,50.0114567,0
+            36.239282,50.0114154,0
+            36.2398989,50.0111327,0
+            36.241063,50.0106431,0
+            36.2418193,50.0104087,0
+            36.2421734,50.0103087,0
+            36.2424684,50.0102226,0
+            36.2426884,50.0101812,0
+            36.2428386,50.0102053,0
+            36.2429727,50.0102708,0
+            36.2432141,50.0104811,0
+            36.2443031,50.0113878,0
+            36.2451721,50.0121152,0
+            36.2456549,50.0125426,0
+            36.2466741,50.0134424,0
+            36.2474949,50.0142283,0
+            36.2481118,50.0147626,0
+            36.2487502,50.0153521,0
+            36.2489647,50.0155761,0
+            36.2491525,50.0157933,0
+            36.2491793,50.0160656,0
+            36.2490881,50.0162897,0
+            36.2490291,50.0164793,0
+            36.2489701,50.0166654,0
+            36.2489594,50.0166999,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Южный Вокзал 
+</name>
+        <description>Трамвай-1, 7, 12, 20.</description>
+        <styleUrl>#icon-1499-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2058064,49.987644,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Привокзальная площадь
+</name>
+        <description>Трамвай-1, 12, 20.</description>
+        <styleUrl>#icon-1626-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2075227,49.9898871,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Чеботарская  
+</name>
+        <description>Трамвай-1, 12, 20.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2068682,49.9939188,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Малая Панасовская
+</name>
+        <description>Трамвай-1, 12, 20.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2072867,49.9970983,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пер. Резниковский
+</name>
+        <description>Трамвай-12, 20.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2100124,49.9968431,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пер. Лосевский
+</name>
+        <description>Трамвай-12, 20.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2134779,49.9953602,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция метро Центральный рынок 
+</name>
+        <description>Трамвай-12, 20.</description>
+        <styleUrl>#icon-1626-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2189388,49.9953637,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка проезд Рогатинский
+</name>
+        <description>Трамвай-12, 20.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2212246,49.9996271,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Пантелеймоновский храм
+</name>
+        <description>Трамвай-12, 20.</description>
+        <styleUrl>#icon-1670-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2189448,50.0014581,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка спуск Клочковский
+</name>
+        <description>Трамвай-12.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2188246,50.0033987,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Госпром
+</name>
+        <description>Трамвай-12.</description>
+        <styleUrl>#icon-1626-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2262856,50.0068646,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Тринклера 
+</name>
+        <description>Трамвай-12.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2345253,50.0073473,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Культуры
+</name>
+        <description>Трамвай-12.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2380191,50.0104419,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Сумская
+</name>
+        <description>Трамвай-12.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.240661,50.0107642,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Олеся Гончара
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2446609,50.0116563,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Веснина
+</name>
+        <description>Трамвай-12.</description>
+        <styleUrl>#icon-1718-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2463929,50.0132136,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Маршрут обратно</name>
+      <Placemark>
+        <name>Линия маршрута</name>
+        <styleUrl>#line-000000-3519-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.2489594,50.0166999,0
+            36.2489549,50.01662,0
+            36.24903,50.0164098,0
+            36.2491319,50.016072,0
+            36.2491319,50.0159272,0
+            36.2491104,50.0157859,0
+            36.2490085,50.0156583,0
+            36.2480912,50.0147931,0
+            36.246852,50.0136555,0
+            36.2455431,50.0124938,0
+            36.243392,50.0106736,0
+            36.2429843,50.0103289,0
+            36.2428555,50.0102496,0
+            36.2427536,50.0102151,0
+            36.2426034,50.0102185,0
+            36.2420992,50.0103564,0
+            36.2411014,50.0106564,0
+            36.2408707,50.0107495,0
+            36.2394599,50.0113596,0
+            36.2392721,50.0114424,0
+            36.2391004,50.0114803,0
+            36.2390039,50.0114803,0
+            36.2388859,50.0114355,0
+            36.2388108,50.0113838,0
+            36.2387678,50.0113183,0
+            36.2387357,50.0112528,0
+            36.2387035,50.0111769,0
+            36.2386713,50.0111011,0
+            36.2385908,50.0110011,0
+            36.237754,50.0102565,0
+            36.2364558,50.0091291,0
+            36.2351522,50.0079777,0
+            36.233854,50.0068261,0
+            36.2337628,50.0067848,0
+            36.2336556,50.0067641,0
+            36.2335054,50.0067882,0
+            36.2333552,50.0068468,0
+            36.2332103,50.0069227,0
+            36.2330816,50.0069847,0
+            36.2319068,50.0075191,0
+            36.2315205,50.0077018,0
+            36.2312201,50.0078397,0
+            36.230909,50.0079535,0
+            36.2304101,50.0080742,0
+            36.2299756,50.0081466,0
+            36.2295089,50.0081707,0
+            36.2289456,50.0081535,0
+            36.228377,50.0081156,0
+            36.2277654,50.0079914,0
+            36.2272826,50.0078363,0
+            36.2268535,50.0076467,0
+            36.2264297,50.0074157,0
+            36.22614,50.0072019,0
+            36.225786,50.0068296,0
+            36.2256626,50.0066813,0
+            36.2255607,50.0064952,0
+            36.2254802,50.0063021,0
+            36.2254158,50.0060987,0
+            36.2253783,50.0058332,0
+            36.225389,50.0056436,0
+            36.2254212,50.0054608,0
+            36.2254373,50.005254,0
+            36.2254158,50.005154,0
+            36.2253622,50.0050712,0
+            36.2252817,50.0050092,0
+            36.2251583,50.0049333,0
+            36.2248794,50.0048609,0
+            36.2224386,50.0043093,0
+            36.2196813,50.0036817,0
+            36.2190912,50.0035542,0
+            36.2182329,50.0033542,0
+            36.2180558,50.0033094,0
+            36.2179807,50.0032404,0
+            36.2179861,50.0031473,0
+            36.2179915,50.0029197,0
+            36.2180022,50.0027094,0
+            36.2180129,50.0025577,0
+            36.2180505,50.0024577,0
+            36.2181041,50.0023163,0
+            36.2181631,50.002175,0
+            36.2182919,50.0019819,0
+            36.2185064,50.0016923,0
+            36.2186727,50.0014647,0
+            36.2189624,50.0011509,0
+            36.2191716,50.0009613,0
+            36.2193379,50.0008199,0
+            36.2195793,50.000682,0
+            36.2198744,50.0005199,0
+            36.220148,50.0003923,0
+            36.2204805,50.0002613,0
+            36.2207434,50.000144,0
+            36.2209473,50.0000751,0
+            36.2210706,50.000013,0
+            36.2211565,49.9999096,0
+            36.2211726,49.9997923,0
+            36.2211028,49.9996647,0
+            36.2210116,49.9995268,0
+            36.2208024,49.9991234,0
+            36.2201801,49.9979889,0
+            36.2194506,49.9966958,0
+            36.2185815,49.9951957,0
+            36.2183938,49.9949301,0
+            36.218265,49.9947887,0
+            36.2181041,49.9947198,0
+            36.2179807,49.9946991,0
+            36.2178359,49.9947198,0
+            36.2176857,49.994737,0
+            36.217514,49.9947818,0
+            36.2172458,49.9948577,0
+            36.2169722,49.9949646,0
+            36.2165484,49.9951301,0
+            36.2161193,49.9952922,0
+            36.2159423,49.9953405,0
+            36.2157974,49.9953784,0
+            36.2156365,49.9953784,0
+            36.215497,49.9953646,0
+            36.2153522,49.9953405,0
+            36.2151698,49.9952405,0
+            36.2147138,49.9949715,0
+            36.2145314,49.9948922,0
+            36.2144295,49.9948681,0
+            36.2143168,49.994875,0
+            36.2141774,49.9949198,0
+            36.2124071,49.9964371,0
+            36.2122301,49.9965889,0
+            36.2120745,49.9966923,0
+            36.2118707,49.996744,0
+            36.2098858,49.9969406,0
+            36.208534,49.9970682,0
+            36.2077454,49.9971751,0
+            36.2074933,49.9972199,0
+            36.2072358,49.9972234,0
+            36.2070373,49.9971958,0
+            36.2068657,49.997144,0
+            36.2067691,49.9970785,0
+            36.2067155,49.9969578,0
+            36.2067208,49.9967578,0
+            36.2067208,49.9964164,0
+            36.2067315,49.9960957,0
+            36.2067315,49.9957198,0
+            36.206753,49.9950336,0
+            36.2067476,49.9946991,0
+            36.2067315,49.994337,0
+            36.2067155,49.9940404,0
+            36.2067047,49.9939438,0
+            36.2067691,49.9935886,0
+            36.2069193,49.9927196,0
+            36.2070373,49.9920781,0
+            36.2071339,49.9913366,0
+            36.2071661,49.9910952,0
+            36.2072143,49.9909262,0
+            36.2072626,49.9907814,0
+            36.2072787,49.990671,0
+            36.2073216,49.9901261,0
+            36.2073377,49.9899743,0
+            36.2074396,49.9894708,0
+            36.2076435,49.9883912,0
+            36.2076542,49.9882498,0
+            36.2076167,49.9881878,0
+            36.2074343,49.9881533,0
+            36.2071392,49.988136,0
+            36.2068817,49.988105,0
+            36.2063614,49.9880463,0
+            36.2062166,49.988036,0
+            36.2060503,49.9879843,0
+            36.205943,49.9879325,0
+            36.2058732,49.9878635,0
+            36.2058571,49.9877911,0
+            36.2058518,49.9877152,0
+            36.2058831,49.9876606,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Центральный парк 
+</name>
+        <description>Трамвай-12, 26.</description>
+        <styleUrl>#icon-1499-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2490642,50.016654,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Веснина
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2463952,50.0133357,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Олеся Гончара
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.245117,50.0122605,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Сумская
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2414795,50.010564,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Культуры
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.238295,50.0108801,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Тринклера
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.234062,50.0070654,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Госпром
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1626-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2258587,50.0069599,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка спуск Клочковский
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2187463,50.0034406,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Пантелеймоновский храм
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1670-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2188125,50.0014976,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Рогатинский проезд
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2209253,49.9995192,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Центральный рынок
+</name>
+        <description>Трамвай - 12.</description>
+        <styleUrl>#icon-1626-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2171147,49.9949887,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пер. Резниковский
+</name>
+        <description>Трамвай-12, 20.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2105646,49.9969433,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Малая Панасовская
+</name>
+        <description>Трамвай - 1, 12, 20.</description>
+        <styleUrl>#icon-1718-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2078172,49.9972219,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Привокзальная площадь
+</name>
+        <description>Трамвай-1, 12, 20.</description>
+        <styleUrl>#icon-1626-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2071819,49.9903875,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

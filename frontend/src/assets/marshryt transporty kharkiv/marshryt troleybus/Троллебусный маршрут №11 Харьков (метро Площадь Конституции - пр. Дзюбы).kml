@@ -1,0 +1,992 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Троллебусный маршрут №11 Харьков (метро Площадь Конституции - пр. Дзюбы)</name>
+    <description>Подробно https://kharkiv.inform.city/-ru/-tr/tr_city/tr_city_tb/</description>
+    <Style id="icon-1499-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1499-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1499-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1499-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1499-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1499-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1499-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1499-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1499-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1499-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1532-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1532-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1532-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1532-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1532-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1532-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1532-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1532-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1532-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1532-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1624-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1624-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1624-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1624-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1624-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1662-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1662-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1662-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1662-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1662-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1662-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1662-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1662-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1662-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1662-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1670-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1670-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1670-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1670-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1670-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1769-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1769-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1769-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1769-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1769-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1769-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1769-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1769-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1769-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1769-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-000000-5263-nodesc-normal">
+      <LineStyle>
+        <color>ff000000</color>
+        <width>5.263</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-000000-5263-nodesc-highlight">
+      <LineStyle>
+        <color>ff000000</color>
+        <width>7.8945</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-000000-5263-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-000000-5263-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-000000-5263-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-F57C00-5069-nodesc-normal">
+      <LineStyle>
+        <color>ff007cf5</color>
+        <width>5.069</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-F57C00-5069-nodesc-highlight">
+      <LineStyle>
+        <color>ff007cf5</color>
+        <width>7.6035</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-F57C00-5069-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-F57C00-5069-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-F57C00-5069-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Folder>
+      <name>Маршрут туда </name>
+      <Placemark>
+        <name>Линия маршрута</name>
+        <styleUrl>#line-F57C00-5069-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.2324186,49.9912013,0
+            36.2324833,49.9911218,0
+            36.2325906,49.9910459,0
+            36.2325692,49.9905699,0
+            36.232773,49.9887213,0
+            36.2326335,49.988473,0
+            36.2305092,49.9877832,0
+            36.2297153,49.9876866,0
+            36.229211,49.9876935,0
+            36.2287926,49.9877073,0
+            36.2284707,49.9878108,0
+            36.2284064,49.9881281,0
+            36.2282776,49.988473,0
+            36.2281381,49.9896042,0
+            36.2280309,49.9900871,0
+            36.2279879,49.9902871,0
+            36.2277894,49.9904389,0
+            36.2276661,49.9904527,0
+            36.2272584,49.9904596,0
+            36.2257885,49.9904182,0
+            36.2253808,49.9904251,0
+            36.2251126,49.9905009,0
+            36.224898,49.9906596,0
+            36.2246727,49.9908182,0
+            36.2244903,49.9909286,0
+            36.2240826,49.99097,0
+            36.2210464,49.9908596,0
+            36.2182998,49.9907838,0
+            36.2174093,49.9908596,0
+            36.2155747,49.9909907,0
+            36.2140941,49.9911976,0
+            36.2115085,49.9915977,0
+            36.2119912,49.9892731,0
+            36.2122809,49.9878039,0
+            36.2122166,49.9872037,0
+            36.2124204,49.986369,0
+            36.2125277,49.9857965,0
+            36.2126028,49.9854515,0
+            36.2127637,49.9851273,0
+            36.2129783,49.9849825,0
+            36.2122273,49.984672,0
+            36.2107574,49.9840235,0
+            36.2105536,49.9838787,0
+            36.2106716,49.9836993,0
+            36.2119805,49.9824782,0
+            36.2121844,49.9823678,0
+            36.2121951,49.9821678,0
+            36.2119161,49.9817814,0
+            36.2115728,49.981609,0
+            36.209985,49.980719,0
+            36.2094914,49.9804499,0
+            36.2036228,49.9789873,0
+            36.202979,49.9787596,0
+            36.202507,49.978456,0
+            36.2020778,49.9781662,0
+            36.2011337,49.9776281,0
+            36.2006616,49.9773107,0
+            36.2002646,49.9772003,0
+            36.2001252,49.9771727,0
+            36.2000501,49.9760549,0
+            36.1999642,49.9747371,0
+            36.1989557,49.9746888,0
+            36.1965525,49.9745646,0
+            36.1959624,49.9745025,0
+            36.1954045,49.97433,0
+            36.1920785,49.9723496,0
+            36.1899864,49.9711282,0
+            36.1877977,49.9697205,0
+            36.1850619,49.9679125,0
+            36.1808884,49.9651727,0
+            36.1767899,49.9624466,0
+            36.1727881,49.9598515,0
+            36.1709642,49.9587678,0
+            36.1694085,49.9578015,0
+            36.1687111,49.957346,0
+            36.168518,49.9571251,0
+            36.1683571,49.9565453,0
+            36.1679172,49.9549438,0
+            36.1674773,49.9533009,0
+            36.16737,49.9529213,0
+            36.1665975,49.9521757,0
+            36.1650311,49.9505949,0
+            36.1645269,49.9501185,0
+            36.1641943,49.9499252,0
+            36.1635506,49.9498355,0
+            36.1619198,49.9497388,0
+            36.1609005,49.9496422,0
+            36.1600851,49.9496215,0
+            36.1586367,49.949801,0
+            36.1545491,49.9502842,0
+            36.1503112,49.9507951,0
+            36.1397218,49.9523207,0
+            36.1396574,49.9521619,0
+            36.1396145,49.9520169,0
+            36.1396682,49.9519134,0
+            36.1397647,49.9518306,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Станция метро Майдан Конституции
+</name>
+        <description>Автобус- 238э. Троллейбус-11.</description>
+        <styleUrl>#icon-1499-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2322794,49.9910962,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пл. Сергиевская
+</name>
+        <description>Троллейбус-11. </description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2283828,49.9889349,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Благовещенский собор
+</name>
+        <description>Троллейбус-11.</description>
+        <styleUrl>#icon-1670-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2224372,49.9909378,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Ярославская
+</name>
+        <description>Троллейбус-11.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2181993,49.990855,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Славянская
+</name>
+        <description>Автобус- 57, 67, 109. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2116011,49.9905369,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Конева
+</name>
+        <description>Автобус- 58, 67. Маршрутка - 258э. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2121772,49.9855034,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Большая Гончаровская
+</name>
+        <description>Автобус- 67. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2113661,49.9815878,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул.  Семинарская
+</name>
+        <description>Автобус- 67. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1998863,49.9766169,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Институт терапии
+</name>
+        <description>Троллейбус-11.</description>
+        <styleUrl>#icon-1624-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1939332,49.973624,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пр. Любви Малой
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1897965,49.9710941,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Грушевского
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1832983,49.9668112,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка по требованию
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1769-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1778207,49.9632018,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Григорьевка
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1712337,49.9590333,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Станционная
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э,  259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1662-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1680439,49.9555916,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Китаенко 
+</name>
+        <description>Маршрутка - 75э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1648896,49.9504971,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Даргомыжского
+</name>
+        <description>Маршрутка - 75э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1510844,49.9506904,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Шульженко
+</name>
+        <description>Маршрутка - 75э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.157908,49.9499449,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пер. Архангельский
+</name>
+        <description>Маршрутка - 75э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.1423082,49.9519882,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Маршрут обратно</name>
+      <Placemark>
+        <name>Линия маршрута</name>
+        <styleUrl>#line-000000-5263-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.1397647,49.9518306,0
+            36.1400433,49.9518205,0
+            36.1402686,49.9519585,0
+            36.1402579,49.9521104,0
+            36.1410411,49.952,0
+            36.1465772,49.9511854,0
+            36.1505898,49.9506469,0
+            36.1543127,49.9501844,0
+            36.1562439,49.9499566,0
+            36.1596985,49.9495423,0
+            36.160353,49.9495078,0
+            36.1616297,49.9495838,0
+            36.1633785,49.9496873,0
+            36.1643549,49.9498047,0
+            36.1647089,49.9500394,0
+            36.1668869,49.9522347,0
+            36.1675628,49.9529526,0
+            36.1676593,49.9533737,0
+            36.1686249,49.9569148,0
+            36.1687751,49.9571702,0
+            36.1690434,49.9574187,0
+            36.1701377,49.9580882,0
+            36.1728843,49.9597586,0
+            36.17709,49.9625055,0
+            36.1825188,49.9660598,0
+            36.1876257,49.969462,0
+            36.1906083,49.9713804,0
+            36.1908444,49.9711941,0
+            36.1912413,49.9709525,0
+            36.1915417,49.9708007,0
+            36.1919494,49.9707317,0
+            36.1924108,49.9709939,0
+            36.1931081,49.9714839,0
+            36.1939879,49.9720497,0
+            36.1946316,49.9724292,0
+            36.1952003,49.9726914,0
+            36.1956401,49.9728432,0
+            36.1961873,49.9729053,0
+            36.1978717,49.9729674,0
+            36.1989339,49.9730503,0
+            36.1999531,49.9730572,0
+            36.2000712,49.9731607,0
+            36.2001677,49.9748857,0
+            36.2003394,49.9770729,0
+            36.200672,49.9771833,0
+            36.2011119,49.977411,0
+            36.2015625,49.9777008,0
+            36.202807,49.9785149,0
+            36.203322,49.9787771,0
+            36.2044592,49.9791152,0
+            36.2087186,49.9801156,0
+            36.2095233,49.9803432,0
+            36.2098451,49.9804881,0
+            36.2108107,49.9810263,0
+            36.2117012,49.9815506,0
+            36.2122162,49.9818886,0
+            36.2123235,49.9821094,0
+            36.2122377,49.9824543,0
+            36.212066,49.9825233,0
+            36.210682,49.983841,0
+            36.2108,49.9839583,0
+            36.2131174,49.9849586,0
+            36.2130745,49.9850896,0
+            36.2128599,49.9853518,0
+            36.2127312,49.9857933,0
+            36.2124522,49.9871247,0
+            36.2123879,49.9876489,0
+            36.2122269,49.9887595,0
+            36.2134607,49.9888561,0
+            36.2164219,49.9891044,0
+            36.2217649,49.9894976,0
+            36.2229343,49.9895942,0
+            36.2233849,49.9899597,0
+            36.2236531,49.9901391,0
+            36.2249191,49.990277,0
+            36.2258418,49.9903253,0
+            36.2278374,49.9903874,0
+            36.2301334,49.990415,0
+            36.2300905,49.9915462,0
+            36.2310561,49.99156,0
+            36.2316998,49.9916014,0
+            36.2321826,49.9915393,0
+            36.2322899,49.9914496,0
+            36.2324186,49.9912013,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пр. Дзюбы
+</name>
+        <description>Маршрутка - 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1499-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1395188,49.9519883,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пер. Архангельский
+</name>
+        <description>Маршрутка - 75э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.14346,49.9515689,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Даргомыжского
+</name>
+        <description>Маршрутка - 75э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1499402,49.9506715,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Шульженко
+</name>
+        <description>Маршрутка - 75э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1573431,49.9497188,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Китаенко
+</name>
+        <description>Маршрутка - 75э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1638591,49.9496983,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Стационная
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1662-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1685136,49.9559335,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Грирорьевка
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1723545,49.9592414,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка По требованию
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1769-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1773063,49.9626064,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Грушевского
+</name>
+        <description>Маршрутка - 75э, 209э, 220э, 237э, 259э. Троллейбус-11, 27.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1829282,49.9663125,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пр. Любви Малой
+</name>
+        <description>Троллейбус-11.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1909282,49.9710491,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Плановая
+</name>
+        <description>Троллейбус-11.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.1959489,49.9728172,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Семинарская
+</name>
+        <description>Автобус- 67. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2002632,49.9756053,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Большая Гончаровская
+</name>
+        <description>Автобус- 67. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2107984,49.9809062,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Конева
+</name>
+        <description>Автобус- 58, 67. Маршрутка - 258э. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2127029,49.9866923,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Благовещенская
+</name>
+        <description>Автобус- 57, 109. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2130441,49.9887079,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Дмитриевская
+</name>
+        <description>Автобус- 57, 109. Троллейбус-11.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.216413,49.989039,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Рождественская
+</name>
+        <description>Троллейбус-11.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2222334,49.9894962,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

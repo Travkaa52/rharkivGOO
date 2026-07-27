@@ -1,0 +1,1202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Троллейбусный маршрут №35 Харьков (ул. Одесская - Северная Салтовка)</name>
+    <description>Подробно https://kharkiv.inform.city/-ru/-tr/tr_city/tr_city_tb/</description>
+    <Style id="icon-1499-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1499-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1499-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1499-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1499-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1499-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1499-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1499-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1499-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1499-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1532-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1532-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1532-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1532-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1532-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1532-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1532-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1532-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1532-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1532-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1546-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1546-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1546-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1546-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1546-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1546-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1546-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1546-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1546-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1546-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1582-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1582-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1582-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1582-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1582-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1582-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1582-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1582-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1582-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1582-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1892-000000-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1892-000000-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1892-000000">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1892-000000-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1892-000000-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1892-F57C00-normal">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="icon-1892-F57C00-highlight">
+      <IconStyle>
+        <color>ff007cf5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+    </Style>
+    <StyleMap id="icon-1892-F57C00">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1892-F57C00-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1892-F57C00-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-000000-5069-nodesc-normal">
+      <LineStyle>
+        <color>ff000000</color>
+        <width>5.069</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-000000-5069-nodesc-highlight">
+      <LineStyle>
+        <color>ff000000</color>
+        <width>7.6035</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-000000-5069-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-000000-5069-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-000000-5069-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-F57C00-5263-nodesc-normal">
+      <LineStyle>
+        <color>ff007cf5</color>
+        <width>5.263</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-F57C00-5263-nodesc-highlight">
+      <LineStyle>
+        <color>ff007cf5</color>
+        <width>7.8945</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-F57C00-5263-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-F57C00-5263-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-F57C00-5263-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Folder>
+      <name>Маршрут туда</name>
+      <Placemark>
+        <name>Линия маршрута</name>
+        <styleUrl>#line-F57C00-5263-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.2618237,49.9461202,0
+            36.2616198,49.9461961,0
+            36.2613301,49.946203,0
+            36.2611531,49.946165,0
+            36.261019,49.9460304,0
+            36.2609868,49.945844,0
+            36.2610244,49.9456852,0
+            36.2610861,49.94563,0
+            36.2611692,49.9456024,0
+            36.2612738,49.9455437,0
+            36.2613999,49.9455264,0
+            36.2617378,49.9455057,0
+            36.262918,49.9455057,0
+            36.2659865,49.9451813,0
+            36.2707394,49.9446634,0
+            36.2757711,49.9441042,0
+            36.2791185,49.943973,0
+            36.2830453,49.9439799,0
+            36.2941818,49.9438763,0
+            36.3013916,49.9438349,0
+            36.3015311,49.9441594,0
+            36.301692,49.9447808,0
+            36.3018208,49.9456369,0
+            36.3018208,49.9463342,0
+            36.3018529,49.9505593,0
+            36.3019817,49.9530928,0
+            36.3021533,49.9535622,0
+            36.3023035,49.9540592,0
+            36.3028078,49.9554329,0
+            36.303473,49.9571862,0
+            36.3042026,49.9592983,0
+            36.3052432,49.9619004,0
+            36.3061981,49.9644747,0
+            36.3075499,49.9680633,0
+            36.3086979,49.9709685,0
+            36.3096313,49.9734043,0
+            36.3102965,49.9751638,0
+            36.3104253,49.9758538,0
+            36.3106184,49.9771027,0
+            36.3106935,49.9780134,0
+            36.3108759,49.9792622,0
+            36.311348,49.9823047,0
+            36.3118629,49.9863059,0
+            36.3121848,49.9882995,0
+            36.3124638,49.9889203,0
+            36.3134508,49.9917346,0
+            36.3144593,49.9947005,0
+            36.3158004,49.9983696,0
+            36.3164334,49.9983144,0
+            36.3228815,49.9978248,0
+            36.3289969,49.9973834,0
+            36.3289754,49.9976317,0
+            36.3290505,49.9986248,0
+            36.3296084,50.0006109,0
+            36.3300161,50.0016247,0
+            36.3305955,50.0027487,0
+            36.3312499,50.0038176,0
+            36.3322048,50.0051347,0
+            36.3332884,50.0064035,0
+            36.3340716,50.0072378,0
+            36.335284,50.0085686,0
+            36.3358097,50.0091202,0
+            36.3364105,50.0096166,0
+            36.3373547,50.0103061,0
+            36.3388996,50.0114644,0
+            36.3412063,50.0131881,0
+            36.3413136,50.0133053,0
+            36.341732,50.0138155,0
+            36.3433199,50.0156149,0
+            36.3453262,50.0179244,0
+            36.3468175,50.0196409,0
+            36.3485663,50.0217434,0
+            36.3496714,50.0229979,0
+            36.3517098,50.0254104,0
+            36.3521497,50.0258585,0
+            36.3541346,50.0281192,0
+            36.354553,50.0285603,0
+            36.356806,50.0311517,0
+            36.3589733,50.0336603,0
+            36.3590698,50.0339084,0
+            36.3610654,50.0360723,0
+            36.3636403,50.0390216,0
+            36.3651638,50.0406754,0
+            36.3646274,50.0408201,0
+            36.3644557,50.0407718,0
+            36.3643806,50.0405996,0
+            36.3644128,50.0404756,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Одесская 
+</name>
+        <description>Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1499-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2618165,49.9463314,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Монюшко
+</name>
+        <description>Маршрутка-259э.  Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2681143,49.9448677,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Николая Кравченко
+</name>
+        <description>Маршрутка-259э. Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2754532,49.9440993,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Морозова
+</name>
+        <description>Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2820948,49.9439668,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Павла Чубинского
+</name>
+        <description>Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.2908638,49.9439204,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка 28 м/р
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1546-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3016542,49.9446271,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка проезд Садовый 
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1582-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3019897,49.9484095,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Киргизская
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3021215,49.9519449,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Ковтуна
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3043971,49.9591133,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Олимпийская
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3054283,49.9620467,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пр. Героев Харькова
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3075526,49.9675264,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Единства
+</name>
+        <description>Автобус- 249. Маршрутка- 259э. Троллейбус-19, 20, 31, 35, 57.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3115544,49.982705,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ш. Салтовское
+</name>
+        <description>Автобус- 249. Маршрутка- 259э. Троллейбус-19, 20, 31, 35, 57.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3127346,49.9885334,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Камышева
+</name>
+        <description>Автобус- 249. Маршрутка- 259э. Троллейбус-19, 20, 31, 35, 57.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3137216,49.9919045,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пр. Юбилейный
+</name>
+        <description>Автобус- 81, 83. Маршрутка- 38э, 121э, 259э. Троллейбус-19, 20, 24, 31, 35, 56.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3170121,49.9981027,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Гвардейцев Широнинцев
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3291917,49.9979306,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Василя Стуса
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.330926,50.0030043,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Владислава Зубенко
+</name>
+        <description>Автобус-63, 107. Маршрутка-259э. Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3356335,50.0088711,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Валентиновская
+</name>
+        <description>Автобус-63, 107. Маршрутка-259э. Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.342209,50.0142619,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка 607 микрорайон
+</name>
+        <description>Автобус-63, 107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1546-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3457708,50.0183093,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Непокоренных
+</name>
+        <description>Автобус-63, 107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3488607,50.0219422,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка 524 микрорайон
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1546-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3512973,50.0246524,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Бучмы
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3537852,50.0276697,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Родниковая
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1892-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3573221,50.0316608,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Соборности Украины
+</name>
+        <description>Автобус-106, 107. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3603486,50.0350337,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Метростроителей
+</name>
+        <description>Автобус-106, 107. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3633033,50.0385182,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Северная Салтовка
+</name>
+        <description>Автобус-106, 107. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-F57C00</styleUrl>
+        <Point>
+          <coordinates>
+            36.3647486,50.040245,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Маршрут обратно</name>
+      <Placemark>
+        <name>Линия маршрута</name>
+        <styleUrl>#line-000000-5069-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.3644128,50.0404756,0
+            36.3645056,50.0401738,0
+            36.3637439,50.0393332,0
+            36.3620058,50.0373486,0
+            36.3594738,50.0345163,0
+            36.3588086,50.0337583,0
+            36.3581756,50.0329864,0
+            36.3571671,50.0318424,0
+            36.3561586,50.0306708,0
+            36.354045,50.0282241,0
+            36.3531116,50.0271971,0
+            36.3516203,50.0254671,0
+            36.3509766,50.0247433,0
+            36.3487772,50.0221929,0
+            36.3468138,50.0198699,0
+            36.3444856,50.0171882,0
+            36.342297,50.0147132,0
+            36.3409666,50.0132378,0
+            36.3407413,50.0130655,0
+            36.3391749,50.0118382,0
+            36.336836,50.0101076,0
+            36.3357738,50.0092734,0
+            36.33557,50.0091079,0
+            36.3353232,50.0088321,0
+            36.3345829,50.0080322,0
+            36.3340357,50.0073979,0
+            36.3323084,50.0054809,0
+            36.3316003,50.0046259,0
+            36.3312999,50.0041983,0
+            36.3305703,50.0030054,0
+            36.3302485,50.0025089,0
+            36.3300232,50.002033,0
+            36.3297979,50.0015572,0
+            36.3292185,49.999909,0
+            36.3289825,49.999109,0
+            36.3288859,49.9987849,0
+            36.3287893,49.9974952,0
+            36.32718,49.9975918,0
+            36.3239614,49.9978607,0
+            36.3156465,49.9984883,0
+            36.3155178,49.9980469,0
+            36.3146917,49.9957572,0
+            36.3137475,49.9934191,0
+            36.312857,49.9906256,0
+            36.3120202,49.9883562,0
+            36.3119129,49.9880802,0
+            36.3117841,49.9875077,0
+            36.3115159,49.985383,0
+            36.311355,49.9842586,0
+            36.3109795,49.9815128,0
+            36.3108293,49.9801744,0
+            36.3105289,49.978284,0
+            36.3103679,49.9777596,0
+            36.3104216,49.9774491,0
+            36.3103572,49.9771042,0
+            36.3101534,49.9758208,0
+            36.3100139,49.9751998,0
+            36.3097349,49.9743442,0
+            36.3093594,49.9732816,0
+            36.3091878,49.9728262,0
+            36.308426,49.9709493,0
+            36.307793,49.9693345,0
+            36.3065914,49.9662567,0
+            36.3057867,49.9640759,0
+            36.3043705,49.9603903,0
+            36.3037804,49.9588856,0
+            36.3031045,49.9569047,0
+            36.3018385,49.9534257,0
+            36.301742,49.952832,0
+            36.3016776,49.9520864,0
+            36.3016239,49.9491387,0
+            36.3016025,49.9461976,0
+            36.3016239,49.9456729,0
+            36.3011197,49.9439676,0
+            36.2997357,49.9439468,0
+            36.2879983,49.9440642,0
+            36.2823549,49.9441333,0
+            36.2788144,49.9441609,0
+            36.2758104,49.9442092,0
+            36.2739328,49.9444232,0
+            36.2699095,49.9449134,0
+            36.2631289,49.9455832,0
+            36.2618237,49.9461202,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Северная Салтовка
+</name>
+        <description>Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1499-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3644882,50.0406963,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Метростроителей
+</name>
+        <description>Автобус-106, 107. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3627287,50.0383535,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Соборности Украины
+</name>
+        <description>Автобус-106, 107. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3601795,50.0353793,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Гвардейцев Широнинцев
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3584584,50.0334407,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Родниковая
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1892-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3565917,50.0312973,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Бучмы
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3533469,50.0276476,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка 524 микрорайон
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1546-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3496776,50.0233673,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Непокоренных
+</name>
+        <description>Автобус-63, 107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3471252,50.0204125,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка 607 микрорайон
+</name>
+        <description>Автобус-63, 107. Маршрутка-259э. Троллейбус-31, 35.</description>
+        <styleUrl>#icon-1546-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.344679,50.0176206,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Валентиновская
+</name>
+        <description>Автобус-63, 107. Маршрутка-259э. Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3403232,50.0128843,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Владислава Зубенко
+</name>
+        <description>Автобус-63, 107. Маршрутка-259э. Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3350601,50.0086904,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка 605 микрорайон
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1546-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3319701,50.0050185,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка Василя Стуса
+</name>
+        <description>Автобус-107. Маршрутка-259э. Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3300819,50.0025223,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Гвардейцев Широнинцев
+</name>
+        <description>Автобус-107. Маршрутка-259э.  Троллейбус-31, 35, 56.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3286013,49.9981362,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ш. Салтовское
+</name>
+        <description>Автобус- 249. Маршрутка- 259э. Троллейбус-19, 20, 31, 35, 57.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3117785,49.9878295,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пр. Льва Ландау 
+</name>
+        <description>Автобус- 107. Маршрутка- 259э. Троллейбус-19, 20, 31, 35, 57.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3151259,49.997819,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Камышева
+</name>
+        <description>Автобус- 249. Маршрутка- 259э. Троллейбус-19, 20, 31, 35, 57.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3127655,49.9912785,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Единства
+</name>
+        <description>Автобус- 249. Маршрутка- 259э. Троллейбус-19, 20, 31, 35, 57. </description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3108129,49.9821314,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка пр. Героев Харькова
+</name>
+        <description>Автобус-107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3069304,49.967485,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Олимпийская  
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3045057,49.9611494,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Ковтуна
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3034971,49.9585266,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Киргизская
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3017061,49.9535693,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка проезд Садовый
+</name>
+        <description>Автобус-102, 107. Троллейбус-19, 35.</description>
+        <styleUrl>#icon-1582-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3014644,49.9493998,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка 28 м/р
+</name>
+        <description>Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1546-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.3000611,49.9440619,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Павла Чубинского
+</name>
+        <description>Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2903539,49.9441279,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Морозова
+</name>
+        <description>Маршрутка-259э. Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.280395,49.9442198,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Николая Кравченко
+</name>
+        <description>Маршрутка-259э. Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2743857,49.9443922,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Остановка ул. Монюшко
+</name>
+        <description>Маршрутка-259э. Троллейбус-3, 19, 35, 59.</description>
+        <styleUrl>#icon-1532-000000</styleUrl>
+        <Point>
+          <coordinates>
+            36.2683074,49.9449367,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>
