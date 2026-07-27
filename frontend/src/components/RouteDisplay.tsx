@@ -1,4 +1,5 @@
-import { memo, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useLayoutEffect, useState } from 'react';
+import clsx from 'clsx';
 import { TRANSPORT_COLORS } from '@/config/map';
 import type { TransportKind } from '@/types/transport';
 
@@ -11,17 +12,20 @@ export interface RouteDisplayProps {
   compact?: boolean;
 }
 
-const MARQUEE_THRESHOLD_CH = 11; // якщо кінцева не влазить приблизно в стільки символів — вмикаємо біжучий рядок
+const MARQUEE_THRESHOLD_CH = 12; // Поріг увімкнення біжучого рядка
 
 /**
- * Маршрутне табло транспорту — НЕ частина зображення (PNG спрайту).
- * Малюється програмно поверх <TransportSprite />: номер маршруту завжди
- * вміщується, а кінцева зупинка переноситься/масштабується або йде
- * біжучим рядком, якщо текст задовгий для статичного відображення.
+ * Маршрутне LED-табло транспорту.
+ * Малюється програмно поверх маркера: номер маршруту виділяється фірмовим кольором,
+ * а кінцева зупинка відображається у стилі бурштинового електронного табло.
  */
-function RouteDisplayComponent({ kind, routeNumber, headsign, scale = 1, compact = false }: RouteDisplayProps) {
-  const textRef = useRef<HTMLSpanElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
+function RouteDisplayComponent({
+  kind,
+  routeNumber,
+  headsign,
+  scale = 1,
+  compact = false
+}: RouteDisplayProps) {
   const [needsMarquee, setNeedsMarquee] = useState(false);
   const color = TRANSPORT_COLORS[kind] ?? '#2B2F31';
 
@@ -29,43 +33,41 @@ function RouteDisplayComponent({ kind, routeNumber, headsign, scale = 1, compact
     setNeedsMarquee(headsign.length > MARQUEE_THRESHOLD_CH);
   }, [headsign]);
 
-  const boardWidth = compact ? 64 : 88;
+  const boardWidth = compact ? 68 : 92;
 
   return (
     <div
-      className="pointer-events-none flex select-none flex-col items-center gap-0.5 rounded-md border border-white/70 bg-graphite/95 px-1.5 py-1 shadow-glass"
+      className="pointer-events-none flex select-none flex-col items-center gap-1 rounded-lg border border-white/20 bg-zinc-950/90 px-1.5 py-1 shadow-2xl backdrop-blur-md transition-transform duration-150 will-change-transform"
       style={{
-        width: boardWidth * scale,
+        width: `${boardWidth}px`,
         transform: `scale(${scale})`,
-        transformOrigin: 'center bottom'
+        transformOrigin: 'bottom center'
       }}
       aria-hidden="true"
     >
+      {/* Бейдж із номером маршруту у фірмовому кольорі */}
       <div
-        className="rounded-sm px-1 font-display text-[10px] font-extrabold leading-none text-white"
+        className="flex items-center justify-center rounded px-1.5 py-0.5 font-display text-[10px] font-black leading-none text-white shadow-sm"
         style={{ backgroundColor: color }}
       >
         {routeNumber}
       </div>
-      <div ref={trackRef} className="w-full overflow-hidden">
+
+      {/* Електронне LED-табло напрямку */}
+      <div className="w-full overflow-hidden">
         {needsMarquee ? (
-          <div className="flex w-max animate-marquee whitespace-nowrap text-[8px] font-semibold leading-tight text-amber-300">
-            <span ref={textRef} className="pr-4">
+          <div className="flex w-max animate-marquee whitespace-nowrap text-[8.5px] font-bold leading-tight text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]">
+            <span className="pr-4">{headsign}</span>
+            <span className="pr-4" aria-hidden="true">
               {headsign}
             </span>
-            <span className="pr-4">{headsign}</span>
           </div>
         ) : (
           <span
-            ref={textRef}
-            className="block w-full text-center text-[8px] font-semibold leading-tight text-amber-300"
-            style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              wordBreak: 'break-word'
-            }}
+            className={clsx(
+              'block w-full text-center text-[8.5px] font-bold leading-tight text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]',
+              'line-clamp-2 break-words'
+            )}
           >
             {headsign}
           </span>
