@@ -4,7 +4,6 @@ import {
   User, 
   Star, 
   History, 
-  Settings, 
   Send, 
   ChevronRight, 
   ShieldCheck,
@@ -16,7 +15,6 @@ import {
   Info,
   Trash2,
   RefreshCw,
-  Download,
   Share2,
   FileText,
   Award,
@@ -37,9 +35,10 @@ export function ProfilePage() {
   const favoritesCount = favoriteStops.length + favoriteRoutes.length;
   
   const historyEntries = useHistoryStore((s) => s.entries);
-  const clearHistory = useHistoryStore((s) => s.clearHistory);
+  const clearHistory = () => {
+    useHistoryStore.setState({ entries: [] });
+  };
 
-  // Локальні стани для інтерактивних перемикачів налаштувань (без зміни бізнес-логіки)
   const [darkMode, setDarkMode] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
@@ -65,10 +64,8 @@ export function ProfilePage() {
 
       <div className="mx-auto max-w-md space-y-5 px-4 pt-2">
         
-        {/* 1. ВЕРХНЯ ЧАСТИНА: КАРТКА ПРОФІЛЮ АБО АВТОРИЗАЦІЇ */}
         {profile ? (
           <div className="relative overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 p-6 backdrop-blur-2xl shadow-xl transition-all">
-            {/* Ambient Glow */}
             <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
             
             <div className="flex items-center gap-4">
@@ -164,7 +161,6 @@ export function ProfilePage() {
           </div>
         )}
 
-        {/* 2. РОЗДІЛ "ІЗБРАННОЕ" */}
         <div className="space-y-2">
           <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
             Збережене
@@ -193,7 +189,6 @@ export function ProfilePage() {
           </div>
         </div>
 
-        {/* 3. РОЗДІЛ "ИСТОРИЯ" */}
         <div className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
@@ -213,17 +208,20 @@ export function ProfilePage() {
           <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm p-4">
             {historyEntries.length > 0 ? (
               <div className="space-y-2">
-                {historyEntries.slice(0, 10).map((entry, idx) => (
-                  <div key={idx} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
-                    <div className="flex items-center gap-3">
-                      <History className="h-4 w-4 text-ink-muted shrink-0" />
-                      <span className="text-xs font-semibold text-ink-text truncate max-w-[220px]">
-                        {entry.title || `Об'єкт #${entry.id}`}
-                      </span>
+                {historyEntries.slice(0, 10).map((entry, idx) => {
+                  const entryText = (entry as any).title || (entry as any).query || (entry as any).name || `Об'єкт #${entry.id ?? idx}`;
+                  return (
+                    <div key={idx} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+                      <div className="flex items-center gap-3">
+                        <History className="h-4 w-4 text-ink-muted shrink-0" />
+                        <span className="text-xs font-semibold text-ink-text truncate max-w-[220px]">
+                          {entryText}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-ink-muted font-medium">Щойно</span>
                     </div>
-                    <span className="text-[10px] text-ink-muted font-medium">Щойно</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="py-6 text-center flex flex-col items-center justify-center">
@@ -239,13 +237,11 @@ export function ProfilePage() {
           </div>
         </div>
 
-        {/* 4. НАЛАШТУВАННЯ (Групування по картках) */}
         <div className="space-y-3">
           <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
             Налаштування
           </span>
 
-          {/* Внешний вид */}
           <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
             <div className="p-4 font-bold text-xs text-ink-muted bg-surface-muted/30 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
@@ -288,7 +284,6 @@ export function ProfilePage() {
             </div>
           </div>
 
-          {/* Карта */}
           <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
             <div className="p-4 font-bold text-xs text-ink-muted bg-surface-muted/30 flex items-center gap-2">
               <MapPin className="h-4 w-4 text-emerald-500" />
@@ -319,7 +314,6 @@ export function ProfilePage() {
             </div>
           </div>
 
-          {/* Уведомления */}
           <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
             <div className="p-4 font-bold text-xs text-ink-muted bg-surface-muted/30 flex items-center gap-2">
               <Bell className="h-4 w-4 text-blue-500" />
@@ -350,7 +344,6 @@ export function ProfilePage() {
             </div>
           </div>
 
-          {/* Приложение */}
           <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
             <div className="p-4 font-bold text-xs text-ink-muted bg-surface-muted/30 flex items-center gap-2">
               <Info className="h-4 w-4 text-amber-500" />
@@ -415,7 +408,6 @@ export function ProfilePage() {
           </div>
         </div>
 
-        {/* 5. ІНФОРМАЦІЯ ТА СИСТЕМНІ ДАНІ */}
         <div className="space-y-2">
           <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
             Системна інформація
@@ -440,7 +432,6 @@ export function ProfilePage() {
           </div>
         </div>
 
-        {/* 6. ШВИДКІ ДІЇ */}
         <div className="space-y-2">
           <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
             Швидкі дії
