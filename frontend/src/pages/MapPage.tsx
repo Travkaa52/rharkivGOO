@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
+import { Clock, X, ChevronRight, Navigation } from 'lucide-react';
 import { MapView } from '@/components/MapView';
 import { MetroLayer } from '@/components/MetroLayer';
 import { SearchBar } from '@/components/SearchBar';
@@ -25,11 +26,7 @@ export function MapPage() {
   const visibleKinds = useSettingsStore((s) => s.visibleTransportKinds);
   const showStops = useSettingsStore((s) => s.showStopsOnMap);
 
-  // Інстанс MapLibre-карти передається сюди з <MapView /> одразу після
-  // завантаження стилю — <MetroLayer /> використовує його лише для
-  // проєкції геокоординат потягів у пікселі (map.project), нічого не
-  // домальовуючи в саму карту; тут же ним користуємось для flyTo/fitBounds
-  // при виборі зупинки/маршруту з пошуку.
+  // Інстанс MapLibre-карти передається сюди з <MapView /> одразу після завантаження стилю
   const [map, setMap] = useState<MapLibreMap | null>(null);
 
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
@@ -95,13 +92,14 @@ export function MapPage() {
     setSelectedVehicleId((current) => (current === trainId ? null : trainId));
   }
 
-  // Синхронізуємо поле пошуку з ?q= у URL, якщо воно змінилось ззовні (напр. з іншого екрана).
+  // Синхронізуємо поле пошуку з ?q= у URL, якщо воно змінилось ззовні
   useEffect(() => {
     setQuery(initialQuery);
   }, [initialQuery]);
 
   return (
-    <div className="relative h-dvh w-full">
+    <div className="relative h-dvh w-full overflow-hidden bg-bg text-ink-text">
+      {/* Map Base Canvas */}
       <MapView
         vehicles={[]}
         userPosition={position}
@@ -121,8 +119,7 @@ export function MapPage() {
         onMapReady={setMap}
       />
 
-      {/* Метро — рухається за офіційним розкладом (без GPS, без випадковості), завжди активне;
-          пропс visible лише ховає/показує шар, симуляція рахується незалежно від нього. */}
+      {/* Live Metro Layer Simulation */}
       <MetroLayer
         map={map}
         visible={visibleKinds.includes('metro')}
@@ -130,10 +127,13 @@ export function MapPage() {
         onTrainSelect={handleTrainSelect}
       />
 
+      {/* Floating Layer Selection Bar */}
       <TransportLayersPanel />
+
+      {/* Top Controls Header */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-2">
-          <div className="pointer-events-auto flex-1">
+          <div className="pointer-events-auto flex-1 shadow-lg rounded-2xl">
             <SearchBar
               value={query}
               onSubmit={handleSearchSubmit}
@@ -143,20 +143,20 @@ export function MapPage() {
                 setSuggestionsOpen(true);
               }}
               onBlur={() => {
-                // невелика затримка — щоб клік по підказці (onMouseDown) встиг спрацювати
-                blurTimeoutRef.current = setTimeout(() => setSuggestionsOpen(false), 120);
+                blurTimeoutRef.current = setTimeout(() => setSuggestionsOpen(false), 150);
               }}
-              placeholder="Куди їдемо? Зупинка або номер маршруту…"
+              placeholder="Зупинка або номер маршруту…"
             />
           </div>
-          <div className="pointer-events-auto flex flex-col gap-2">
+          <div className="pointer-events-auto flex flex-col gap-2 shrink-0">
             <GpsButton onClick={locate} isLocating={isLocating} hasError={!!error} />
             <MapModeButton />
           </div>
         </div>
 
+        {/* Dynamic Search Suggestions Popup */}
         {suggestionsOpen && query.trim() && (
-          <div className="pointer-events-auto">
+          <div className="pointer-events-auto shadow-2xl rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <MapSearchSuggestions
               stops={suggestedStops}
               routes={suggestedRoutes}
@@ -167,49 +167,88 @@ export function MapPage() {
         )}
       </div>
 
+      {/* Bottom Sheet: Active Selected Route */}
       {selectedRoute && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-          <div className="pointer-events-auto mx-auto max-w-md">
+          <div className="pointer-events-auto mx-auto max-w-md animate-in slide-in-from-bottom-6 duration-300">
             <RouteSheet route={selectedRoute} onClose={clearSelection} onStopSelect={handleStopSelect} />
           </div>
         </div>
       )}
 
+      {/* Bottom Sheet: Active Selected Stop & Realtime Arrivals */}
       {selectedStop && !selectedRoute && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-          <div className="pointer-events-auto mx-auto max-w-md animate-slide-up">
-            <StopCard stop={selectedStop} onClick={() => setSelectedStopId(null)} />
+          <div className="pointer-events-auto mx-auto max-w-md space-y-2.5 animate-in slide-in-from-bottom-6 duration-300">
+            {/* Stop Main Card with Quick Dismiss Button */}
+            <div className="relative">
+              <StopCard stop={selectedStop} onClick={() => setSelectedStopId(null)} />
+              <button
+                onClick={() => setSelectedStopId(null)}
+                className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-border/40 bg-surface/80 text-ink-muted backdrop-blur-md transition-all hover:text-ink-text active:scale-90 shadow-2xs"
+                aria-label="Закрити"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Arrivals Live List */}
             {arrivals.length > 0 && (
-              <ul className="mt-2 flex max-h-40 flex-col gap-1 overflow-y-auto rounded-xl2 border border-ink-border bg-ink-surface/90 p-2 shadow-glass">
-                {arrivals
-                  .sort((a, b) => a.etaMinutes - b.etaMinutes)
-                  .map((a) => {
-                    const route = localRoutes.getById(a.routeId);
-                    if (!route) return null;
-                    return (
-                      <li key={a.routeId}>
-                        <button
-                          type="button"
-                          onClick={() => handleRouteSelect(a.routeId)}
-                          className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs transition hover:bg-mint/20"
-                        >
-                          <span className="flex items-center gap-2">
-                            <span
-                              className="flex h-5 w-8 items-center justify-center rounded-full font-display text-[10px] font-bold text-white"
-                              style={{ backgroundColor: route.color }}
-                            >
-                              {route.number}
-                            </span>
-                            <span className="text-white/60">{KIND_LABELS_UK[route.kind]}</span>
-                          </span>
-                          <span className="font-semibold text-mint">
-                            {a.etaMinutes === 0 ? 'прибуває' : `≈ ${a.etaMinutes} хв`}
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-              </ul>
+              <div className="overflow-hidden rounded-2xl border border-border/60 bg-surface/90 p-3 backdrop-blur-xl shadow-xl">
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/40 px-1">
+                  <div className="flex items-center gap-1.5 text-caption font-bold uppercase tracking-wider text-ink-muted">
+                    <Clock className="h-3.5 w-3.5 text-primary" />
+                    <span>Прибуття транспорту</span>
+                  </div>
+                  <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/20">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    LIVE
+                  </span>
+                </div>
+
+                <ul className="flex max-h-48 flex-col gap-1.5 overflow-y-auto no-scrollbar">
+                  {arrivals
+                    .sort((a, b) => a.etaMinutes - b.etaMinutes)
+                    .map((a) => {
+                      const route = localRoutes.getById(a.routeId);
+                      if (!route) return null;
+                      const isArrivingNow = a.etaMinutes === 0;
+
+                      return (
+                        <li key={a.routeId}>
+                          <button
+                            type="button"
+                            onClick={() => handleRouteSelect(a.routeId)}
+                            className="flex w-full items-center justify-between rounded-xl border border-border/30 bg-surface/60 px-3 py-2 text-body-sm transition-all hover:border-border/80 hover:bg-surface/90 active:scale-98"
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span
+                                className="flex h-6 w-9 shrink-0 items-center justify-center rounded-lg font-display text-xs font-bold text-white shadow-xs"
+                                style={{ backgroundColor: route.color || '#10b981' }}
+                              >
+                                {route.number}
+                              </span>
+                              <div className="flex flex-col text-left min-w-0">
+                                <span className="text-caption font-semibold text-ink-muted truncate">
+                                  {KIND_LABELS_UK[route.kind]}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className={`text-body-sm font-bold ${
+                                isArrivingNow ? 'text-emerald-400 animate-pulse' : 'text-primary'
+                              }`}>
+                                {isArrivingNow ? 'Прибуває' : `≈ ${a.etaMinutes} хв`}
+                              </span>
+                              <ChevronRight className="h-4 w-4 text-ink-muted/60" />
+                            </div>
+                          </button>
+                        </li>
+                      );
+                    })}
+                </ul>
+              </div>
             )}
           </div>
         </div>
