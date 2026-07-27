@@ -2,6 +2,11 @@
  * Схематичні дані Харківського метрополітену — координати станцій, лінії,
  * пересадочні вузли та розклад руху. Всі координати та підписи точнісінько
  * відтворюють офіційну схему Тимофія Білецького (v5.1.1).
+ *
+ * ВАЖЛИВО: `id` кожної станції тут навмисно узгоджений з ключами станцій у
+ * `data/stops.json` (реальна геолокація) та `liveMetro/timetableData.ts`
+ * (реальні графіки відправлень з табло станцій). Це дозволяє напряму
+ * з'єднувати схему з живими даними без додаткового мапінгу id.
  */
 
 export type LiveMetroDayType = 'weekday' | 'weekend';
@@ -84,26 +89,26 @@ const redStations: SchematicStation[] = [
 
 /** Лінія 2 — Салтівська (синя). */
 const blueStations: SchematicStation[] = [
-  st('heroiv-saltyvky', 'Салтівська', 'Saltivska', 880, 110, 0, undefined, { x: 75, y: 4 }),
+  st('saltivska', 'Салтівська', 'Saltivska', 880, 110, 0, undefined, { x: 75, y: 4 }),
   st('studentska', 'Студентська', 'Studentska', 830, 170, 120, undefined, { x: 70, y: 4 }),
   st('akademika-pavlova', 'Академіка Павлова', 'Akademika Pavlova', 780, 230, 240, undefined, { x: 90, y: 4 }),
   st('akademika-barabashova', 'Академіка Барабашова', 'Akademika Barabashova', 730, 290, 360, undefined, { x: 100, y: 4 }),
   st('kyivska', 'Київська', 'Kyivska', 680, 350, 480, undefined, { x: 60, y: 4 }),
-  st('yaroslava-mudroho', 'Ярослава Мудрого', 'Yaroslava Mudroho', 630, 410, 600, undefined, { x: 70, y: 4 }),
+  st('iaroslava-mudrogo', 'Ярослава Мудрого', 'Yaroslava Mudroho', 630, 410, 600, undefined, { x: 70, y: 4 }),
   st('universytet', 'Університет', 'Universytet', 550, 440, 720, ['stop-metro-derzhprom'], { x: 0, y: 28 }),
   st('istorychnyi-muzei', 'Історичний музей', 'Istorychnyi Muzei', 490, 530, 840, ['stop-metro-maidan-konstytutsii'], { x: 85, y: 4 })
 ];
 
 /** Лінія 3 — Олексіївська (зелена). */
 const greenStations: SchematicStation[] = [
-  st('peremoha', 'Перемога', 'Peremoha', 330, 110, 0, undefined, { x: -65, y: 4 }),
+  st('peremoga', 'Перемога', 'Peremoha', 330, 110, 0, undefined, { x: -65, y: 4 }),
   st('oleksiivska', 'Олексіївська', 'Oleksiivska', 370, 170, 120, undefined, { x: -75, y: 4 }),
-  st('23-serpnya', '23 Серпня', '23 Serpnya', 410, 230, 240, undefined, { x: -65, y: 4 }),
+  st('23-serpnia', '23 Серпня', '23 Serpnya', 410, 230, 240, undefined, { x: -65, y: 4 }),
   st('botanichnyi-sad', 'Ботанічний сад', 'Botanichnyi Sad', 450, 290, 360, undefined, { x: -80, y: 4 }),
   st('naukova', 'Наукова', 'Naukova', 490, 350, 480, undefined, { x: -60, y: 4 }),
   st('derzhprom', 'Держпром', 'Derzhprom', 510, 440, 600, ['stop-metro-universytet'], { x: -55, y: -18 }),
-  st('arkhitektora-beketova', 'Архітектора Бекетова', 'Arkhitektora Beketova', 590, 520, 730, undefined, { x: 100, y: 4 }),
-  st('zakhysnykiv-ukrainy', 'Захисників України', 'Zakhysnykiv Ukrainy', 570, 620, 850, undefined, { x: 95, y: 4 }),
+  st('arhitektora-beketova', 'Архітектора Бекетова', 'Arkhitektora Beketova', 590, 520, 730, undefined, { x: 100, y: 4 }),
+  st('zahysnykiv-ukrainy', 'Захисників України', 'Zakhysnykiv Ukrainy', 570, 620, 850, undefined, { x: 95, y: 4 }),
   st('metrobudivnykiv', 'Метробудівників', 'Metrobudivnykiv', 510, 700, 970, ['stop-metro-sportyvna'], { x: -10, y: 28 })
 ];
 
