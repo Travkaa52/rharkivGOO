@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
+import { Train } from 'lucide-react';
 import { useMetroSimulation } from '@/hooks/useMetroSimulation';
 import type { MetroRenderFrame } from '@/metro/MetroRenderer';
 
@@ -10,23 +11,16 @@ interface ScreenFrame {
 }
 
 interface MetroLayerProps {
-  /** Інстанс MapLibre-карти (з <MapView />). Поки null (карта ще не завантажилась) шар нічого не рендерить. */
+  /** Інстанс MapLibre-карти. */
   map: MapLibreMap | null;
-  /** Показувати шар метро — керується панеллю фільтрів транспорту. Симуляція рахується завжди, незалежно від видимості. */
+  /** Показувати шар метро — керується панеллю фільтрів. */
   visible: boolean;
   selectedTrainId?: string | null;
   onTrainSelect?: (trainId: string) => void;
 }
 
 /**
- * Шар потягів метро на карті.
- *
- * Дані про рух (позиція/курс/швидкість/фаза) повністю надходять з
- * useMetroSimulation() — детермінований аналітичний рушій за розкладом,
- * БЕЗ GPS. Цей компонент відповідає лише за проєкцію геокоординат у
- * пікселі поточного вигляду карти (map.project) та відображення
- * плейсхолдер-маркера (кружечок з кольором лінії, номером і стрілкою
- * напрямку) — до підключення PNG Sprite Sheet.
+ * Шар потягів метро на карті з проекцією геокоординат у пікселі екрана.
  */
 export function MetroLayer({ map, visible, selectedTrainId, onTrainSelect }: MetroLayerProps) {
   const frames = useMetroSimulation();
@@ -34,36 +28,62 @@ export function MetroLayer({ map, visible, selectedTrainId, onTrainSelect }: Met
   const framesRef = useRef(frames);
   framesRef.current = frames;
 
-  // Перепроєктовуємо геопозиції потягів у пікселі щоразу, коли з'являється
-  // новий кадр симуляції (~60 разів/сек через MetroRenderer) АБО коли
-  // користувач рухає/масштабує карту.
+  // Синхронізація проєкції координат з кадрами анімації та рухом карти (Viewport Culling + rAF)
   useEffect(() => {
     if (!map) {
       setScreenFrames([]);
       return;
     }
 
+    let rafId: number | null = null;
+    const CULL_PADDING_PX = 100;
+
     function project() {
+      rafId = null;
       if (!map) return;
+
+      const canvas = map.getCanvas();
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
       const next: ScreenFrame[] = [];
+
       for (const frame of framesRef.current) {
         const point = map.project([frame.snapshot.position.lng, frame.snapshot.position.lat]);
+
+        // Пропускаємо потяги поза видимою зоною екрана
+        if (
+          point.x < -CULL_PADDING_PX ||
+          point.y < -CULL_PADDING_PX ||
+          point.x > w + CULL_PADDING_PX ||
+          point.y > h + CULL_PADDING_PX
+        ) {
+          continue;
+        }
+
         next.push({ frame, x: point.x, y: point.y });
       }
+
       setScreenFrames(next);
     }
 
-    project();
-    map.on('move', project);
+    function scheduleProject() {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(project);
+    }
+
+    scheduleProject();
+    map.on('move', scheduleProject);
+
     return () => {
-      map.off('move', project);
+      map.off('move', scheduleProject);
+      if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, [map, frames]);
 
   if (!visible || !map) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-20" aria-hidden={screenFrames.length === 0}>
+    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden={screenFrames.length === 0}>
       {screenFrames.map(({ frame, x, y }) => (
         <MetroTrainMarker
           key={frame.snapshot.id}
@@ -87,11 +107,7 @@ interface MetroTrainMarkerProps {
 }
 
 /**
- * Плейсхолдер-маркер потяга метро: кольоровий кружечок лінії з номером +
- * стрілка напрямку руху + компактне табло "номер -> кінцева". Геометрія й
- * розмір навмисно прості — компонент буде замінено на <TransportSprite />-
- * подібний рендер PNG Sprite Sheet, коли власник проєкту додасть спрайти
- * (див. /public/sprites/README.md), без зміни логіки симуляції.
+ * Маркер потяга метро з лінійним неоновим світінням та скляним тултипом для обраного потяга.
  */
 const MetroTrainMarker = memo(function MetroTrainMarker({ frame, x, y, selected, onClick }: MetroTrainMarkerProps) {
   const { snapshot } = frame;
@@ -102,28 +118,29 @@ const MetroTrainMarker = memo(function MetroTrainMarker({ frame, x, y, selected,
       type="button"
       onClick={onClick}
       aria-label={`Метро, лінія ${snapshot.lineNumber}, прямує до ${snapshot.headsign}, ${Math.round(snapshot.speedKmh)} км/год`}
-      className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 select-none transition-[left,top] duration-100 ease-linear will-change-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+      className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 select-none transition-[left,top] duration-100 ease-linear will-change-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       style={{ left: x, top: y, opacity: frame.opacity, zIndex: selected ? 30 : 20 }}
     >
-      <div className="relative flex flex-col items-center gap-1">
+      <div className="relative flex flex-col items-center gap-1.5">
         <div
           data-placeholder="metro-train"
           className={[
-            'flex items-center justify-center rounded-full border-2 border-white font-display text-[11px] font-bold text-white shadow-glass transition-transform duration-200',
-            isDwell ? 'animate-pulse-soft' : ''
+            'relative flex items-center justify-center rounded-full border-2 border-white/90 font-display text-[11px] font-bold text-white transition-all duration-200 active:scale-95',
+            isDwell ? 'animate-pulse' : ''
           ].join(' ')}
           style={{
-            width: selected ? 30 : 24,
-            height: selected ? 30 : 24,
+            width: selected ? 32 : 26,
+            height: selected ? 32 : 26,
             backgroundColor: snapshot.lineColor,
-            transform: `scale(${selected ? 1.1 : 1})`
+            boxShadow: `0 0 12px ${snapshot.lineColor}80`,
+            transform: `scale(${selected ? 1.15 : 1})`
           }}
         >
-          {/* Стрілка напрямку — обертається за фактичним курсом руху (headingDeg), не показується під час стоянки. */}
+          {/* Стрілка напрямку руху */}
           {!isDwell && (
             <span
-              className="absolute -top-2.5 h-2.5 w-2.5"
-              style={{ transform: `rotate(${snapshot.headingDeg}deg)`, transformOrigin: '50% 14px' }}
+              className="absolute -top-2.5 h-2.5 w-2.5 transition-transform duration-200"
+              style={{ transform: `rotate(${snapshot.headingDeg}deg)`, transformOrigin: '50% 15px' }}
             >
               <span
                 className="block h-full w-full"
@@ -131,14 +148,19 @@ const MetroTrainMarker = memo(function MetroTrainMarker({ frame, x, y, selected,
               />
             </span>
           )}
-          {snapshot.lineNumber.replace(/^M/, '')}
+
+          <span className="drop-shadow-sm">{snapshot.lineNumber.replace(/^M/, '')}</span>
         </div>
 
+        {/* Скляна картка детальної інформації при виборі */}
         {selected && (
-          <div className="flex flex-col items-center rounded-lg border border-white/60 bg-white/95 px-2 py-1 text-center shadow-glass backdrop-blur-xs">
-            <span className="font-display text-[11px] font-bold text-graphite">{snapshot.lineNumber} → {snapshot.headsign}</span>
-            <span className="text-[10px] text-graphite/60">
-              {isDwell ? 'на станції' : `${Math.round(snapshot.speedKmh)} км/год`} · далі: {snapshot.nextStation.name}
+          <div className="flex flex-col items-center rounded-xl border border-border/60 bg-surface/95 px-3 py-1.5 text-center shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150">
+            <span className="font-display text-[11px] font-bold text-ink-text flex items-center gap-1 whitespace-nowrap">
+              <Train className="h-3 w-3 text-primary" />
+              {snapshot.lineNumber} → {snapshot.headsign}
+            </span>
+            <span className="text-[10px] text-ink-muted whitespace-nowrap">
+              {isDwell ? 'На станції' : `${Math.round(snapshot.speedKmh)} км/год`} · далі: {snapshot.nextStation.name}
             </span>
           </div>
         )}
