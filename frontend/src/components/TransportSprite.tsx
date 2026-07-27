@@ -61,11 +61,17 @@ function TransportSpriteComponent({
       onClick={onClick}
       aria-label={`${kind} №${routeNumber}, прямує до ${headsign}, ${Math.round(speedKmh)} км/год`}
       className={[
-        'absolute -translate-x-1/2 -translate-y-1/2 select-none',
-        'transition-[left,top] duration-300 ease-out will-change-transform',
+        'absolute left-0 top-0 select-none',
+        'will-change-transform',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-gold'
       ].join(' ')}
-      style={{ left: x, top: y, zIndex: selected ? 30 : 20 }}
+      style={{
+        // translate3d замість left/top: браузер рухає елемент лише в compositor-шарі
+        // (GPU), без layout/paint усього документа на кожен кадр анімації —
+        // це і прибирає джанк при великій кількості машин на екрані.
+        transform: `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`,
+        zIndex: selected ? 30 : 20
+      }}
     >
       <div className="relative flex flex-col items-center gap-1">
         {spriteReady ? (

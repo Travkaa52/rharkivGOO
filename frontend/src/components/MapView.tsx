@@ -395,24 +395,56 @@ export function MapView({
     }
   }, [userIsMoving, userHeading]);
 
-  // Перерахунок екранних координат транспорту на кожен кадр анімації + рух карти
+  // Перерахунок екранних координат транспорту на кожен кадр анімації + рух карти.
+  //
+  // Продуктивність (120fps-таргет):
+  // 1) 'move' на MapLibre може стріляти десятки разів за секунду під час
+  //    інерційного панорамування — раніше кожен такий івент одразу викликав
+  //    setState (React re-render). Тепер запит на перерахунок лише "зводить"
+  //    прапорець, а сам проект+setState виконується щонайбільше раз на кадр
+  //    через rAF — так React re-render синхронізований з циклом малювання
+  //    карти, а не з частотою internal-подій MapLibre.
+  // 2) Viewport culling: машини, що вийшли за межі екрана (з невеликим
+  //    запасом), не потрапляють у screenPositions і не рендеряться в DOM —
+  //    на щільних маршрутах це різко скорочує кількість <TransportSprite/>.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
 
-    function updateScreenPositions() {
+    let rafId: number | null = null;
+    const CULL_PADDING_PX = 120;
+
+    function computeAndSet() {
+      rafId = null;
+      const canvas = map!.getCanvas();
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
       const positions: Record<string, ScreenVehicle> = {};
       for (const v of animatedVehicles) {
         const point = map!.project([v.animatedPosition.lng, v.animatedPosition.lat]);
+        if (
+          point.x < -CULL_PADDING_PX ||
+          point.y < -CULL_PADDING_PX ||
+          point.x > w + CULL_PADDING_PX ||
+          point.y > h + CULL_PADDING_PX
+        ) {
+          continue;
+        }
         positions[v.id] = { id: v.id, x: point.x, y: point.y };
       }
       setScreenPositions(positions);
     }
 
-    updateScreenPositions();
-    map.on('move', updateScreenPositions);
+    function scheduleUpdate() {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(computeAndSet);
+    }
+
+    scheduleUpdate();
+    map.on('move', scheduleUpdate);
     return () => {
-      map.off('move', updateScreenPositions);
+      map.off('move', scheduleUpdate);
+      if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, [animatedVehicles, mapReady]);
 

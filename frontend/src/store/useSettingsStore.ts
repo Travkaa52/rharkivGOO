@@ -32,7 +32,15 @@ export const useSettingsStore = create<SettingsState>()(
       visibleTransportKinds: ALL_KINDS,
       showStopsOnMap: true,
       is3DMode: true,
-      setTheme: (theme) => set({ theme }),
+      // Зміна теми одразу підлаштовує стиль карти (день/ніч) — так перемикач
+      // теми в Налаштуваннях виглядає як єдина, цілісна дія, а не два окремих
+      // перемикачі, які треба узгоджувати вручну. Якщо тема "Авто" — рівняємось
+      // по системному preference; mapStyle лишається окремо доступним нижче.
+      setTheme: (theme) =>
+        set({
+          theme,
+          mapStyle: theme === 'light' ? 'day' : theme === 'dark' ? 'night' : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day'
+        }),
       setMapStyle: (mapStyle) => set({ mapStyle }),
       setLanguage: (language) => set({ language }),
       setUnits: (units) => set({ units }),
