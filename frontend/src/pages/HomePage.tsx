@@ -25,7 +25,8 @@ import { useHistoryStore } from '@/store/useHistoryStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { TransportKind } from '@/types/transport';
-import metroIcon from '/metroicono.png';
+
+const metroIcon = '/metroicono.png';
 
 const KIND_ICON: Record<TransportKind, string> = {
   metro: '🚇',
