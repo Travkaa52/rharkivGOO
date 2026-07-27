@@ -22,7 +22,6 @@ interface TransportMeta {
   subtitle: string;
   icon: typeof TrainTrack;
   badgeColor: string;
-  accentBg: string;
 }
 
 const TRANSPORT_META: Record<TransportKind, TransportMeta> = {
@@ -30,29 +29,25 @@ const TRANSPORT_META: Record<TransportKind, TransportMeta> = {
     title: 'Метро', 
     subtitle: '3 лінії · 30 станцій · Швидкісний підземний транспорт',
     icon: TrainTrack,
-    badgeColor: 'text-red-500 bg-red-500/10 border-red-500/20',
-    accentBg: 'from-red-500/20 to-transparent'
+    badgeColor: 'text-red-500 bg-red-500/10 border-red-500/20'
   },
   tram: { 
     title: 'Трамваї', 
     subtitle: 'Наземні рейкові маршрути міста',
     icon: TrainTrack,
-    badgeColor: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
-    accentBg: 'from-amber-500/20 to-transparent'
+    badgeColor: 'text-amber-500 bg-amber-500/10 border-amber-500/20'
   },
   trolleybus: { 
     title: 'Тролейбуси', 
     subtitle: 'Екологічний міський електротранспорт',
     icon: Zap,
-    badgeColor: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-    accentBg: 'from-blue-500/20 to-transparent'
+    badgeColor: 'text-blue-500 bg-blue-500/10 border-blue-500/20'
   },
   bus: { 
     title: 'Автобуси', 
     subtitle: 'Міські та приміські маршрутні автобуси',
     icon: Bus,
-    badgeColor: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
-    accentBg: 'from-emerald-500/20 to-transparent'
+    badgeColor: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'
   }
 };
 
@@ -75,7 +70,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const meta = TRANSPORT_META[kind] || TRANSPORT_META.bus;
-  const Icon = meta.icon;
+  const TransportIcon = meta.icon;
 
   const loadRoutes = useCallback(() => {
     let cancelled = false;
@@ -104,16 +99,14 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
     return cleanup;
   }, [loadRoutes]);
 
-  // Client-side quick filter
   const filteredRoutes = useMemo(() => {
     if (!searchQuery.trim()) return routes;
     const query = searchQuery.toLowerCase().trim();
-    return routes.filter(
-      (r) => 
-        r.number?.toString().toLowerCase().includes(query) ||
-        r.name?.toLowerCase().includes(query) ||
-        r.title?.toLowerCase().includes(query)
-    );
+    return routes.filter((r) => {
+      const numMatch = r.number != null && String(r.number).toLowerCase().includes(query);
+      const nameMatch = r.name != null && r.name.toLowerCase().includes(query);
+      return numMatch || nameMatch;
+    });
   }, [routes, searchQuery]);
 
   return (
@@ -122,6 +115,14 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
 
       <div className="mx-auto max-w-md space-y-4 px-4 pt-2">
         
+        {/* Кастомний бейдж з іконкою типу транспорту */}
+        <div className="flex items-center justify-between gap-2">
+          <div className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-semibold backdrop-blur-md ${meta.badgeColor}`}>
+            <TransportIcon className="h-4 w-4" />
+            <span>{meta.title}</span>
+          </div>
+        </div>
+
         {/* Metro Live Hero Banner */}
         {kind === 'metro' && (
           <div className="relative group overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-surface/80 to-surface/60 p-0.5 shadow-lg backdrop-blur-xl transition-all hover:border-emerald-500/50">
@@ -160,7 +161,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           </div>
         )}
 
-        {/* Search Bar & Header Stats */}
+        {/* Search Bar */}
         {!loading && !errorMsg && routes.length > 0 && (
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -190,19 +191,16 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           </div>
         )}
 
-        {/* Routes List Container */}
+        {/* List Content */}
         <div className="flex flex-col gap-2.5">
-          {/* Skeleton Loaders */}
           {loading && (
             <>
-              <RouteSkeleton />
               <RouteSkeleton />
               <RouteSkeleton />
               <RouteSkeleton />
             </>
           )}
 
-          {/* Error State */}
           {errorMsg && !loading && (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/5 p-8 text-center backdrop-blur-md">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive mb-3">
@@ -212,7 +210,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
               <p className="text-body-sm text-ink-muted max-w-xs mb-4">{errorMsg}</p>
               <button
                 onClick={loadRoutes}
-                className="inline-flex items-center gap-2 rounded-xl bg-surface border border-border/80 px-4 py-2 text-body-sm font-medium text-ink-text hover:bg-muted/50 active:scale-95 transition-all shadow-2xs"
+                className="inline-flex items-center gap-2 rounded-xl bg-surface border border-border/80 px-4 py-2 text-body-sm font-medium text-ink-text hover:bg-muted/50 transition-all shadow-2xs"
               >
                 <RotateCcw className="h-4 w-4" />
                 <span>Спробувати знову</span>
@@ -220,18 +218,16 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
             </div>
           )}
 
-          {/* Empty State (No items in API) */}
           {!loading && !errorMsg && routes.length === 0 && (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-border/60 bg-surface/60 p-8 text-center backdrop-blur-md">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/60 text-ink-muted mb-3">
                 <Compass className="h-6 w-6" />
               </div>
               <p className="text-body font-medium text-ink-text mb-1">Маршрутів не знайдено</p>
-              <p className="text-body-sm text-ink-muted">Список для даного типу транспорту наразі порожній.</p>
+              <p className="text-body-sm text-ink-muted">Список наразі порожній.</p>
             </div>
           )}
 
-          {/* Empty Search State */}
           {!loading && !errorMsg && routes.length > 0 && filteredRoutes.length === 0 && (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-border/60 bg-surface/60 p-8 text-center backdrop-blur-md">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/60 text-ink-muted mb-3">
@@ -239,12 +235,11 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
               </div>
               <p className="text-body font-medium text-ink-text mb-1">Нічого не знайдено</p>
               <p className="text-body-sm text-ink-muted">
-                Немає маршрутів, що відповідають запиту «{searchQuery}»
+                Немає маршрутів за запитом «{searchQuery}»
               </p>
             </div>
           )}
 
-          {/* Rendered Route Cards */}
           {!loading &&
             !errorMsg &&
             filteredRoutes.map((route) => (
