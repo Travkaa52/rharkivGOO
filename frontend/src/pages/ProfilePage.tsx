@@ -58,6 +58,24 @@ export function ProfilePage() {
     }, 800);
   };
 
+  const handleShareApp = async () => {
+    const shareData = {
+      title: 'Kharkiv GO',
+      text: 'Найкращий додаток для навігації та громадського транспорту у Харкові!',
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled or share failed
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Посилання скопійовано в буфер обміну!');
+    }
+  };
+
   return (
     <div className="min-h-dvh bg-bg text-ink-text selection:bg-primary/20 pb-32">
       <PageHeader title="Профіль" subtitle="Особистий кабінет та керування" />
@@ -118,8 +136,8 @@ export function ProfilePage() {
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive mb-3 border border-destructive/20">
               <User className="h-7 w-7" />
             </div>
-            <h3 className="text-body font-bold text-ink-text mb-1">Не вдалося завантажити профіль</h3>
-            <p className="text-body-sm text-ink-muted max-w-xs mx-auto">
+            <h3 className="text-sm font-bold text-ink-text mb-1">Не вдалося завантажити профіль</h3>
+            <p className="text-xs text-ink-muted max-w-xs mx-auto">
               Спробуйте перевідкрити застосунок у Telegram.
             </p>
           </div>
@@ -132,7 +150,7 @@ export function ProfilePage() {
             </div>
 
             <h3 className="text-base font-extrabold text-ink-text mb-2">
-              Увійдіть у свій акаунт
+              Ви ще не увійшли
             </h3>
 
             <p className="text-xs text-ink-muted leading-relaxed mb-5 max-w-xs mx-auto">
@@ -155,7 +173,7 @@ export function ProfilePage() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 rounded-2xl bg-surface border border-border/80 px-4 py-3 text-xs font-bold text-ink-text shadow-xs transition-all hover:bg-surface/90 active:scale-98"
               >
-                <span>Зареєструватися</span>
+                <span>Продовжити гостем</span>
               </a>
             </div>
           </div>
@@ -192,7 +210,7 @@ export function ProfilePage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
-              Історія переглядів (до 10)
+              Історія переглядів (до 20)
             </span>
             {historyEntries.length > 0 && (
               <button
@@ -207,8 +225,8 @@ export function ProfilePage() {
 
           <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm p-4">
             {historyEntries.length > 0 ? (
-              <div className="space-y-2">
-                {historyEntries.slice(0, 10).map((entry, idx) => {
+              <div className="space-y-2 max-h-60 overflow-y-auto no-scrollbar">
+                {historyEntries.slice(0, 20).map((entry, idx) => {
                   const entryText = (entry as any).title || (entry as any).query || (entry as any).name || `Об'єкт #${entry.id ?? idx}`;
                   return (
                     <div key={idx} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
@@ -218,7 +236,7 @@ export function ProfilePage() {
                           {entryText}
                         </span>
                       </div>
-                      <span className="text-[10px] text-ink-muted font-medium">Щойно</span>
+                      <span className="text-[10px] text-ink-muted font-medium">Нещодавно</span>
                     </div>
                   );
                 })}
@@ -378,19 +396,18 @@ export function ProfilePage() {
               <ChevronRight className="h-4 w-4 text-ink-muted" />
             </a>
 
-            <a
-              href="#share"
-              onClick={(e) => { e.preventDefault(); alert('Посилання скопійовано в буфер обміну!'); }}
-              className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
+            <button
+              onClick={handleShareApp}
+              className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
                   <Share2 className="h-4 w-4" />
                 </div>
-                <span className="text-xs font-bold text-ink-text">Поділитися з друзями</span>
+                <span className="text-xs font-bold text-ink-text">Поділитися застосунком</span>
               </div>
               <ChevronRight className="h-4 w-4 text-ink-muted" />
-            </a>
+            </button>
 
             <a
               href="#privacy"
@@ -418,15 +435,15 @@ export function ProfilePage() {
               <span className="font-bold text-ink-text">v1.2.0 (Build 420)</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-ink-muted font-medium">Версія бази даних</span>
-              <span className="font-bold text-ink-text">GTFS 2026.06</span>
+              <span className="text-ink-muted font-medium">Існуюча карта</span>
+              <span className="font-bold text-ink-text">Leaflet / OpenStreetMap</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-ink-muted font-medium">Останнє оновлення</span>
+              <span className="text-ink-muted font-medium">Останнє оновлення даних</span>
               <span className="font-bold text-ink-text">Сьогодні, 06:30</span>
             </div>
             <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
-              <span className="text-ink-muted font-medium">Розмір локального кешу</span>
+              <span className="text-ink-muted font-medium">Розмір кэшу</span>
               <span className="font-bold text-emerald-600">{cacheSize}</span>
             </div>
           </div>
