@@ -1,7 +1,21 @@
 import { localRoutes, localStops } from '@/data/localData';
 import { KIND_PRIORITY, TRANSPORT_COLORS } from '@/config/map';
-import type { FeatureCollection, LineString, Point } from 'geojson';
+import routeGeometriesJson from '@/data/routeGeometries.json';
+import type { FeatureCollection, LineString, MultiLineString, Point } from 'geojson';
 import type { TransportKind } from '@/types/transport';
+
+/**
+ * Реальні геометрії маршрутів (координати вздовж вулиць), розшифровані з
+ * офіційних KML-схем трамваїв/тролейбусів/метро Харкова. Ключ — `${kind}-${number}`,
+ * значення — масив ліній (кожна лінія = один прохід/напрямок маршруту з KML).
+ * Якщо для маршруту немає реальної геометрії (наприклад автобуси), карта
+ * повертається до прямих ліній між зупинками (fallback нижче).
+ */
+const ROUTE_GEOMETRIES = routeGeometriesJson as Record<string, [number, number][][]>;
+
+function geometryKey(kind: TransportKind, number: string): string {
+  return `${kind}-${number}`;
+}
 
 function dominantKind(kinds: TransportKind[]): TransportKind {
   for (const k of KIND_PRIORITY) {
@@ -20,12 +34,35 @@ function dominantKind(kinds: TransportKind[]): TransportKind {
 export function buildRouteLinesGeoJson(
   visibleKinds?: TransportKind[],
   selectedRouteId?: string | null
-): FeatureCollection<LineString> {
+): FeatureCollection<LineString | MultiLineString> {
   const routes = localRoutes.all().filter((r) => !visibleKinds || visibleKinds.includes(r.kind));
   return {
     type: 'FeatureCollection',
     features: routes
       .map((route) => {
+        const realGeometry = ROUTE_GEOMETRIES[geometryKey(route.kind, route.number)];
+
+        const properties = {
+          routeId: route.id,
+          kind: route.kind,
+          number: route.number,
+          color: route.color ?? TRANSPORT_COLORS[route.kind],
+          // Використовується paint-виразами шару ліній: обраний маршрут — товстіший і
+          // непрозорий, решта — притлумлені, щоб виділялись на карті без перестворення шару.
+          selected: selectedRouteId ? route.id === selectedRouteId : true,
+          dimmed: !!selectedRouteId && route.id !== selectedRouteId
+        };
+
+        // Реальна траєкторія вздовж вулиць (з KML) — пріоритетна.
+        if (realGeometry && realGeometry.length > 0) {
+          return {
+            type: 'Feature' as const,
+            properties,
+            geometry: { type: 'MultiLineString' as const, coordinates: realGeometry }
+          };
+        }
+
+        // Фолбек: пряма лінія між зупинками, якщо реальної геометрії немає.
         const coordinates = route.stopIds
           .map((stopId) => localStops.getById(stopId))
           .filter((s): s is NonNullable<typeof s> => !!s)
@@ -33,16 +70,7 @@ export function buildRouteLinesGeoJson(
         if (coordinates.length < 2) return null;
         return {
           type: 'Feature' as const,
-          properties: {
-            routeId: route.id,
-            kind: route.kind,
-            number: route.number,
-            color: route.color ?? TRANSPORT_COLORS[route.kind],
-            // Використовується paint-виразами шару ліній: обраний маршрут — товстіший і
-            // непрозорий, решта — притлумлені, щоб виділялись на карті без перестворення шару.
-            selected: selectedRouteId ? route.id === selectedRouteId : true,
-            dimmed: !!selectedRouteId && route.id !== selectedRouteId
-          },
+          properties,
           geometry: { type: 'LineString' as const, coordinates }
         };
       })

@@ -427,7 +427,18 @@ export function MapView({
 
   return (
     <div className="relative h-full w-full overflow-hidden">
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* КРИТИЧНО: position/inset заданий інлайн-стилем, а НЕ класами Tailwind
+          (absolute inset-0). Бібліотека maplibre-gl.css сама додає на цей
+          контейнер клас .maplibregl-map з правилом `position: relative` —
+          та сама специфічність (один клас), тож перемагає той, чий CSS
+          підключений пізніше в зібраному бандлі. Раніше це призводило до
+          того, що контейнер лишався position:relative без заданої висоти,
+          inset-0 переставав щось важити, висота схлопувалась у 0px — і
+          карта була невидимою (canvas 0×0), хоча жодної JS-помилки не було.
+          Інлайн-стиль має найвищий пріоритет і завжди перемагає будь-який
+          зовнішній клас, тож карта відображається незалежно від порядку
+          CSS-чанків у білді. */}
+      <div ref={containerRef} className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} />
 
       {/* Оверлей транспорту, спроєктований у пікселі поверх карты */}
       <div className="pointer-events-none absolute inset-0 z-10">

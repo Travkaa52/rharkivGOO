@@ -159,8 +159,24 @@ body {
 }
 
 /* ==========================================================================
-   Доступність (Reduced Motion)
+   Плавна зміна теми (light/dark/auto)
    ========================================================================== */
+
+/* Без цього блоку зміна теми була миттєвою/різкою: <html data-theme> міняється
+   синхронно, а картки/бордери/фон одразу перефарбовувались без переходу —
+   тільки body мав transition. Тепер усі поверхні, що використовують кольори
+   з CSS-змінних (а отже залежать від теми), плавно перефарбовуються разом. */
+.glass-panel,
+.glass-card,
+[class*='bg-surface'],
+[class*='bg-ink'],
+[class*='border-border'],
+[class*='border-ink-border'] {
+  transition: background-color 0.28s ease, background 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease,
+    backdrop-filter 0.28s ease;
+}
+
+
 
 @media (prefers-reduced-motion: reduce) {
   * {

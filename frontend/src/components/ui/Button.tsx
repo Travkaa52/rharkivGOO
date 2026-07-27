@@ -69,9 +69,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         disabled={isDisabled}
         className={clsx(
-          'inline-flex items-center justify-center font-display font-semibold transition-all duration-150 select-none outline-none',
+          'inline-flex items-center justify-center font-display font-semibold transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] select-none outline-none',
           'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
-          !isDisabled && 'active:scale-[0.97]',
+          !isDisabled && 'active:scale-[0.96] active:duration-75',
           'disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none',
           variantClasses[variant],
           sizeClasses[size],
