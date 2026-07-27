@@ -1,51 +1,102 @@
 import { type ButtonHTMLAttributes, type ReactNode, forwardRef } from 'react';
 import clsx from 'clsx';
+import { Loader2 } from 'lucide-react';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
+  /** Іконка зліва від тексту */
   icon?: ReactNode;
+  /** Іконка справа від тексту */
+  iconRight?: ReactNode;
+  /** Стан завантаження (блокує кнопку та показує анімований спінер) */
+  isLoading?: boolean;
   fullWidth?: boolean;
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-forest text-white shadow-glass hover:bg-forest-light active:bg-forest-dark',
-  secondary: 'bg-surface-raised text-ink-text border border-border hover:border-gold/50',
-  ghost: 'bg-transparent text-ink-text hover:bg-surface-soft',
-  danger: 'bg-red-500/10 text-red-500 hover:bg-red-500/15'
+  primary:
+    'bg-forest text-white shadow-glass hover:bg-forest-light active:bg-forest-dark focus-visible:ring-forest',
+  secondary:
+    'bg-surface-raised text-ink-text border border-border/80 hover:border-gold/50 hover:bg-surface-soft active:bg-surface-raised focus-visible:ring-gold',
+  ghost:
+    'bg-transparent text-ink-text hover:bg-surface-soft active:bg-surface-raised focus-visible:ring-primary',
+  danger:
+    'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 active:bg-red-500/30 focus-visible:ring-red-500'
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: 'h-9 px-3 text-body-sm gap-1.5 rounded-md',
-  md: 'h-11 px-4 text-body gap-2 rounded-lg',
-  lg: 'h-14 px-6 text-title gap-2 rounded-xl2'
+  sm: 'h-9 px-3 text-body-sm gap-1.5 rounded-md text-xs',
+  md: 'h-11 px-4 text-body gap-2 rounded-lg text-sm',
+  lg: 'h-14 px-6 text-title gap-2.5 rounded-2xl text-base'
+};
+
+const iconSizes: Record<Size, string> = {
+  sm: 'h-3.5 w-3.5',
+  md: 'h-4 w-4',
+  lg: 'h-5 w-5'
 };
 
 /**
- * Єдина кнопка для всього застосунку. Замінює розрізнені <button className="...">
- * що були розкидані по сторінках з різними радіусами/кольорами/паддінгами.
+ * Універсальна кнопка застосунку із підтримкою варіантів дизайну,
+ * іконок, станів завантаження та високою доступністю (a11y).
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', icon, fullWidth, className, children, disabled, ...rest }, ref) => (
-    <button
-      ref={ref}
-      disabled={disabled}
-      className={clsx(
-        'inline-flex items-center justify-center font-display font-semibold transition-all duration-150 active:scale-[0.97]',
-        'disabled:opacity-40 disabled:pointer-events-none',
-        variantClasses[variant],
-        sizeClasses[size],
-        fullWidth && 'w-full',
-        className
-      )}
-      {...rest}
-    >
-      {icon}
-      {children}
-    </button>
-  )
+  (
+    {
+      variant = 'primary',
+      size = 'md',
+      icon,
+      iconRight,
+      isLoading = false,
+      fullWidth = false,
+      className,
+      children,
+      disabled,
+      type = 'button',
+      ...rest
+    },
+    ref
+  ) => {
+    const isDisabled = disabled || isLoading;
+
+    return (
+      <button
+        ref={ref}
+        type={type}
+        disabled={isDisabled}
+        className={clsx(
+          'inline-flex items-center justify-center font-display font-semibold transition-all duration-150 select-none outline-none',
+          'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+          !isDisabled && 'active:scale-[0.97]',
+          'disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none',
+          variantClasses[variant],
+          sizeClasses[size],
+          fullWidth && 'w-full',
+          className
+        )}
+        {...rest}
+      >
+        {/* Спінер завантаження або ліва іконка */}
+        {isLoading ? (
+          <Loader2 className={clsx('animate-spin shrink-0', iconSizes[size])} />
+        ) : icon ? (
+          <span className="shrink-0 flex items-center justify-center">{icon}</span>
+        ) : null}
+
+        {/* Текст кнопки */}
+        {children && <span>{children}</span>}
+
+        {/* Права іконка (приховується під час завантаження) */}
+        {!isLoading && iconRight && (
+          <span className="shrink-0 flex items-center justify-center">{iconRight}</span>
+        )}
+      </button>
+    );
+  }
 );
+
 Button.displayName = 'Button';
