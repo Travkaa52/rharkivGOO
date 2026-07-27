@@ -27,6 +27,7 @@ import { useHistoryStore } from '@/store/useHistoryStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { TransportKind } from '@/types/transport';
+import metroIcon from '/metroicono.png';
 
 const KIND_ICON: Record<TransportKind, string> = {
   metro: '🚇',
@@ -282,13 +283,13 @@ export function HomePage() {
                                 addHistoryEntry({ query: s.name, type: 'stop' });
                               }}
                               className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
-                            >
+                          >
                               <div className="flex items-center gap-2.5">
                                 <span className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">🚏</span>
                                 <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900">{s.name}</span>
                               </div>
                               <ChevronRight size={14} className="text-slate-400" />
-                            </Link>
+                          </Link>
                           ))}
                         </div>
                       </div>
@@ -306,36 +307,35 @@ export function HomePage() {
                               onClick={() => {
                                 setIsSearchFocused(false);
                                 addHistoryEntry({ query: m.name, type: 'route' });
-                              }}
-                              className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
-                            >
-                              <div className="flex items-center gap-2.5">
-                                <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs">🚇</span>
-                                <div>
-                                  <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900 block">{m.name}</span>
-                                  {m.lineName && <span className="text-[10px] text-slate-400">{m.lineName}</span>}
-                                </div>
+                            }}
+                            className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <img src={metroIcon} alt="Метро" className="w-6 h-6 rounded-lg object-contain bg-amber-100 p-0.5" />
+                              <div>
+                                <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900 block">{m.name}</span>
+                                {m.lineName && <span className="text-[10px] text-slate-400">{m.lineName}</span>}
                               </div>
-                              <ChevronRight size={14} className="text-slate-400" />
-                            </Link>
-                          ))}
-                        </div>
+                            </div>
+                            <ChevronRight size={14} className="text-slate-400" />
+                          </Link>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </div>
 
         {/* 3. QUICK ACTIONS GRID (2x2) */}
         <section className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
-            { label: 'Маршрути', icon: Bus, to: '/routes', color: 'bg-blue-50 text-blue-600 border-blue-100' },
-            { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-            { label: 'Метро', icon: Train, to: '/metro/live', color: 'bg-amber-50 text-amber-600 border-amber-100' },
-            { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-purple-50 text-purple-600 border-purple-100' },
+            { label: 'Маршрути', icon: Bus, to: '/routes', color: 'bg-blue-50 text-blue-600 border-blue-100', isImage: false },
+            { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-emerald-50 text-emerald-600 border-emerald-100', isImage: false },
+            { label: 'Метро', icon: null, to: '/metro/live', color: 'bg-amber-50 text-amber-600 border-amber-100', isImage: true },
+            { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-purple-50 text-purple-600 border-purple-100', isImage: false },
           ].map((item, index) => {
             const Icon = item.icon;
             return (
@@ -345,7 +345,11 @@ export function HomePage() {
                 className="bg-white rounded-[22px] p-4 flex items-center gap-3.5 border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200 active:scale-[0.98] transition-all duration-200 group"
               >
                 <div className={`w-11 h-11 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
-                  <Icon size={21} />
+                  {item.isImage ? (
+                    <img src={metroIcon} alt="Метро" className="w-6 h-6 object-contain" />
+                  ) : (
+                    Icon && <Icon size={21} />
+                  )}
                 </div>
                 <span className="font-extrabold text-slate-800 text-xs tracking-tight">{item.label}</span>
               </Link>
@@ -383,7 +387,7 @@ export function HomePage() {
             to="/metro/live"
             className="w-full py-3.5 px-4 bg-white text-emerald-900 rounded-[18px] font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg hover:bg-emerald-50 active:scale-[0.98] transition-all duration-200"
           >
-            <Train size={16} />
+            <img src={metroIcon} alt="Метро" className="w-4 h-4 object-contain" />
             <span>Відкрити карту метро</span>
             <ArrowUpRight size={16} className="text-emerald-700" />
           </Link>
@@ -493,7 +497,11 @@ export function HomePage() {
                   className="flex items-center justify-between p-3 rounded-[18px] bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-100"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-base">{KIND_ICON[r.kind]}</span>
+                    {r.kind === 'metro' ? (
+                      <img src={metroIcon} alt="Метро" className="w-5 h-5 object-contain" />
+                    ) : (
+                      <span className="text-base">{KIND_ICON[r.kind]}</span>
+                    )}
                     <div className="truncate">
                       <span className="font-extrabold text-slate-800 text-xs truncate block">{r.number} — {r.name}</span>
                     </div>
