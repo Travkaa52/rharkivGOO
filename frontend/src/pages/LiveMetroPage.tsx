@@ -2,9 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, t
 import { PageHeader } from '@/components/PageHeader';
 import { getStationPhoto } from '@/data/stationPhotos';
 import { TIMETABLES } from '@/liveMetro/timetableData';
-import { localStops } from '@/data/localData';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { Navigation, Loader2 } from 'lucide-react';
 
 export { getStationPhoto };
 
@@ -59,18 +56,6 @@ function timeStrToSec(time: string): number {
   if (!m) return 0;
   return Number(m[1]) * 3600 + Number(m[2]) * 60;
 }
-
-function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
-  const R = 6371000;
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
-  const lat1 = (a.lat * Math.PI) / 180;
-  const lat2 = (b.lat * Math.PI) / 180;
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
-}
-
-const WALK_SPEED_MPS = 1.35; // ~4.8 км/год — та сама константа, що й у data/localData.ts
 
 // =============================================================================
 // ТИПИ ДАНИХ
