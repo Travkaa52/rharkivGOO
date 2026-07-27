@@ -7,8 +7,7 @@ import {
   Send, 
   ChevronRight, 
   ShieldCheck,
-  Sparkles,
-  HelpCircle
+  Sparkles
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { useAuthStore } from '@/store/useAuthStore';
