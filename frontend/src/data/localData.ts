@@ -12,7 +12,7 @@ export interface RouteItem {
   schedule: any[];
   firstDeparture: string;
   lastDeparture: string;
-  intervalMinutes?: number;
+  intervalMinutes: number;
 }
 
 export interface StopItem {
