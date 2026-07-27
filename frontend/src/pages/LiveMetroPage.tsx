@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
 import { PageHeader } from '@/components/PageHeader';
+import { getStationPhoto } from '@/data/stationPhotos';
+
+export { getStationPhoto };
 
 // =============================================================================
 // ТИПИ ДАНИХ
@@ -241,8 +244,8 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'saltivska',
     name: 'Салтівська',
     nameEn: 'Saltivska',
-    point: { x: 420, y: 120 },
-    labelOffset: { x: -10, y: -18 },
+    point: { x: 670, y: 30 },
+    labelOffset: { x: 0, y: -20 },
     lineId: 'route-metro-2',
     opened: '1986-10-26',
     type: 'shallow',
@@ -252,8 +255,8 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'studentska',
     name: 'Студентська',
     nameEn: 'Studentska',
-    point: { x: 420, y: 200 },
-    labelOffset: { x: -10, y: -18 },
+    point: { x: 635, y: 120 },
+    labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1986-10-26',
     type: 'shallow',
@@ -263,8 +266,8 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'akademika-pavlova',
     name: 'Академіка Павлова',
     nameEn: 'Akademika Pavlova',
-    point: { x: 420, y: 280 },
-    labelOffset: { x: -10, y: -18 },
+    point: { x: 600, y: 210 },
+    labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1986-10-26',
     type: 'single-vault',
@@ -274,8 +277,8 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'akademika-barabashova',
     name: 'Академіка Барабашова',
     nameEn: 'Akademika Barabashova',
-    point: { x: 420, y: 360 },
-    labelOffset: { x: -10, y: 18 },
+    point: { x: 565, y: 300 },
+    labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1984-08-11',
     type: 'shallow',
@@ -285,8 +288,8 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'kyivska',
     name: 'Київська',
     nameEn: 'Kyivska',
-    point: { x: 420, y: 440 },
-    labelOffset: { x: -10, y: 18 },
+    point: { x: 530, y: 390 },
+    labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1984-08-11',
     type: 'single-vault',
@@ -296,8 +299,8 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'yaroslava-mudroho',
     name: 'Ярослава Мудрого',
     nameEn: 'Yaroslava Mudroho',
-    point: { x: 420, y: 520 },
-    labelOffset: { x: -10, y: 18 },
+    point: { x: 495, y: 480 },
+    labelOffset: { x: 16, y: -14 },
     lineId: 'route-metro-2',
     opened: '1984-08-11',
     type: 'pylon',
@@ -307,8 +310,8 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'universytet',
     name: 'Університет',
     nameEn: 'Universytet',
-    point: { x: 420, y: 600 },
-    labelOffset: { x: -10, y: 18 },
+    point: { x: 460, y: 570 },
+    labelOffset: { x: 18, y: 4 },
     interchangeWith: ['derzhprom'],
     lineId: 'route-metro-2',
     opened: '1984-08-11',
@@ -319,8 +322,8 @@ const LINE2_STATIONS: SchematicStation[] = [
     id: 'istorychnyi-muzei',
     name: 'Історичний музей',
     nameEn: 'Istorychnyi Muzei',
-    point: { x: 420, y: 680 },
-    labelOffset: { x: -10, y: 18 },
+    point: { x: 420, y: 660 },
+    labelOffset: { x: 0, y: 22 },
     interchangeWith: ['maidan-konstytutsii'],
     lineId: 'route-metro-2',
     opened: '1984-08-11',
@@ -338,8 +341,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'peremoha',
     name: 'Перемога',
     nameEn: 'Peremoha',
-    point: { x: 820, y: 120 },
-    labelOffset: { x: 10, y: -18 },
+    point: { x: 400, y: 30 },
+    labelOffset: { x: 0, y: -20 },
     lineId: 'route-metro-3',
     opened: '2016-08-19',
     type: 'shallow',
@@ -349,8 +352,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'oleksiivska',
     name: 'Олексіївська',
     nameEn: 'Oleksiivska',
-    point: { x: 820, y: 200 },
-    labelOffset: { x: 10, y: -18 },
+    point: { x: 430, y: 110 },
+    labelOffset: { x: -16, y: -14 },
     lineId: 'route-metro-3',
     opened: '2010-12-21',
     type: 'shallow',
@@ -360,8 +363,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: '23-serpnia',
     name: '23 Серпня',
     nameEn: '23 Serpnia',
-    point: { x: 820, y: 280 },
-    labelOffset: { x: 10, y: -18 },
+    point: { x: 460, y: 190 },
+    labelOffset: { x: -16, y: -14 },
     lineId: 'route-metro-3',
     opened: '2004-08-21',
     type: 'shallow',
@@ -371,8 +374,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'botanichnyi-sad',
     name: 'Ботанічний сад',
     nameEn: 'Botanichnyi Sad',
-    point: { x: 820, y: 360 },
-    labelOffset: { x: 10, y: -18 },
+    point: { x: 490, y: 270 },
+    labelOffset: { x: -16, y: -14 },
     lineId: 'route-metro-3',
     opened: '2004-08-21',
     type: 'shallow',
@@ -382,8 +385,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'naukova',
     name: 'Наукова',
     nameEn: 'Naukova',
-    point: { x: 820, y: 440 },
-    labelOffset: { x: 10, y: -18 },
+    point: { x: 520, y: 350 },
+    labelOffset: { x: -16, y: -14 },
     lineId: 'route-metro-3',
     opened: '1995-05-06',
     type: 'shallow',
@@ -393,8 +396,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'derzhprom',
     name: 'Держпром',
     nameEn: 'Derzhprom',
-    point: { x: 820, y: 520 },
-    labelOffset: { x: 10, y: -18 },
+    point: { x: 555, y: 430 },
+    labelOffset: { x: -18, y: 4 },
     interchangeWith: ['universytet'],
     lineId: 'route-metro-3',
     opened: '1995-05-06',
@@ -405,8 +408,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'arkhitektora-beketova',
     name: 'Архітектора Бекетова',
     nameEn: 'Arkhitektora Beketova',
-    point: { x: 820, y: 600 },
-    labelOffset: { x: 10, y: 18 },
+    point: { x: 595, y: 500 },
+    labelOffset: { x: -16, y: 14 },
     lineId: 'route-metro-3',
     opened: '1995-05-06',
     type: 'shallow',
@@ -416,8 +419,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'zakhysnykiv-ukrainy',
     name: 'Захисників України',
     nameEn: 'Zakhysnykiv Ukrainy',
-    point: { x: 820, y: 680 },
-    labelOffset: { x: 10, y: 18 },
+    point: { x: 630, y: 575 },
+    labelOffset: { x: -16, y: 14 },
     lineId: 'route-metro-3',
     opened: '1995-05-06',
     type: 'shallow',
@@ -427,8 +430,8 @@ const LINE3_STATIONS: SchematicStation[] = [
     id: 'metrobudivnykiv',
     name: 'Метробудівників',
     nameEn: 'Metrobudivnykiv',
-    point: { x: 820, y: 760 },
-    labelOffset: { x: 10, y: 18 },
+    point: { x: 660, y: 650 },
+    labelOffset: { x: 0, y: 22 },
     interchangeWith: ['sportyvna'],
     lineId: 'route-metro-3',
     opened: '1995-05-06',
@@ -779,49 +782,16 @@ function updateTrains(prev: LiveMetroTrain[]): LiveMetroTrain[] {
 }
 
 // =============================================================================
-// ФОТО СТАНЦІЙ (Wikimedia Commons)
+// ФОТО СТАНЦІЙ — реальні фото з src/assets/stancia (не Wikimedia-заглушки)
 // =============================================================================
 
-const STATION_PHOTOS: Record<string, string> = {
-  'kholodna-hora': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Kholodna_Hora_metro_station.jpg/320px-Kholodna_Hora_metro_station.jpg',
-  'vokzalna': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Vokzalna_metro_station_Kharkiv.jpg/320px-Vokzalna_metro_station_Kharkiv.jpg',
-  'tsentralnyi-rynok': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Tsentralnyi_Rynok_metro_station.jpg/320px-Tsentralnyi_Rynok_metro_station.jpg',
-  'maidan-konstytutsii': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Maidan_Konstytutsii_metro_station.jpg/320px-Maidan_Konstytutsii_metro_station.jpg',
-  'levada': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Levada_metro_station.jpg/320px-Levada_metro_station.jpg',
-  'sportyvna': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Sportyvna_metro_station.jpg/320px-Sportyvna_metro_station.jpg',
-  'zavodska': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Zavodska_metro_station.jpg/320px-Zavodska_metro_station.jpg',
-  'turboatom': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Turboatom_metro_station.jpg/320px-Turboatom_metro_station.jpg',
-  'palats-sportu': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Palats_Sportu_metro_station.jpg/320px-Palats_Sportu_metro_station.jpg',
-  'armiiska': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Armiiska_metro_station.jpg/320px-Armiiska_metro_station.jpg',
-  'imeni-maselskoho': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Imeni_Maselskoho_metro_station.jpg/320px-Imeni_Maselskoho_metro_station.jpg',
-  'traktornyi-zavod': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Traktornyi_Zavod_metro_station.jpg/320px-Traktornyi_Zavod_metro_station.jpg',
-  'industrialna': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Industrialna_metro_station.jpg/320px-Industrialna_metro_station.jpg',
-  'saltivska': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Saltivska_metro_station.jpg/320px-Saltivska_metro_station.jpg',
-  'studentska': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Studentska_metro_station.jpg/320px-Studentska_metro_station.jpg',
-  'akademika-pavlova': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Akademika_Pavlova_metro_station.jpg/320px-Akademika_Pavlova_metro_station.jpg',
-  'akademika-barabashova': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Akademika_Barabashova_metro_station.jpg/320px-Akademika_Barabashova_metro_station.jpg',
-  'kyivska': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Kyivska_metro_station_Kharkiv.jpg/320px-Kyivska_metro_station_Kharkiv.jpg',
-  'yaroslava-mudroho': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Yaroslava_Mudroho_metro_station.jpg/320px-Yaroslava_Mudroho_metro_station.jpg',
-  'universytet': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Universytet_metro_station_Kharkiv.jpg/320px-Universytet_metro_station_Kharkiv.jpg',
-  'istorychnyi-muzei': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Istorychnyi_Muzei_metro_station.jpg/320px-Istorychnyi_Muzei_metro_station.jpg',
-  'peremoha': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Peremoha_metro_station.jpg/320px-Peremoha_metro_station.jpg',
-  'oleksiivska': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Oleksiivska_metro_station.jpg/320px-Oleksiivska_metro_station.jpg',
-  '23-serpnia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/23_Serpnia_metro_station.jpg/320px-23_Serpnia_metro_station.jpg',
-  'botanichnyi-sad': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Botanichnyi_Sad_metro_station.jpg/320px-Botanichnyi_Sad_metro_station.jpg',
-  'naukova': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Naukova_metro_station.jpg/320px-Naukova_metro_station.jpg',
-  'derzhprom': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Derzhprom_metro_station.jpg/320px-Derzhprom_metro_station.jpg',
-  'arkhitektora-beketova': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Arkhitektora_Beketova_metro_station.jpg/320px-Arkhitektora_Beketova_metro_station.jpg',
-  'zakhysnykiv-ukrainy': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Zakhysnykiv_Ukrainy_metro_station.jpg/320px-Zakhysnykiv_Ukrainy_metro_station.jpg',
-  'metrobudivnykiv': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Metrobudivnykiv_metro_station.jpg/320px-Metrobudivnykiv_metro_station.jpg',
-};
-
-export function getStationPhoto(stationId: string): string | undefined {
-  return STATION_PHOTOS[stationId];
-}
-
+/** Префіксує шлях у /public базовим шляхом збірки (важливо для GitHub Pages, де base ≠ "/"). */
 export function assetUrl(path: string): string {
-  return path;
+  const base = import.meta.env.BASE_URL ?? '/';
+  const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+  return `${normalizedBase}${path}`;
 }
+
 
 // =============================================================================
 // КОМПОНЕНТИ
