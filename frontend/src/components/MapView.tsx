@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import maplibregl, { Map as MapLibreMap } from 'maplibre-gl';
+import { Navigation } from 'lucide-react';
 import 'maplibre-gl/dist/maplibre-gl.css';
+
 import { DEFAULT_ZOOM, KHARKIV_CENTER, MAP_STYLES, MAX_ZOOM, MIN_ZOOM, TRANSPORT_COLORS } from '@/config/map';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useVehicleAnimation } from '@/hooks/useVehicleAnimation';
@@ -31,15 +33,7 @@ const STOP_COLOR_MATCH: maplibregl.ExpressionSpecification = [
 ];
 
 /**
- * Додає статичні шари маршрутів (лінії) і зупинок (точки) — без анімації руху.
- * `visibleKinds`/`showStops` керуються панеллю <TransportLayersPanel /> —
- * дані з локальної бази (routes.json / stops.json) відфільтровуються ще
- * ДО потрапляння в GeoJSON-джерело, тож карта не малює зайвого.
- *
- * Лінії маршрутів мають "casing" (темна підкладка під кольоровою лінією) для
- * контрасту на світлих/темних тайлах, а обраний маршрут — товстіший і
- * непрозорий, решта — притлумлені (властивості selected/dimmed рахуються в
- * buildRouteLinesGeoJson і оновлюються без перестворення джерела/шару).
+ * Додає статичні шари маршрутів (лінії) і зупинок (точки).
  */
 function addStaticTransitLayers(
   map: MapLibreMap,
@@ -83,8 +77,6 @@ function addStaticTransitLayers(
   if (!map.getSource(STOPS_SOURCE_ID)) {
     map.addSource(STOPS_SOURCE_ID, { type: 'geojson', data: buildStopsGeoJson(visibleKinds) });
 
-    // Тонкий світлий ореол під кожною зупинкою — робить кольорові кола
-    // читабельними і на світлій, і на темній підкладці карти.
     map.addLayer({
       id: STOPS_HALO_LAYER_ID,
       type: 'circle',
@@ -128,8 +120,6 @@ function addStaticTransitLayers(
       }
     });
 
-    // Позначка зупинок обраного маршруту — золоте кільце навколо звичайного
-    // маркера. Фільтр порожній за замовчуванням, оновлюється разом з вибором маршруту.
     map.addLayer({
       id: STOP_HIGHLIGHT_LAYER_ID,
       type: 'circle',
@@ -146,14 +136,12 @@ function addStaticTransitLayers(
   }
 }
 
-/** Оновлює лише фільтр шару підсвітки зупинок обраного маршруту. */
 function updateRouteStopHighlight(map: MapLibreMap, selectedRouteId?: string | null) {
   if (!map.getLayer(STOP_HIGHLIGHT_LAYER_ID)) return;
   const route = selectedRouteId ? localRoutes.getById(selectedRouteId) : undefined;
   map.setFilter(STOP_HIGHLIGHT_LAYER_ID, ['in', ['get', 'stopId'], ['literal', route?.stopIds ?? []]]);
 }
 
-/** Додає шар об'ємних будівель (якщо його ще немає) — видимість керується окремо через layout.visibility. */
 function ensureBuildingsLayer(map: MapLibreMap, visible: boolean) {
   if (map.getLayer('3d-buildings') || !map.getSource('openmaptiles')) return;
   map.addLayer({
@@ -172,7 +160,6 @@ function ensureBuildingsLayer(map: MapLibreMap, visible: boolean) {
   });
 }
 
-/** Оновлює вже додані шари маршрутів/зупинок під нові фільтри панелі керування — без перестворення джерел. */
 function updateStaticTransitLayers(
   map: MapLibreMap,
   visibleKinds: TransportKind[],
@@ -197,21 +184,15 @@ function updateStaticTransitLayers(
 interface MapViewProps {
   vehicles: Vehicle[];
   userPosition?: { lat: number; lng: number } | null;
-  /** Курс руху користувача в градусах (0 = північ) — обертає іконку-стрілку в потрібний бік. */
   userHeading?: number | null;
-  /** true, коли користувач реально йде/їде — маркер перемикається з PNG-іконки на відеопетлю ходьби. */
   userIsMoving?: boolean;
   onVehicleSelect?: (vehicleId: string) => void;
   selectedVehicleId?: string | null;
   onStopSelect?: (stopId: string) => void;
-  /** Обраний маршрут (клік по лінії на карті або вибір у пошуку/картці) — підсвічує лінію й зупинки. */
   selectedRouteId?: string | null;
   onRouteSelect?: (routeId: string) => void;
-  /** Які види транспорту показувати (лінії маршрутів на карті) — керується панеллю керування шарами. */
   visibleKinds?: TransportKind[];
-  /** Показувати шар зупинок з локальної бази. */
   showStops?: boolean;
-  /** Викликається з інстансом карти одразу після завантаження (для зовнішніх шарів, напр. <MetroLayer />), і з null при демонтуванні. */
   onMapReady?: (map: MapLibreMap | null) => void;
 }
 
@@ -238,11 +219,14 @@ export function MapView({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const userMarkerRef = useRef<maplibregl.Marker | null>(null);
+
   const mapStyle = useSettingsStore((s) => s.mapStyle);
   const show3DBuildings = useSettingsStore((s) => s.is3DMode);
+
   const animatedVehicles = useVehicleAnimation(vehicles);
   const [screenPositions, setScreenPositions] = useState<Record<string, ScreenVehicle>>({});
   const [mapReady, setMapReady] = useState(false);
+
   const onStopSelectRef = useRef(onStopSelect);
   onStopSelectRef.current = onStopSelect;
   const onRouteSelectRef = useRef(onRouteSelect);
@@ -271,14 +255,17 @@ export function MapView({
     map.on('load', () => {
       ensureBuildingsLayer(map, show3DBuildings);
       addStaticTransitLayers(map, visibleKinds, showStops, selectedRouteId);
+
       map.on('click', STOPS_LAYER_ID, (e) => {
         const stopId = e.features?.[0]?.properties?.stopId as string | undefined;
         if (stopId) onStopSelectRef.current?.(stopId);
       });
+
       map.on('click', ROUTES_LAYER_ID, (e) => {
         const routeId = e.features?.[0]?.properties?.routeId as string | undefined;
         if (routeId) onRouteSelectRef.current?.(routeId);
       });
+
       for (const layerId of [STOPS_LAYER_ID, ROUTES_LAYER_ID]) {
         map.on('mouseenter', layerId, () => {
           map.getCanvas().style.cursor = 'pointer';
@@ -302,8 +289,7 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Зміна стилю карти (день/ніч) без пересворення інстансу.
-  // setStyle() скидає всі кастомні джерела/шари — тож перевішуємо їх після 'styledata'.
+  // Зміна стилю карти (день/ніч)
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -315,7 +301,7 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapStyle]);
 
-  // Живе перемикання 2D/3D: нахил камери + видимість об'ємних будівель, без перестворення карти чи стилю.
+  // Живе перемикання 2D/3D
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -326,7 +312,7 @@ export function MapView({
     }
   }, [show3DBuildings, mapReady]);
 
-  // Панель керування шарами: перефільтровуємо лінії маршрутів і зупинки без перестворення карти.
+  // Перефільтрація видів транспорту та зупинок
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -334,8 +320,7 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleKinds, showStops, mapReady]);
 
-  // Вибір маршруту (клік по лінії, пошук, картка зупинки) — перефарбовуємо лінії
-  // й підсвічуємо зупинки без зміни фільтрів видів транспорту/зупинок.
+  // Підсвічування обраного маршруту
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -345,9 +330,7 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRouteId, mapReady]);
 
-  // Маркер користувача: створюється один раз (img + video всередині), далі лише
-  // рухається/перемикається — так video не перестворюється (і не блимає) на кожен
-  // GPS-семпл.
+  // Маркер користувача
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !userPosition) return;
@@ -356,10 +339,10 @@ export function MapView({
       const el = document.createElement('div');
       el.className = 'kg-user-marker relative h-11 w-11';
       el.innerHTML = `
-        <div class="absolute inset-0 rounded-full bg-neon/25 animate-pulse-soft"></div>
+        <div class="absolute inset-0 rounded-full bg-primary/30 animate-ping"></div>
         <div class="kg-user-marker-rotate absolute inset-0 flex items-center justify-center transition-transform duration-300 ease-out">
-          <img class="kg-user-marker-icon h-11 w-11 select-none" src="${assetUrl('markers/user-location.png')}" alt="" draggable="false" />
-          <video class="kg-user-marker-video absolute inset-0 hidden h-11 w-11 rounded-full object-cover" src="${assetUrl('markers/walking.mp4')}" muted loop playsinline preload="none"></video>
+          <img class="kg-user-marker-icon h-11 w-11 select-none drop-shadow-md" src="${assetUrl('markers/user-location.png')}" alt="" draggable="false" />
+          <video class="kg-user-marker-video absolute inset-0 hidden h-11 w-11 rounded-full object-cover shadow-lg" src="${assetUrl('markers/walking.mp4')}" muted loop playsinline preload="none"></video>
         </div>
       `;
       userMarkerRef.current = new maplibregl.Marker({ element: el, rotationAlignment: 'map' })
@@ -370,8 +353,7 @@ export function MapView({
     }
   }, [userPosition]);
 
-  // Перемикання іконка⇄відео і поворот за курсом — окремий ефект, щоб не чіпати
-  // маркер (і не рестартити відео) на кожну зміну координат.
+  // Перемикання станів та орієнтації маркера
   useEffect(() => {
     const el = userMarkerRef.current?.getElement();
     if (!el) return;
@@ -384,8 +366,6 @@ export function MapView({
       img.classList.add('hidden');
       video.classList.remove('hidden');
       if (video.paused) void video.play().catch(() => {});
-      // У русі курс дає GPS-компас — стрілку/бейдж більше не крутимо вручну по heading,
-      // відео ходьби вже само по собі не напрямлене, лишаємо нейтральну орієнтацію.
       rotor.style.transform = 'rotate(0deg)';
     } else {
       video.classList.add('hidden');
@@ -395,18 +375,7 @@ export function MapView({
     }
   }, [userIsMoving, userHeading]);
 
-  // Перерахунок екранних координат транспорту на кожен кадр анімації + рух карти.
-  //
-  // Продуктивність (120fps-таргет):
-  // 1) 'move' на MapLibre може стріляти десятки разів за секунду під час
-  //    інерційного панорамування — раніше кожен такий івент одразу викликав
-  //    setState (React re-render). Тепер запит на перерахунок лише "зводить"
-  //    прапорець, а сам проект+setState виконується щонайбільше раз на кадр
-  //    через rAF — так React re-render синхронізований з циклом малювання
-  //    карти, а не з частотою internal-подій MapLibre.
-  // 2) Viewport culling: машини, що вийшли за межі екрана (з невеликим
-  //    запасом), не потрапляють у screenPositions і не рендеряться в DOM —
-  //    на щільних маршрутах це різко скорочує кількість <TransportSprite/>.
+  // Синхронізація екранних координат транспорту (Viewport Culling + rAF)
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -420,6 +389,7 @@ export function MapView({
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
       const positions: Record<string, ScreenVehicle> = {};
+
       for (const v of animatedVehicles) {
         const point = map!.project([v.animatedPosition.lng, v.animatedPosition.lat]);
         if (
@@ -442,6 +412,7 @@ export function MapView({
 
     scheduleUpdate();
     map.on('move', scheduleUpdate);
+
     return () => {
       map.off('move', scheduleUpdate);
       if (rafId !== null) cancelAnimationFrame(rafId);
@@ -458,8 +429,8 @@ export function MapView({
     <div className="relative h-full w-full overflow-hidden">
       <div ref={containerRef} className="absolute inset-0" />
 
-      {/* Оверлей транспорту, спроєктований у пікселі поверх карти */}
-      <div className="pointer-events-none absolute inset-0">
+      {/* Оверлей транспорту, спроєктований у пікселі поверх карты */}
+      <div className="pointer-events-none absolute inset-0 z-10">
         {animatedVehicles.map((v) => {
           const screen = screenPositions[v.id];
           if (!screen) return null;
@@ -482,14 +453,15 @@ export function MapView({
         })}
       </div>
 
+      {/* Плаваюча кнопка «Моє місцезнаходження» (FAB) */}
       {userPosition && (
         <button
           type="button"
           onClick={flyToUser}
           aria-label="Показати моє місцезнаходження"
-          className="absolute bottom-24 right-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/90 shadow-glass-lg backdrop-blur-xs transition hover:scale-105 active:scale-95"
+          className="absolute bottom-20 right-4 z-20 flex h-12 w-12 items-center justify-center rounded-2xl border border-border/40 bg-surface/85 text-primary shadow-2xl backdrop-blur-xl transition-all duration-200 hover:scale-105 hover:bg-surface active:scale-95 mb-safe"
         >
-          <span className="h-3 w-3 rounded-full bg-forest" />
+          <Navigation className="h-5 w-5 fill-primary/20 stroke-[2.25]" />
         </button>
       )}
     </div>
