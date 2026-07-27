@@ -7,6 +7,11 @@ export interface RouteItem {
   name?: string;
   color?: string;
   stopIds: string[];
+  headsignForward?: string;
+  headsignBackward?: string;
+  schedule?: unknown;
+  firstDeparture?: string;
+  lastDeparture?: string;
 }
 
 export interface StopItem {
@@ -17,6 +22,7 @@ export interface StopItem {
     lat: number;
     lng: number;
   };
+  routeIds: string[];
 }
 
 const routesData: RouteItem[] = [
@@ -25,7 +31,8 @@ const routesData: RouteItem[] = [
     "kind": "tram",
     "number": "1",
     "name": "Трамвайный маршрут №1 Харьков (Жд вокзал - Ивановка)",
-    "stopIds": []
+    "stopIds": [],
+    "routeIds": []
   },
   {
     "id": "tram-12",
@@ -285,13 +292,6 @@ const routesData: RouteItem[] = [
     "number": "7",
     "name": "Троллейбусный маршрут №7 Харьков (ул. 12 Апреля - метро Армейская)",
     "stopIds": []
-  },
-  {
-    "id": "tram-Харьковское",
-    "kind": "tram",
-    "number": "Харьковское",
-    "name": "Харьковское метро на карте Google",
-    "stopIds": []
   }
 ];
 
@@ -300,9 +300,23 @@ const stopsData: StopItem[] = [];
 export const localRoutes = {
   all: (): RouteItem[] => routesData,
   getById: (id: string): RouteItem | undefined => routesData.find((r) => r.id === id),
+  getByKind: (kind: TransportKind): RouteItem[] => routesData.filter((r) => r.kind === kind),
+  search: (query: string): RouteItem[] => {
+    const q = query.toLowerCase();
+    return routesData.filter(
+      (r) => r.number.toLowerCase().includes(q) || (r.name && r.name.toLowerCase().includes(q))
+    );
+  },
+  buildTrip: (routeId: string) => ({ routeId, segments: [] })
 };
 
 export const localStops = {
   all: (): StopItem[] => stopsData,
   getById: (id: string): StopItem | undefined => stopsData.find((s) => s.id === id),
+  search: (query: string): StopItem[] => {
+    const q = query.toLowerCase();
+    return stopsData.filter((s) => s.name.toLowerCase().includes(q));
+  },
+  getNearby: (_lat: number, _lng: number, _maxDistance = 1000): StopItem[] => stopsData,
+  getArrivals: (_stopId: string) => []
 };
