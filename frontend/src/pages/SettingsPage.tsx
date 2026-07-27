@@ -1,34 +1,80 @@
 import { useState, type ReactNode } from 'react';
+import { 
+  Palette, 
+  Map, 
+  Globe, 
+  Ruler, 
+  Bell, 
+  Building2, 
+  Database, 
+  Check, 
+  Trash2, 
+  Sparkles,
+  AlertTriangle,
+  MapPin
+} from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, SegmentedControl, Switch, Button, Emblem } from '@/components/ui';
 import { useSettingsStore } from '@/store/useSettingsStore';
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+interface SectionProps {
+  title: string;
+  icon?: ReactNode;
+  children: ReactNode;
+}
+
+function Section({ title, icon, children }: SectionProps) {
   return (
-    <section className="flex flex-col gap-2">
-      <h2 className="text-caption px-1 text-ink-muted">{title}</h2>
-      <Card padding="none" className="divide-y divide-border overflow-hidden">
+    <section className="flex flex-col gap-2.5">
+      <div className="flex items-center gap-2 px-1 text-ink-muted">
+        {icon && <span className="text-primary/80">{icon}</span>}
+        <h2 className="text-caption font-semibold uppercase tracking-wider text-xs opacity-75">
+          {title}
+        </h2>
+      </div>
+      <Card 
+        padding="none" 
+        className="divide-y divide-border/50 overflow-hidden rounded-2xl border border-border/60 bg-surface/80 backdrop-blur-md shadow-sm transition-all hover:border-border/80"
+      >
         {children}
       </Card>
     </section>
   );
 }
 
-function Row({ label, hint, control }: { label: string; hint?: string; control: ReactNode }) {
+interface RowProps {
+  label: string;
+  hint?: string;
+  icon?: ReactNode;
+  control: ReactNode;
+  badge?: ReactNode;
+}
+
+function Row({ label, hint, icon, control, badge }: RowProps) {
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3.5">
-      <div className="min-w-0">
-        <p className="text-body text-ink-text">{label}</p>
-        {hint && <p className="text-body-sm text-ink-muted">{hint}</p>}
+    <div className="group flex items-center justify-between gap-3 px-4 py-3.5 transition-colors hover:bg-muted/30">
+      <div className="flex items-center gap-3.5 min-w-0">
+        {icon && (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/60 text-ink-muted transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+            {icon}
+          </div>
+        )}
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-body font-medium text-ink-text">{label}</p>
+            {badge}
+          </div>
+          {hint && <p className="text-body-sm text-ink-muted/80 mt-0.5 leading-snug">{hint}</p>}
+        </div>
       </div>
-      <div className="shrink-0">{control}</div>
+      <div className="shrink-0 pl-2">{control}</div>
     </div>
   );
 }
 
 export function SettingsPage() {
   const settings = useSettingsStore();
-  const [clearing, setClearing] = useState<'idle' | 'done'>('idle');
+  const [clearingState, setClearingState] = useState<'idle' | 'loading' | 'done'>('idle');
   const [notifStatus, setNotifStatus] = useState<NotificationPermission | 'unsupported'>(
     typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
   );
@@ -43,24 +89,44 @@ export function SettingsPage() {
   };
 
   const handleClearCache = async () => {
+    setClearingState('loading');
     await settings.clearCache();
-    setClearing('done');
-    setTimeout(() => setClearing('idle'), 2000);
+    setClearingState('done');
+    setTimeout(() => setClearingState('idle'), 2500);
   };
 
   return (
-    <div className="min-h-dvh bg-bg pb-24">
+    <div className="min-h-dvh bg-gradient-to-b from-bg via-bg/95 to-bg pb-28 text-ink-text selection:bg-primary/20">
       <PageHeader title="Налаштування" />
 
-      <div className="flex flex-col items-center gap-2 px-4 pb-2 pt-1 text-center">
-        <Emblem size={48} glow />
-        <p className="text-body-sm text-ink-muted">Kharkiv GO · офіційний вигляд транспорту Харкова</p>
+      {/* Hero Badge Section */}
+      <div className="relative my-4 flex flex-col items-center justify-center gap-3 px-4 text-center">
+        <div className="relative">
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary/30 to-accent/30 blur-lg opacity-70 animate-pulse" />
+          <Emblem size={56} glow className="relative drop-shadow-md" />
+        </div>
+        
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex items-center gap-1.5 rounded-full border border-border/80 bg-surface/60 backdrop-blur-md px-3 py-1 shadow-2xs">
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            <span className="text-caption font-semibold text-ink-text">Kharkiv GO</span>
+            <span className="h-1 w-1 rounded-full bg-ink-muted/40" />
+            <span className="text-caption text-ink-muted">v2.4.0</span>
+          </div>
+          <p className="text-body-sm text-ink-muted max-w-xs mt-1">
+            Офіційний вигляд та розклад громадського транспорту Харкова
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-5 px-4 pt-3">
-        <Section title="Оформлення">
+      {/* Main Settings Grid */}
+      <div className="flex flex-col gap-6 px-4 pt-2 max-w-md mx-auto">
+        
+        {/* Оформлення */}
+        <Section title="Оформлення" icon={<Palette className="h-4 w-4" />}>
           <Row
             label="Тема"
+            icon={<Palette className="h-4 w-4" />}
             control={
               <SegmentedControl
                 value={settings.theme}
@@ -70,12 +136,13 @@ export function SettingsPage() {
                   { value: 'light', label: 'Світла' },
                   { value: 'dark', label: 'Темна' }
                 ]}
-                className="w-44"
+                className="w-48 shadow-2xs"
               />
             }
           />
           <Row
             label="Стиль карти"
+            icon={<Map className="h-4 w-4" />}
             control={
               <SegmentedControl
                 value={settings.mapStyle}
@@ -84,29 +151,32 @@ export function SettingsPage() {
                   { value: 'day', label: 'Денний' },
                   { value: 'night', label: 'Нічний' }
                 ]}
-                className="w-32"
+                className="w-36 shadow-2xs"
               />
             }
           />
         </Section>
 
-        <Section title="Мова та одиниці">
+        {/* Мова та одиниці */}
+        <Section title="Мова та одиниці" icon={<Globe className="h-4 w-4" />}>
           <Row
             label="Мова застосунку"
+            icon={<Globe className="h-4 w-4" />}
             control={
               <SegmentedControl
                 value={settings.language}
                 onChange={settings.setLanguage}
                 options={[
-                  { value: 'uk', label: 'Українська' },
-                  { value: 'en', label: 'English' }
+                  { value: 'uk', label: 'Укр' },
+                  { value: 'en', label: 'Eng' }
                 ]}
-                className="w-44"
+                className="w-36 shadow-2xs"
               />
             }
           />
           <Row
             label="Одиниці виміру"
+            icon={<Ruler className="h-4 w-4" />}
             control={
               <SegmentedControl
                 value={settings.units}
@@ -115,16 +185,29 @@ export function SettingsPage() {
                   { value: 'metric', label: 'км' },
                   { value: 'imperial', label: 'mi' }
                 ]}
-                className="w-24"
+                className="w-28 shadow-2xs"
               />
             }
           />
         </Section>
 
-        <Section title="Сповіщення">
+        {/* Сповіщення */}
+        <Section title="Сповіщення" icon={<Bell className="h-4 w-4" />}>
           <Row
             label="Push-сповіщення"
-            hint={notifStatus === 'denied' ? 'Заблоковано в налаштуваннях браузера' : 'Про затримки та зміни маршрутів'}
+            icon={<Bell className="h-4 w-4" />}
+            hint={
+              notifStatus === 'denied' 
+                ? 'Заблоковано в налаштуваннях браузера' 
+                : 'Про затримки, сирени та зміни маршрутів'
+            }
+            badge={
+              notifStatus === 'denied' ? (
+                <span className="inline-flex items-center gap-1 rounded-md bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
+                  <AlertTriangle className="h-3 w-3" /> Заблоковано
+                </span>
+              ) : null
+            }
             control={
               <Switch
                 checked={settings.pushNotificationsEnabled}
@@ -136,21 +219,67 @@ export function SettingsPage() {
           />
         </Section>
 
-        <Section title="Карта">
-          <Row
-            label="Зупинки на карті"
-            control={<Switch checked={settings.showStopsOnMap} onChange={settings.toggleStopsOnMap} label="Зупинки на карті" />}
+        {/* Карта */}
+        <Section title="Інтерактивна карта" icon={<MapPin className="h-4 w-4" />}>
+          <Row 
+            label="Зупинки на карті" 
+            icon={<MapPin className="h-4 w-4" />}
+            hint="Відображати маркери зупинок під час зуму"
+            control={
+              <Switch 
+                checked={settings.showStopsOnMap} 
+                onChange={settings.toggleStopsOnMap} 
+                label="Зупинки на карті" 
+              />
+            } 
           />
-          <Row label="3D-будівлі" control={<Switch checked={settings.is3DMode} onChange={settings.toggle3DMode} label="3D-будівлі" />} />
+          <Row 
+            label="3D-будівлі" 
+            icon={<Building2 className="h-4 w-4" />}
+            hint="Об'ємні фасади для кращої орієнтації"
+            control={
+              <Switch 
+                checked={settings.is3DMode} 
+                onChange={settings.toggle3DMode} 
+                label="3D-будівлі" 
+              />
+            } 
+          />
         </Section>
 
-        <Section title="Дані">
-          <div className="px-4 py-3.5">
-            <Button variant="secondary" size="sm" fullWidth onClick={handleClearCache} disabled={clearing === 'done'}>
-              {clearing === 'done' ? 'Кеш очищено ✓' : 'Очистити кеш'}
+        {/* Пам'ять та кеш */}
+        <Section title="Пам'ять та дані" icon={<Database className="h-4 w-4" />}>
+          <div className="p-3.5">
+            <Button 
+              variant={clearingState === 'done' ? 'success' : 'secondary'} 
+              size="md" 
+              fullWidth 
+              onClick={handleClearCache} 
+              disabled={clearingState !== 'idle'}
+              className="relative overflow-hidden transition-all duration-300 font-medium"
+            >
+              <div className="flex items-center justify-center gap-2">
+                {clearingState === 'loading' && (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                )}
+                {clearingState === 'done' ? (
+                  <>
+                    <Check className="h-4 w-4 text-emerald-500 animate-bounce" />
+                    <span>Кеш успішно очищено</span>
+                  </>
+                ) : clearingState === 'loading' ? (
+                  <span>Очищення...</span>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 opacity-70" />
+                    <span>Очистити локальний кеш</span>
+                  </>
+                )}
+              </div>
             </Button>
           </div>
         </Section>
+
       </div>
     </div>
   );
