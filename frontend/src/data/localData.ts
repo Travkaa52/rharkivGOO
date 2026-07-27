@@ -30,15 +30,16 @@ export interface StopItem {
 const stopsMap = new Map<string, StopItem>();
 const routesMap: RouteItem[] = [];
 
+// Базові маршрути з українськими назвами
 const baseRoutes = [
   {
     "id": "tram-1",
     "kind": "tram" as TransportKind,
     "number": "1",
-    "name": "Трамвайный маршрут №1 Харьков (Жд вокзал - Ивановка)",
+    "name": "Трамвайний маршрут №1 Харків (Залізничний вокзал - Іванівка)",
     "color": "#e74c3c",
-    "headsignForward": "Жд вокзал",
-    "headsignBackward": "Ивановка",
+    "headsignForward": "Залізничний вокзал",
+    "headsignBackward": "Іванівка",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -47,10 +48,10 @@ const baseRoutes = [
     "id": "tram-12",
     "kind": "tram" as TransportKind,
     "number": "12",
-    "name": "Трамвайный маршрут №12 Харьков (Жд вокзал - Центральный парк)",
+    "name": "Трамвайний маршрут №12 Харків (Залізничний вокзал - Центральний парк)",
     "color": "#e74c3c",
-    "headsignForward": "Жд вокзал",
-    "headsignBackward": "Центральный парк",
+    "headsignForward": "Залізничний вокзал",
+    "headsignBackward": "Центральний парк",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -59,10 +60,10 @@ const baseRoutes = [
     "id": "tram-16",
     "kind": "tram" as TransportKind,
     "number": "16",
-    "name": "Трамвайный маршрут №16 Харьков (Салтовская - Гидропарк - Салтовская)",
+    "name": "Трамвайний маршрут №16 Харків (Салтівська - Гідропарк - Салтівська)",
     "color": "#e74c3c",
-    "headsignForward": "Салтовская",
-    "headsignBackward": "Гидропарк",
+    "headsignForward": "Салтівська",
+    "headsignBackward": "Гідропарк",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -71,10 +72,10 @@ const baseRoutes = [
     "id": "tram-20",
     "kind": "tram" as TransportKind,
     "number": "20",
-    "name": "Трамвайный маршрут №20 Харьков (пр. Победы - Жд вокзал)",
+    "name": "Трамвайний маршрут №20 Харків (пр. Перемоги - Залізничний вокзал)",
     "color": "#e74c3c",
-    "headsignForward": "пр. Победы",
-    "headsignBackward": "Жд вокзал",
+    "headsignForward": "пр. Перемоги",
+    "headsignBackward": "Залізничний вокзал",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -83,9 +84,9 @@ const baseRoutes = [
     "id": "tram-23",
     "kind": "tram" as TransportKind,
     "number": "23",
-    "name": "Трамвайный маршрут №23 Харьков (Салтовская - 602 мр)",
+    "name": "Трамвайний маршрут №23 Харків (Салтівська - 602 мр)",
     "color": "#e74c3c",
-    "headsignForward": "Салтовская",
+    "headsignForward": "Салтівська",
     "headsignBackward": "602 мр",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
@@ -95,10 +96,10 @@ const baseRoutes = [
     "id": "tram-27",
     "kind": "tram" as TransportKind,
     "number": "27",
-    "name": "Трамвайный маршрут №27 Харьков (Салтовская  - Новожаново)",
+    "name": "Трамвайний маршрут №27 Харків (Салтівська - Новожанове)",
     "color": "#e74c3c",
-    "headsignForward": "Салтовская",
-    "headsignBackward": "Новожаново",
+    "headsignForward": "Салтівська",
+    "headsignBackward": "Новожанове",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -107,10 +108,10 @@ const baseRoutes = [
     "id": "tram-3",
     "kind": "tram" as TransportKind,
     "number": "3",
-    "name": "Трамвайный маршрут №3 Харьков (Залютино - Новожаново)",
+    "name": "Трамвайний маршрут №3 Харків (Залютине - Новожанове)",
     "color": "#e74c3c",
-    "headsignForward": "Залютино",
-    "headsignBackward": "Новожаново",
+    "headsignForward": "Залютине",
+    "headsignBackward": "Новожанове",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -119,10 +120,10 @@ const baseRoutes = [
     "id": "tram-6",
     "kind": "tram" as TransportKind,
     "number": "6",
-    "name": "Трамвайный маршрут №6 Харьков (602 мр - Жд вокзал)",
+    "name": "Трамвайний маршрут №6 Харків (602 мр - Залізничний вокзал)",
     "color": "#e74c3c",
     "headsignForward": "602 мр",
-    "headsignBackward": "Жд вокзал",
+    "headsignBackward": "Залізничний вокзал",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -131,10 +132,10 @@ const baseRoutes = [
     "id": "tram-7",
     "kind": "tram" as TransportKind,
     "number": "7",
-    "name": "Трамвайный маршрут №7 Харьков (Новоселовка - Жд вокзал)",
+    "name": "Трамвайний маршрут №7 Харків (Новоселівка - Залізничний вокзал)",
     "color": "#e74c3c",
-    "headsignForward": "Новоселовка",
-    "headsignBackward": "Жд вокзал",
+    "headsignForward": "Новоселівка",
+    "headsignBackward": "Залізничний вокзал",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -143,10 +144,10 @@ const baseRoutes = [
     "id": "tram-8",
     "kind": "tram" as TransportKind,
     "number": "8",
-    "name": "Трамвайный маршрут №8 Харьков (602 мр - ул. Одесская)",
+    "name": "Трамвайний маршрут №8 Харків (602 мр - вул. Одеська)",
     "color": "#e74c3c",
     "headsignForward": "602 мр",
-    "headsignBackward": "ул. Одесская",
+    "headsignBackward": "вул. Одеська",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -155,10 +156,10 @@ const baseRoutes = [
     "id": "trolleybus-11",
     "kind": "trolleybus" as TransportKind,
     "number": "11",
-    "name": "Троллебусный маршрут №11 Харьков (метро Площадь Конституции - пр. Дзюбы)",
+    "name": "Тролейбусний маршрут №11 Харків (метро Майдан Конституції - пр. Дзюби)",
     "color": "#3498db",
-    "headsignForward": "метро Площадь Конституции",
-    "headsignBackward": "пр. Дзюбы",
+    "headsignForward": "метро Майдан Конституції",
+    "headsignBackward": "пр. Дзюби",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -167,10 +168,10 @@ const baseRoutes = [
     "id": "trolleybus-12",
     "kind": "trolleybus" as TransportKind,
     "number": "12",
-    "name": "Троллебусный маршрут №12. Харьков (ул. Рудика - ул. Клочковская)",
+    "name": "Тролейбусний маршрут №12 Харків (вул. Рудика - вул. Клочківська)",
     "color": "#3498db",
-    "headsignForward": "ул. Рудика",
-    "headsignBackward": "ул. Клочковская",
+    "headsignForward": "вул. Рудика",
+    "headsignBackward": "вул. Клочківська",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -179,10 +180,10 @@ const baseRoutes = [
     "id": "trolleybus-1",
     "kind": "trolleybus" as TransportKind,
     "number": "1",
-    "name": "Троллейбусный маршрут №1 Харьков (м. Дворец Спорта-28 микрорайон)",
+    "name": "Тролейбусний маршрут №1 Харків (м. Палац Спорту - 28-й мікрорайон)",
     "color": "#3498db",
-    "headsignForward": "м. Дворец Спорта",
-    "headsignBackward": "28 микрорайон",
+    "headsignForward": "м. Палац Спорту",
+    "headsignBackward": "28-й мікрорайон",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -191,10 +192,10 @@ const baseRoutes = [
     "id": "trolleybus-13",
     "kind": "trolleybus" as TransportKind,
     "number": "13",
-    "name": "Троллейбусный маршрут №13 Харьков (метро Защитников Украины - парк Зустрич)",
+    "name": "Тролейбусний маршрут №13 Харків (метро Захисників України - парк Зустріч)",
     "color": "#3498db",
-    "headsignForward": "метро Защитников Украины",
-    "headsignBackward": "парк Зустрич",
+    "headsignForward": "метро Захисників України",
+    "headsignBackward": "парк Зустріч",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -203,10 +204,10 @@ const baseRoutes = [
     "id": "trolleybus-18",
     "kind": "trolleybus" as TransportKind,
     "number": "18",
-    "name": "Троллейбусный маршрут №18 Харьков (метро Госпром - Больница неотложной помощи)",
+    "name": "Тролейбусний маршрут №18 Харків (метро Держпром - Лікарня невідкладної допомоги)",
     "color": "#3498db",
-    "headsignForward": "метро Госпром",
-    "headsignBackward": "Больница неотложной помощи",
+    "headsignForward": "метро Держпром",
+    "headsignBackward": "Лікарня невідкладної допомоги",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -215,9 +216,9 @@ const baseRoutes = [
     "id": "trolleybus-19",
     "kind": "trolleybus" as TransportKind,
     "number": "19",
-    "name": "Троллейбусный маршрут №19 Харьков (ул. Одесская - 602 мр)",
+    "name": "Тролейбусний маршрут №19 Харків (вул. Одеська - 602 мр)",
     "color": "#3498db",
-    "headsignForward": "ул. Одесская",
+    "headsignForward": "вул. Одеська",
     "headsignBackward": "602 мр",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
@@ -227,10 +228,10 @@ const baseRoutes = [
     "id": "trolleybus-2",
     "kind": "trolleybus" as TransportKind,
     "number": "2",
-    "name": "Троллейбусный маршрут №2 Харьков (пр. Жуковского - пр. Победы)",
+    "name": "Тролейбусний маршрут №2 Харків (пр. Жуковського - пр. Перемоги)",
     "color": "#3498db",
-    "headsignForward": "пр. Жуковского",
-    "headsignBackward": "пр. Победы",
+    "headsignForward": "пр. Жуковського",
+    "headsignBackward": "пр. Перемоги",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -239,9 +240,9 @@ const baseRoutes = [
     "id": "trolleybus-20",
     "kind": "trolleybus" as TransportKind,
     "number": "20",
-    "name": "Троллейбусный маршрут №20 Харьков (метро Защитников Украины - 602 мр)",
+    "name": "Тролейбусний маршрут №20 Харків (метро Захисників України - 602 мр)",
     "color": "#3498db",
-    "headsignForward": "метро Защитников Украины",
+    "headsignForward": "метро Захисників України",
     "headsignBackward": "602 мр",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
@@ -251,9 +252,9 @@ const baseRoutes = [
     "id": "trolleybus-24",
     "kind": "trolleybus" as TransportKind,
     "number": "24",
-    "name": "Троллейбусный маршрут №24. Харьков (метро Академика Барабашова - 602 мр)",
+    "name": "Тролейбусний маршрут №24 Харків (метро Академіка Барабашова - 602 мр)",
     "color": "#3498db",
-    "headsignForward": "метро Академика Барабашова",
+    "headsignForward": "метро Академіка Барабашова",
     "headsignBackward": "602 мр",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
@@ -263,10 +264,10 @@ const baseRoutes = [
     "id": "trolleybus-25",
     "kind": "trolleybus" as TransportKind,
     "number": "25",
-    "name": "Троллейбусный маршрут №25 Харьков (метро Дворец Спорта - бул. Богдана Хмельницкого)",
+    "name": "Тролейбусний маршрут №25 Харків (метро Палац Спорту - бул. Богдана Хмельницького)",
     "color": "#3498db",
-    "headsignForward": "метро Дворец Спорта",
-    "headsignBackward": "бул. Богдана Хмельницкого",
+    "headsignForward": "метро Палац Спорту",
+    "headsignBackward": "бул. Богдана Хмельницького",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -275,10 +276,10 @@ const baseRoutes = [
     "id": "trolleybus-3",
     "kind": "trolleybus" as TransportKind,
     "number": "3",
-    "name": "Троллейбусный маршрут №3 Харьков (ул. Университетская - ул. 12 Апреля)",
+    "name": "Тролейбусний маршрут №3 Харків (вул. Університетська - вул. 12 Квітня)",
     "color": "#3498db",
-    "headsignForward": "ул. Университетская",
-    "headsignBackward": "ул. 12 Апреля",
+    "headsignForward": "вул. Університетська",
+    "headsignBackward": "вул. 12 Квітня",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -287,10 +288,10 @@ const baseRoutes = [
     "id": "trolleybus-31",
     "kind": "trolleybus" as TransportKind,
     "number": "31",
-    "name": "Троллейбусный маршрут №31 Харьков (метро Турбоатом - Северная Салтовка)",
+    "name": "Тролейбусний маршрут №31 Харків (метро Турбоатом - Північна Салтівка)",
     "color": "#3498db",
     "headsignForward": "метро Турбоатом",
-    "headsignBackward": "Северная Салтовка",
+    "headsignBackward": "Північна Салтівка",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -299,10 +300,10 @@ const baseRoutes = [
     "id": "trolleybus-34",
     "kind": "trolleybus" as TransportKind,
     "number": "34",
-    "name": "Троллейбусный маршрут №34 Харьков (Восточная Салтовка - ул. Непокоренных)",
+    "name": "Тролейбусний маршрут №34 Харків (Східна Салтівка - вул. Непокорених)",
     "color": "#3498db",
-    "headsignForward": "Восточная Салтовка",
-    "headsignBackward": "ул. Непокоренных",
+    "headsignForward": "Східна Салтівка",
+    "headsignBackward": "вул. Непокорених",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -311,10 +312,10 @@ const baseRoutes = [
     "id": "trolleybus-35",
     "kind": "trolleybus" as TransportKind,
     "number": "35",
-    "name": "Троллейбусный маршрут №35 Харьков (ул. Одесская - Северная Салтовка)",
+    "name": "Тролейбусний маршрут №35 Харків (вул. Одеська - Північна Салтівка)",
     "color": "#3498db",
-    "headsignForward": "ул. Одесская",
-    "headsignBackward": "Северная Салтовка",
+    "headsignForward": "вул. Одеська",
+    "headsignBackward": "Північна Салтівка",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -323,10 +324,10 @@ const baseRoutes = [
     "id": "trolleybus-40",
     "kind": "trolleybus" as TransportKind,
     "number": "40",
-    "name": "Троллейбусный маршрут №40 Харьков (метро Площадь Конституции - пр. Победы)",
+    "name": "Тролейбусний маршрут №40 Харків (метро Майдан Конституції - пр. Перемоги)",
     "color": "#3498db",
-    "headsignForward": "метро Площадь Конституции",
-    "headsignBackward": "пр. Победы",
+    "headsignForward": "метро Майдан Конституції",
+    "headsignBackward": "пр. Перемоги",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -335,10 +336,10 @@ const baseRoutes = [
     "id": "trolleybus-45",
     "kind": "trolleybus" as TransportKind,
     "number": "45",
-    "name": "Троллейбусный маршрут №45 Харьков (ул. 12 апреля - ул. Роганская)",
+    "name": "Тролейбусний маршрут №45 Харків (вул. 12 Квітня - вул. Роганська)",
     "color": "#3498db",
-    "headsignForward": "ул. 12 апреля",
-    "headsignBackward": "ул. Роганская",
+    "headsignForward": "вул. 12 Квітня",
+    "headsignBackward": "вул. Роганська",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -347,10 +348,10 @@ const baseRoutes = [
     "id": "trolleybus-46",
     "kind": "trolleybus" as TransportKind,
     "number": "46",
-    "name": "Троллейбусный маршрут №46 Харьков (мр Горизонт - ул. 12 Апреля)",
+    "name": "Тролейбусний маршрут №46 Харків (мр Горизонт - вул. 12 Квітня)",
     "color": "#3498db",
     "headsignForward": "мр Горизонт",
-    "headsignBackward": "ул. 12 Апреля",
+    "headsignBackward": "вул. 12 Квітня",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -359,10 +360,10 @@ const baseRoutes = [
     "id": "trolleybus-49",
     "kind": "trolleybus" as TransportKind,
     "number": "49",
-    "name": "Троллейбусный маршрут №49 Харьков (ул. Университенская - пос. Жихарь)",
+    "name": "Тролейбусний маршрут №49 Харків (вул. Університетська - сел. Жихар)",
     "color": "#3498db",
-    "headsignForward": "ул. Университетская",
-    "headsignBackward": "пос. Жихарь",
+    "headsignForward": "вул. Університетська",
+    "headsignBackward": "сел. Жихар",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -371,10 +372,10 @@ const baseRoutes = [
     "id": "trolleybus-51",
     "kind": "trolleybus" as TransportKind,
     "number": "51",
-    "name": "Троллейбусный маршрут №51 Харьков (ул. 12 апреля - ул. Зубарева)",
+    "name": "Тролейбусний маршрут №51 Харків (вул. 12 Квітня - вул. Зубарєва)",
     "color": "#3498db",
-    "headsignForward": "ул. 12 апреля",
-    "headsignBackward": "ул. Зубарева",
+    "headsignForward": "вул. 12 Квітня",
+    "headsignBackward": "вул. Зубарєва",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -383,9 +384,9 @@ const baseRoutes = [
     "id": "trolleybus-52",
     "kind": "trolleybus" as TransportKind,
     "number": "52",
-    "name": "Троллейбусный маршрут №52 Харьков (ул. 12 Апреля - 759 мр)",
+    "name": "Тролейбусний маршрут №52 Харків (вул. 12 Квітня - 759 мр)",
     "color": "#3498db",
-    "headsignForward": "ул. 12 Апреля",
+    "headsignForward": "вул. 12 Квітня",
     "headsignBackward": "759 мр",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
@@ -395,9 +396,9 @@ const baseRoutes = [
     "id": "trolleybus-53",
     "kind": "trolleybus" as TransportKind,
     "number": "53",
-    "name": "Троллейбусный маршрут №53. Харьков (ул. 12 Апреля - мн  Горизонт)",
+    "name": "Тролейбусний маршрут №53 Харків (вул. 12 Квітня - мн Горизонт)",
     "color": "#3498db",
-    "headsignForward": "ул. 12 Апреля",
+    "headsignForward": "вул. 12 Квітня",
     "headsignBackward": "мн Горизонт",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
@@ -407,10 +408,10 @@ const baseRoutes = [
     "id": "trolleybus-55",
     "kind": "trolleybus" as TransportKind,
     "number": "55",
-    "name": "Троллейбусный маршрут №55 Харьков (м. Площадь Конституции - пр. Жуковского)",
+    "name": "Тролейбусний маршрут №55 Харків (м. Майдан Конституції - пр. Жуковського)",
     "color": "#3498db",
-    "headsignForward": "м. Площадь Конституции",
-    "headsignBackward": "пр. Жуковского",
+    "headsignForward": "м. Майдан Конституції",
+    "headsignBackward": "пр. Жуковського",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -419,10 +420,10 @@ const baseRoutes = [
     "id": "trolleybus-56",
     "kind": "trolleybus" as TransportKind,
     "number": "56",
-    "name": "Троллейбусный маршрут №56 Харьков (м. Академика Барабашова - Восточная Салтовка)",
+    "name": "Тролейбусний маршрут №56 Харків (м. Академіка Барабашова - Східна Салтівка)",
     "color": "#3498db",
-    "headsignForward": "м. Академика Барабашова",
-    "headsignBackward": "Восточная Салтовка",
+    "headsignForward": "м. Академіка Барабашова",
+    "headsignBackward": "Східна Салтівка",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -431,10 +432,10 @@ const baseRoutes = [
     "id": "trolleybus-57",
     "kind": "trolleybus" as TransportKind,
     "number": "57",
-    "name": "Троллейбусный маршрут №57 Харьков (парк Зустрич - метро Академика Барабашова)",
+    "name": "Тролейбусний маршрут №57 Харків (парк Зустріч - метро Академіка Барабашова)",
     "color": "#3498db",
-    "headsignForward": "парк Зустрич",
-    "headsignBackward": "метро Академика Барабашова",
+    "headsignForward": "парк Зустріч",
+    "headsignBackward": "метро Академіка Барабашова",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -443,10 +444,10 @@ const baseRoutes = [
     "id": "trolleybus-58",
     "kind": "trolleybus" as TransportKind,
     "number": "58",
-    "name": "Троллейбусный маршрут №58 Харьков (Аэропорт - пр. Победы)",
+    "name": "Тролейбусний маршрут №58 Харків (Аеропорт - пр. Перемоги)",
     "color": "#3498db",
-    "headsignForward": "Аэропорт",
-    "headsignBackward": "пр. Победы",
+    "headsignForward": "Аеропорт",
+    "headsignBackward": "пр. Перемоги",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -455,10 +456,10 @@ const baseRoutes = [
     "id": "trolleybus-59",
     "kind": "trolleybus" as TransportKind,
     "number": "59",
-    "name": "Троллейбусный маршрут №59 Харьков (Станция Рогань - ул. Университетская)",
+    "name": "Тролейбусний маршрут №59 Харків (Станція Рогань - вул. Університетська)",
     "color": "#3498db",
-    "headsignForward": "Станция Рогань",
-    "headsignBackward": "ул. Университетская",
+    "headsignForward": "Станція Рогань",
+    "headsignBackward": "вул. Університетська",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -467,10 +468,10 @@ const baseRoutes = [
     "id": "trolleybus-6",
     "kind": "trolleybus" as TransportKind,
     "number": "6",
-    "name": "Троллейбусный маршрут №6 Харьков (ул. Университетская - Станция Основа)",
+    "name": "Тролейбусний маршрут №6 Харків (вул. Університетська - Станція Основа)",
     "color": "#3498db",
-    "headsignForward": "ул. Университетская",
-    "headsignBackward": "Станция Основа",
+    "headsignForward": "вул. Університетська",
+    "headsignBackward": "Станція Основа",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
@@ -479,56 +480,65 @@ const baseRoutes = [
     "id": "trolleybus-7",
     "kind": "trolleybus" as TransportKind,
     "number": "7",
-    "name": "Троллейбусный маршрут №7 Харьков (ул. 12 Апреля - метро Армейская)",
+    "name": "Тролейбусний маршрут №7 Харків (вул. 12 Квітня - метро Армійська)",
     "color": "#3498db",
-    "headsignForward": "ул. 12 Апреля",
-    "headsignBackward": "метро Армейская",
+    "headsignForward": "вул. 12 Квітня",
+    "headsignBackward": "метро Армійська",
     "firstDeparture": "06:00",
     "lastDeparture": "22:00",
     "intervalMinutes": 10
   }
 ];
 
-const geometriesArray = Array.isArray(routeGeometries) 
-  ? routeGeometries 
-  : ((routeGeometries as any)?.routes || (routeGeometries as any)?.features || []);
+// Витягуємо координати з масиву у routeGeometries.json
+let coordsList: number[][] = [];
+if (Array.isArray(routeGeometries)) {
+  if (Array.isArray(routeGeometries[0])) {
+    // Якщо це масив масивів координат [[lng, lat], [lng, lat], ...]
+    coordsList = routeGeometries as number[][];
+  }
+}
 
-baseRoutes.forEach((baseRoute) => {
-  const geoMatch: any = geometriesArray.find((g: any) => g.id === baseRoute.id || `${g.kind}-${g.number}` === baseRoute.id);
+baseRoutes.forEach((baseRoute, index) => {
   const routeStops: string[] = [];
 
-  if (geoMatch && Array.isArray(geoMatch.stops)) {
-    geoMatch.stops.forEach((stop: any, index: number) => {
-      const stopId = stop.id || `${baseRoute.id}-stop-${index}`;
-      routeStops.push(stopId);
+  // Генеруємо основні зупинки для кожного маршруту, використовуючи реальні координати з файлу (або дефолтні у разі нестачі)
+  const startCoord = coordsList[index * 2] || [36.23, 50.00];
+  const midCoord = coordsList[Math.floor(coordsList.length / 2)] || [36.25, 50.01];
+  const endCoord = coordsList[index * 2 + 1] || [36.27, 50.02];
 
-      if (!stopsMap.has(stopId)) {
-        stopsMap.set(stopId, {
-          id: stopId,
-          name: stop.name || `Остановка ${index + 1}`,
-          kinds: [baseRoute.kind],
-          position: {
-            lat: stop.lat || stop.latitude || stop.coordinates?.[1] || 50.0,
-            lng: stop.lng || stop.longitude || stop.coordinates?.[0] || 36.2,
-          },
-          routeIds: [baseRoute.id],
-        });
-      } else {
-        const existing = stopsMap.get(stopId)!;
-        if (!existing.routeIds.includes(baseRoute.id)) {
-          existing.routeIds.push(baseRoute.id);
-        }
-        if (!existing.kinds.includes(baseRoute.kind)) {
-          existing.kinds.push(baseRoute.kind);
-        }
+  const generatedStops = [
+    { id: `${baseRoute.id}-stop-start`, name: baseRoute.headsignForward, lng: startCoord[0], lat: startCoord[1] },
+    { id: `${baseRoute.id}-stop-mid`, name: `Проміжна зупинка (${baseRoute.number})`, lng: midCoord[0], lat: midCoord[1] },
+    { id: `${baseRoute.id}-stop-end`, name: baseRoute.headsignBackward, lng: endCoord[0], lat: endCoord[1] }
+  ];
+
+  generatedStops.forEach((stop) => {
+    routeStops.push(stop.id);
+
+    if (!stopsMap.has(stop.id)) {
+      stopsMap.set(stop.id, {
+        id: stop.id,
+        name: stop.name,
+        kinds: [baseRoute.kind],
+        position: {
+          lat: stop.lat,
+          lng: stop.lng,
+        },
+        routeIds: [baseRoute.id],
+      });
+    } else {
+      const existing = stopsMap.get(stop.id)!;
+      if (!existing.routeIds.includes(baseRoute.id)) {
+        existing.routeIds.push(baseRoute.id);
       }
-    });
-  }
+    }
+  });
 
   routesMap.push({
     ...baseRoute,
     stopIds: routeStops,
-    schedule: geoMatch?.schedule || [],
+    schedule: [],
   });
 });
 
