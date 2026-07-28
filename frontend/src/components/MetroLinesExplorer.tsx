@@ -9,9 +9,7 @@ import {
   dayTypeOf,
   secOfDay,
   formatEtaClock,
-  useLiveMetroTrains,
   type LiveMetroDayType,
-  type LiveMetroTrain,
   type StationDayTimetableEntry,
 } from '@/pages/LiveMetroPage';
 
