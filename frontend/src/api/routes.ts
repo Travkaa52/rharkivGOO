@@ -2,7 +2,7 @@ import { localRoutes } from '@/data/localData';
 import type { TransportKind, TransportRoute } from '@/types/transport';
 
 /**
- * Без бекенду: дані читаються з локального JSON (src/data/routes.json).
+ * Без бекенду: дані генеруються з реальної геометрії маршрутів (src/data/routeGeometries.json) у localData.ts.
  */
 export const routesApi = {
   search: (query: string): Promise<TransportRoute[]> => Promise.resolve(localRoutes.search(query)),

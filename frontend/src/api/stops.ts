@@ -2,7 +2,7 @@ import { localStops } from '@/data/localData';
 import type { Stop } from '@/types/transport';
 
 /**
- * Без бекенду: дані читаються з локального JSON (src/data/stops.json).
+ * Без бекенду: дані генеруються з реальної геометрії маршрутів (src/data/routeGeometries.json) у localData.ts.
  * Інтерфейс навмисно лишився async (Promise), щоб сторінки з existing
  * loading/error станами не потребували переписування.
  */

@@ -638,6 +638,56 @@ export const localStops = {
     const q = query.toLowerCase();
     return stopsData.filter((s) => s.name.toLowerCase().includes(q));
   },
-  getNearby: (_lat: number, _lng: number, _maxDistance = 1000): StopItem[] => stopsData,
-  getArrivals: (_stopId: string): { routeId: string; etaMinutes: number }[] => []
+  getNearby: (lat: number, lng: number, maxDistance = 1000): StopItem[] => {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const distanceMeters = (aLat: number, aLng: number, bLat: number, bLng: number) => {
+      const R = 6371000;
+      const dLat = toRad(bLat - aLat);
+      const dLng = toRad(bLng - aLng);
+      const la1 = toRad(aLat);
+      const la2 = toRad(bLat);
+      const x = dLng * Math.cos((la1 + la2) / 2);
+      const y = dLat;
+      return Math.sqrt(x * x + y * y) * R;
+    };
+    return stopsData
+      .filter((s) => distanceMeters(lat, lng, s.position.lat, s.position.lng) <= maxDistance)
+      .sort(
+        (a, b) =>
+          distanceMeters(lat, lng, a.position.lat, a.position.lng) -
+          distanceMeters(lat, lng, b.position.lat, b.position.lng)
+      );
+  },
+  // Симулює найближчі прибуття для кожного маршруту, що проходить через зупинку,
+  // на основі реального інтервалу руху (intervalMinutes) та поточного часу доби.
+  // Раніше повертало завжди [] — картка "Прибуття транспорту" ніколи не з'являлась.
+  getArrivals: (stopId: string): { routeId: string; etaMinutes: number }[] => {
+    const stop = stopsData.find((s) => s.id === stopId);
+    if (!stop) return [];
+
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+    return stop.routeIds
+      .map((routeId) => {
+        const route = routesData.find((r) => r.id === routeId);
+        if (!route) return null;
+
+        const [fromH, fromM] = route.firstDeparture.split(':').map(Number);
+        const [toH, toM] = route.lastDeparture.split(':').map(Number);
+        const startMinutes = fromH * 60 + fromM;
+        const endMinutes = toH * 60 + toM;
+        if (nowMinutes < startMinutes || nowMinutes > endMinutes) return null;
+
+        const interval = Math.max(route.intervalMinutes || 10, 3);
+        // Детермінований, але відмінний для кожного маршруту зсув фази,
+        // щоб борти на одній зупинці не прибували всі одночасно.
+        const phaseSeed = routeId.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+        const minutesIntoInterval = (nowMinutes + phaseSeed) % interval;
+        const etaMinutes = interval - minutesIntoInterval;
+
+        return { routeId, etaMinutes: etaMinutes === interval ? 0 : etaMinutes };
+      })
+      .filter((a): a is { routeId: string; etaMinutes: number } => a !== null);
+  }
 };

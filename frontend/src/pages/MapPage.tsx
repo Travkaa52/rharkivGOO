@@ -6,7 +6,6 @@ import {
   X, 
   ChevronRight, 
   Mic, 
-  SlidersHorizontal, 
   Plus, 
   Minus, 
   Compass, 
@@ -23,7 +22,9 @@ import { RouteSheet } from '@/components/RouteSheet';
 import { MapSearchSuggestions } from '@/components/MapSearchSuggestions';
 import { GpsButton } from '@/components/GpsButton';
 import { MapModeButton } from '@/components/MapModeButton';
+import { TransportLayersPanel } from '@/components/TransportLayersPanel';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useSurfaceVehicles } from '@/hooks/useSurfaceVehicles';
 import { localRoutes, localStops } from '@/data/localData';
 import { getRouteBounds } from '@/lib/mapLayers';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -90,6 +91,31 @@ export function MapPage() {
   const visibleKinds = useMemo(() => {
     return storeVisibleKinds.filter((kind) => activeFilterChips[kind] ?? true);
   }, [storeVisibleKinds, activeFilterChips]);
+
+  const surfaceVehicles = useSurfaceVehicles(visibleKinds);
+
+  const [voiceSupported] = useState(() => typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window));
+  const [isListening, setIsListening] = useState(false);
+
+  const handleVoiceSearch = useCallback(() => {
+    const SpeechRecognitionCtor: any = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) return;
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = 'uk-UA';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results?.[0]?.[0]?.transcript as string | undefined;
+      if (transcript) {
+        setQuery(transcript);
+        setSuggestionsOpen(true);
+      }
+    };
+    recognition.start();
+  }, []);
 
   const selectedStop = useMemo(() => (selectedStopId ? localStops.getById(selectedStopId) : undefined), [selectedStopId]);
   const arrivals = useMemo(() => (selectedStopId ? localStops.getArrivals(selectedStopId) : []), [selectedStopId]);
@@ -219,7 +245,7 @@ export function MapPage() {
         )}
 
         <MapView
-          vehicles={[]}
+          vehicles={surfaceVehicles}
           userPosition={position}
           userHeading={heading}
           userIsMoving={isMoving}
@@ -251,8 +277,8 @@ export function MapPage() {
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2.5 p-4 pt-[max(1rem,env(safe-area-inset-top))] will-change-transform">
         
         <div className="pointer-events-auto flex items-center gap-2.5">
-          <div className="relative flex-1 rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/10 transition-all focus-within:ring-2 focus-within:ring-emerald-500/30">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <div className="glass-surface relative flex-1 rounded-[24px] border border-border/40 bg-surface/90 shadow-xl shadow-black/10 backdrop-blur-xl transition-all focus-within:ring-2 focus-within:ring-primary/30">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-text/40">
               🔍
             </span>
             <input
@@ -270,37 +296,34 @@ export function MapPage() {
                 if (e.key === 'Enter') handleSearchSubmit(query);
               }}
               placeholder="Зупинка, станція метро або маршрут..."
-              className="w-full bg-transparent py-3.5 pl-11 pr-24 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              className="w-full bg-transparent py-3.5 pl-11 pr-24 text-xs font-semibold text-ink-text placeholder:text-ink-text/40 focus:outline-none"
             />
             
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
               {query && (
                 <button
                   onClick={() => setQuery('')}
-                  className="p-1.5 rounded-full hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition-colors"
+                  className="p-1.5 rounded-full text-ink-text/40 transition-colors hover:bg-surface-raised hover:text-ink-text"
                   aria-label="Очистити"
                 >
                   <X size={14} />
                 </button>
               )}
-              <button
-                onClick={() => alert('Голосовий пошук активовано (заглушка)')}
-                className="p-2 rounded-full hover:bg-emerald-50 text-slate-500 hover:text-emerald-600 transition-colors"
-                aria-label="Голосовий пошук"
-                title="Голосовий пошук"
-              >
-                <Mic size={16} />
-              </button>
+              {voiceSupported && (
+                <button
+                  onClick={handleVoiceSearch}
+                  className={`p-2 rounded-full transition-colors ${
+                    isListening ? 'bg-primary/20 text-primary animate-pulse' : 'text-ink-text/50 hover:bg-primary/10 hover:text-primary'
+                  }`}
+                  aria-label="Голосовий пошук"
+                  title="Голосовий пошук"
+                >
+                  <Mic size={16} />
+                </button>
+              )}
             </div>
           </div>
 
-          <button
-            onClick={() => alert('Меню фільтрів')}
-            className="pointer-events-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 text-slate-700 shadow-xl shadow-black/10 transition-all hover:bg-white active:scale-95"
-            aria-label="Фільтри"
-          >
-            <SlidersHorizontal size={19} />
-          </button>
         </div>
 
         {/* Швидкі фільтри */}
@@ -373,6 +396,8 @@ export function MapPage() {
           <GpsButton onClick={locate} isLocating={isLocating} hasError={!!error} />
         </div>
       </div>
+
+      <TransportLayersPanel />
 
       {/* 4. НИЖНЯ КАРТОЧКА: Маршрут */}
       {selectedRoute && (

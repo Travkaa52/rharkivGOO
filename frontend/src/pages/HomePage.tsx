@@ -155,15 +155,8 @@ export function HomePage() {
         {/* 1. UPPER HEADER */}
         <header className="flex items-center justify-between pt-1 pb-1 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-md shadow-emerald-500/20 ring-1 ring-emerald-500/15 bg-white flex items-center justify-center">
-  <img
-    src={logo}
-    alt="Kharkiv GO"
-    className="w-full h-full object-cover"
-    loading="eager"
-    draggable={false}
-  />
-</div>
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 font-black text-base tracking-tighter">
+              GO
             </div>
             <div>
               <div className="flex items-center gap-2">
