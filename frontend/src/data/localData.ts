@@ -618,6 +618,85 @@ baseRoutes.forEach((baseRoute) => {
 const routesData: RouteItem[] = routesMap;
 const stopsData: StopItem[] = Array.from(stopsMap.values());
 
+export interface TripOption {
+  route: RouteItem;
+  boardStop: StopItem;
+  alightStop: StopItem;
+  boardDistanceM: number;
+  alightDistanceM: number;
+}
+
+function distanceMetersLatLng(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const R = 6371000;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const x =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+}
+
+/**
+ * Підбирає маршрути громадського транспорту, які проходять і біля точки
+ * відправлення, і біля точки призначення — простий "будівник маршруту"
+ * без бекенду (жодних live-даних, тільки статична геометрія routes.json).
+ *
+ * Для кожного маршруту шукає найближчу до `from` та найближчу до `to`
+ * зупинку з-поміж його власних зупинок; якщо обидві в межах допустимого
+ * радіусу (і це різні зупинки) — маршрут вважається придатним варіантом.
+ * Радіус пошуку поступово розширюється, якщо нічого не знайдено поруч.
+ */
+export function buildTripOptions(
+  fromLat: number,
+  fromLng: number,
+  toLat: number,
+  toLng: number,
+  maxOptions = 5
+): TripOption[] {
+  const RADII_M = [700, 1200, 2200, 4000];
+
+  for (const radius of RADII_M) {
+    const candidates: TripOption[] = [];
+
+    for (const route of routesData) {
+      let nearestToStart: { stop: StopItem; dist: number } | null = null;
+      let nearestToEnd: { stop: StopItem; dist: number } | null = null;
+
+      for (const stopId of route.stopIds) {
+        const stop = stopsMap.get(stopId);
+        if (!stop) continue;
+
+        const dStart = distanceMetersLatLng(fromLat, fromLng, stop.position.lat, stop.position.lng);
+        if (!nearestToStart || dStart < nearestToStart.dist) nearestToStart = { stop, dist: dStart };
+
+        const dEnd = distanceMetersLatLng(toLat, toLng, stop.position.lat, stop.position.lng);
+        if (!nearestToEnd || dEnd < nearestToEnd.dist) nearestToEnd = { stop, dist: dEnd };
+      }
+
+      if (!nearestToStart || !nearestToEnd) continue;
+      if (nearestToStart.stop.id === nearestToEnd.stop.id) continue;
+      if (nearestToStart.dist > radius || nearestToEnd.dist > radius) continue;
+
+      candidates.push({
+        route,
+        boardStop: nearestToStart.stop,
+        alightStop: nearestToEnd.stop,
+        boardDistanceM: nearestToStart.dist,
+        alightDistanceM: nearestToEnd.dist
+      });
+    }
+
+    if (candidates.length > 0) {
+      return candidates
+        .sort((a, b) => a.boardDistanceM + a.alightDistanceM - (b.boardDistanceM + b.alightDistanceM))
+        .slice(0, maxOptions);
+    }
+  }
+
+  return [];
+}
+
+
 export const localRoutes = {
   all: (): RouteItem[] => routesData,
   getById: (id: string): RouteItem | undefined => routesData.find((r) => r.id === id),
@@ -628,7 +707,8 @@ export const localRoutes = {
       (r) => r.number.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)
     );
   },
-  buildTrip: (..._args: unknown[]) => ({ routeId: _args[0] as string, segments: [] })
+  buildTrip: (fromLat: number, fromLng: number, toLat: number, toLng: number): TripOption[] =>
+    buildTripOptions(fromLat, fromLng, toLat, toLng)
 };
 
 export const localStops = {

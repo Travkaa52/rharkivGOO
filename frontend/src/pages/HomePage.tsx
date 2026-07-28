@@ -17,8 +17,10 @@ import {
   MapPin,
   Compass,
   CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  AlertTriangle
 } from 'lucide-react';
+import { ReportDelayModal } from '@/components/ReportDelayModal';
 import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
@@ -71,6 +73,9 @@ export function HomePage() {
   
   const historyEntries = useHistoryStore((s) => s.entries);
   const addHistoryEntry = useHistoryStore((s) => s.addEntry);
+
+  // Модалка "Повідомити про затримку"
+  const [isReportDelayOpen, setIsReportDelayOpen] = useState(false);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -668,7 +673,16 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* 9. FOOTER */}
+        {/* 9. REPORT DELAY CTA */}
+        <button
+          onClick={() => setIsReportDelayOpen(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-[22px] border border-amber-200 bg-amber-50 py-3.5 text-xs font-extrabold text-amber-700 shadow-sm transition-all active:scale-[0.98] hover:bg-amber-100"
+        >
+          <AlertTriangle size={16} />
+          <span>Повідомити про затримку</span>
+        </button>
+
+        {/* 10. FOOTER */}
         <footer className="text-center py-4 space-y-1">
           <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700">
             <span>Kharkiv GO</span>
@@ -679,6 +693,8 @@ export function HomePage() {
         </footer>
 
       </div>
+
+      <ReportDelayModal open={isReportDelayOpen} onClose={() => setIsReportDelayOpen(false)} />
     </div>
   );
 }

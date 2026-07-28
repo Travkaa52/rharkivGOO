@@ -10,13 +10,15 @@ import {
   Minus, 
   Compass, 
   Navigation, 
-  Star, 
   Bus, 
   Zap, 
-  TrainTrack 
+  TrainTrack,
+  MapPin,
+  ArrowUpDown,
+  Route as RouteIcon,
+  LocateFixed
 } from 'lucide-react';
 import { MapView } from '@/components/MapView';
-import { MetroLayer } from '@/components/MetroLayer';
 import { StopCard } from '@/components/StopCard';
 import { RouteSheet } from '@/components/RouteSheet';
 import { MapSearchSuggestions } from '@/components/MapSearchSuggestions';
@@ -24,8 +26,7 @@ import { GpsButton } from '@/components/GpsButton';
 import { MapModeButton } from '@/components/MapModeButton';
 import { TransportLayersPanel } from '@/components/TransportLayersPanel';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { useSurfaceVehicles } from '@/hooks/useSurfaceVehicles';
-import { localRoutes, localStops } from '@/data/localData';
+import { localRoutes, localStops, type TripOption, type StopItem } from '@/data/localData';
 import { getRouteBounds } from '@/lib/mapLayers';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { KIND_LABELS_UK } from '@/components/TransportKindIcon';
@@ -34,12 +35,11 @@ import type { TransportKind } from '@/types/transport';
 const SUGGESTIONS_LIMIT = 6;
 const STORAGE_PREFIX = 'kharkiv_go_map_state_';
 
-const CHIP_FILTERS: { id: TransportKind | 'favorites' | 'stops'; label: string; icon: typeof Bus }[] = [
+const CHIP_FILTERS: { id: TransportKind | 'stops'; label: string; icon: typeof Bus }[] = [
   { id: 'bus', label: 'Автобуси', icon: Bus },
   { id: 'trolleybus', label: 'Тролейбуси', icon: Zap },
   { id: 'tram', label: 'Трамваї', icon: TrainTrack },
   { id: 'metro', label: 'Метро', icon: TrainTrack },
-  { id: 'favorites', label: 'Обране', icon: Star },
   { id: 'stops', label: 'Зупинки', icon: Navigation },
 ];
 
@@ -55,12 +55,16 @@ export function MapPage() {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
-  const [query, setQuery] = useState(initialQuery);
-  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  // --- Побудова маршруту "Звідки -> Куди" -------------------------------
+  const [fromQuery, setFromQuery] = useState('');
+  const [toQuery, setToQuery] = useState(initialQuery);
+  const [fromPoint, setFromPoint] = useState<{ lat: number; lng: number } | null>(null);
+  const [toPoint, setToPoint] = useState<{ lat: number; lng: number } | null>(null);
+  const [activeField, setActiveField] = useState<'from' | 'to' | null>(null);
+  const [tripOptions, setTripOptions] = useState<TripOption[] | null>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [activeFilterChips, setActiveFilterChips] = useState<Record<string, boolean>>(() => {
@@ -75,7 +79,6 @@ export function MapPage() {
       trolleybus: true,
       tram: true,
       metro: true,
-      favorites: false,
       stops: true,
     };
   });
@@ -92,12 +95,10 @@ export function MapPage() {
     return storeVisibleKinds.filter((kind) => activeFilterChips[kind] ?? true);
   }, [storeVisibleKinds, activeFilterChips]);
 
-  const surfaceVehicles = useSurfaceVehicles(visibleKinds);
-
   const [voiceSupported] = useState(() => typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window));
   const [isListening, setIsListening] = useState(false);
 
-  const handleVoiceSearch = useCallback(() => {
+  const handleVoiceSearch = useCallback((field: 'from' | 'to') => {
     const SpeechRecognitionCtor: any = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
     if (!SpeechRecognitionCtor) return;
     const recognition = new SpeechRecognitionCtor();
@@ -110,8 +111,9 @@ export function MapPage() {
     recognition.onresult = (event: any) => {
       const transcript = event.results?.[0]?.[0]?.transcript as string | undefined;
       if (transcript) {
-        setQuery(transcript);
-        setSuggestionsOpen(true);
+        if (field === 'from') setFromQuery(transcript);
+        else setToQuery(transcript);
+        setActiveField(field);
       }
     };
     recognition.start();
@@ -121,25 +123,21 @@ export function MapPage() {
   const arrivals = useMemo(() => (selectedStopId ? localStops.getArrivals(selectedStopId) : []), [selectedStopId]);
   const selectedRoute = useMemo(() => (selectedRouteId ? localRoutes.getById(selectedRouteId) : undefined), [selectedRouteId]);
 
-  const suggestedStops = useMemo(() => (query.trim() ? localStops.search(query).slice(0, SUGGESTIONS_LIMIT) : []), [query]);
-  const suggestedRoutes = useMemo(() => (query.trim() ? localRoutes.search(query).slice(0, SUGGESTIONS_LIMIT) : []), [query]);
-
-  const handleSearchSubmit = useCallback((q: string) => {
-    setSearchParams({ q });
-    setSuggestionsOpen(false);
-  }, [setSearchParams]);
+  const activeFieldQuery = activeField === 'from' ? fromQuery : activeField === 'to' ? toQuery : '';
+  const fieldSuggestions = useMemo(
+    () => (activeField && activeFieldQuery.trim() ? localStops.search(activeFieldQuery).slice(0, SUGGESTIONS_LIMIT) : []),
+    [activeField, activeFieldQuery]
+  );
 
   const clearSelection = useCallback(() => {
     setSelectedStopId(null);
     setSelectedRouteId(null);
-    setSelectedVehicleId(null);
   }, []);
 
   const handleStopSelect = useCallback((stopId: string) => {
-    setSelectedVehicleId(null);
     setSelectedRouteId(null);
     setSelectedStopId(stopId);
-    setSuggestionsOpen(false);
+    setActiveField(null);
     const stop = localStops.getById(stopId);
     if (map && stop) {
       map.flyTo({ center: [stop.position.lng, stop.position.lat], zoom: Math.max(map.getZoom(), 15.5), essential: true });
@@ -148,9 +146,8 @@ export function MapPage() {
 
   const handleRouteSelect = useCallback((routeId: string) => {
     setSelectedStopId(null);
-    setSelectedVehicleId(null);
     setSelectedRouteId((current) => (current === routeId ? null : routeId));
-    setSuggestionsOpen(false);
+    setActiveField(null);
     if (map) {
       const coords = getRouteBounds(routeId);
       if (coords.length >= 2) {
@@ -167,11 +164,70 @@ export function MapPage() {
     }
   }, [map]);
 
-  const handleTrainSelect = useCallback((trainId: string) => {
-    setSelectedStopId(null);
-    setSelectedRouteId(null);
-    setSelectedVehicleId((current) => (current === trainId ? null : trainId));
-  }, []);
+  const handlePickPoint = useCallback((field: 'from' | 'to', stop: StopItem) => {
+    const point = { lat: stop.position.lat, lng: stop.position.lng };
+    if (field === 'from') {
+      setFromPoint(point);
+      setFromQuery(stop.name);
+    } else {
+      setToPoint(point);
+      setToQuery(stop.name);
+      setSearchParams({ q: stop.name });
+    }
+    setActiveField(null);
+    setTripOptions(null);
+    clearSelection();
+  }, [clearSelection, setSearchParams]);
+
+  const [pendingUseLocation, setPendingUseLocation] = useState(false);
+
+  const handleUseMyLocationAsFrom = useCallback(() => {
+    if (position) {
+      setFromPoint({ lat: position.lat, lng: position.lng });
+      setFromQuery('Моє місцезнаходження');
+      setTripOptions(null);
+    } else {
+      setPendingUseLocation(true);
+      locate();
+    }
+  }, [position, locate]);
+
+  useEffect(() => {
+    if (pendingUseLocation && position) {
+      setFromPoint({ lat: position.lat, lng: position.lng });
+      setFromQuery('Моє місцезнаходження');
+      setPendingUseLocation(false);
+    }
+  }, [pendingUseLocation, position]);
+
+  const handleSwapPoints = useCallback(() => {
+    setFromPoint(toPoint);
+    setToPoint(fromPoint);
+    setFromQuery(toQuery);
+    setToQuery(fromQuery);
+    setTripOptions(null);
+  }, [fromPoint, toPoint, fromQuery, toQuery]);
+
+  const handleBuildTrip = useCallback(() => {
+    if (!fromPoint || !toPoint) return;
+    clearSelection();
+    const options = localRoutes.buildTrip(fromPoint.lat, fromPoint.lng, toPoint.lat, toPoint.lng);
+    setTripOptions(options);
+
+    if (map) {
+      map.fitBounds(
+        [
+          [Math.min(fromPoint.lng, toPoint.lng), Math.min(fromPoint.lat, toPoint.lat)],
+          [Math.max(fromPoint.lng, toPoint.lng), Math.max(fromPoint.lat, toPoint.lat)]
+        ],
+        { padding: { top: 160, bottom: 320, left: 60, right: 60 }, duration: 700, maxZoom: 15 }
+      );
+    }
+  }, [fromPoint, toPoint, map, clearSelection]);
+
+  const handleSelectTripOption = useCallback((option: TripOption) => {
+    handleRouteSelect(option.route.id);
+  }, [handleRouteSelect]);
 
   const toggleChip = useCallback((id: string) => {
     setActiveFilterChips((prev) => {
@@ -215,7 +271,7 @@ export function MapPage() {
   }, [map]);
 
   useEffect(() => {
-    setQuery(initialQuery);
+    if (initialQuery) setToQuery(initialQuery);
   }, [initialQuery]);
 
   const handleMapReady = useCallback((mapInstance: MapLibreMap | null) => {
@@ -245,85 +301,141 @@ export function MapPage() {
         )}
 
         <MapView
-          vehicles={surfaceVehicles}
           userPosition={position}
           userHeading={heading}
           userIsMoving={isMoving}
-          selectedVehicleId={selectedVehicleId}
-          onVehicleSelect={useCallback((id: string | null) => {
-            setSelectedStopId(null);
-            setSelectedRouteId(null);
-            setSelectedVehicleId(id);
-          }, [])}
           onStopSelect={handleStopSelect}
           selectedRouteId={selectedRouteId}
           onRouteSelect={handleRouteSelect}
           visibleKinds={visibleKinds}
           showStops={showStops}
           onMapReady={handleMapReady}
+          fromPoint={fromPoint}
+          toPoint={toPoint}
         />
-
-        {isMapLoaded && (
-          <MetroLayer
-            map={map}
-            visible={visibleKinds.includes('metro')}
-            selectedTrainId={selectedVehicleId}
-            onTrainSelect={handleTrainSelect}
-          />
-        )}
       </div>
 
-      {/* 2. ВЕРХНЯ ПАНЕЛЬ */}
+      {/* 2. ВЕРХНЯ ПАНЕЛЬ: побудова маршруту "Звідки -> Куди" */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2.5 p-4 pt-[max(1rem,env(safe-area-inset-top))] will-change-transform">
-        
-        <div className="pointer-events-auto flex items-center gap-2.5">
-          <div className="glass-surface relative flex-1 rounded-[24px] border border-border/40 bg-surface/90 shadow-xl shadow-black/10 backdrop-blur-xl transition-all focus-within:ring-2 focus-within:ring-primary/30">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-text/40">
-              🔍
-            </span>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => {
-                clearTimeout(blurTimeoutRef.current);
-                setSuggestionsOpen(true);
-              }}
-              onBlur={() => {
-                blurTimeoutRef.current = setTimeout(() => setSuggestionsOpen(false), 200);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSearchSubmit(query);
-              }}
-              placeholder="Зупинка, станція метро або маршрут..."
-              className="w-full bg-transparent py-3.5 pl-11 pr-24 text-xs font-semibold text-ink-text placeholder:text-ink-text/40 focus:outline-none"
-            />
-            
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              {query && (
-                <button
-                  onClick={() => setQuery('')}
-                  className="p-1.5 rounded-full text-ink-text/40 transition-colors hover:bg-surface-raised hover:text-ink-text"
-                  aria-label="Очистити"
-                >
-                  <X size={14} />
-                </button>
-              )}
-              {voiceSupported && (
-                <button
-                  onClick={handleVoiceSearch}
-                  className={`p-2 rounded-full transition-colors ${
-                    isListening ? 'bg-primary/20 text-primary animate-pulse' : 'text-ink-text/50 hover:bg-primary/10 hover:text-primary'
-                  }`}
-                  aria-label="Голосовий пошук"
-                  title="Голосовий пошук"
-                >
-                  <Mic size={16} />
-                </button>
-              )}
+
+        <div className="pointer-events-auto relative rounded-[24px] border border-border/40 bg-surface/95 shadow-xl shadow-black/10 backdrop-blur-xl">
+          <div className="flex items-stretch">
+            <div className="flex flex-col items-center pl-4 pt-4 pb-4">
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
+              <span className="my-1 h-6 w-px flex-1 border-l border-dashed border-ink-text/20" />
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-rose-500 ring-4 ring-rose-500/20" />
             </div>
+
+            <div className="flex-1 divide-y divide-border/40 py-1.5">
+              {/* Звідки */}
+              <div className="flex items-center gap-1 px-2 py-1.5">
+                <input
+                  type="text"
+                  value={fromQuery}
+                  onChange={(e) => {
+                    setFromQuery(e.target.value);
+                    setFromPoint(null);
+                    setTripOptions(null);
+                  }}
+                  onFocus={() => {
+                    clearTimeout(blurTimeoutRef.current);
+                    setActiveField('from');
+                  }}
+                  onBlur={() => {
+                    blurTimeoutRef.current = setTimeout(() => setActiveField((f) => (f === 'from' ? null : f)), 200);
+                  }}
+                  placeholder="Звідки: адреса, зупинка..."
+                  className="w-full bg-transparent py-1.5 text-xs font-semibold text-ink-text placeholder:text-ink-text/40 focus:outline-none"
+                />
+                <button
+                  onClick={handleUseMyLocationAsFrom}
+                  aria-label="Моє місцезнаходження"
+                  title="Моє місцезнаходження"
+                  className="shrink-0 rounded-full p-1.5 text-ink-text/50 transition-colors hover:bg-primary/10 hover:text-primary"
+                >
+                  <LocateFixed size={15} />
+                </button>
+                {voiceSupported && (
+                  <button
+                    onClick={() => handleVoiceSearch('from')}
+                    aria-label="Голосовий пошук"
+                    className={`shrink-0 rounded-full p-1.5 transition-colors ${
+                      isListening && activeField === 'from' ? 'bg-primary/20 text-primary animate-pulse' : 'text-ink-text/50 hover:bg-primary/10 hover:text-primary'
+                    }`}
+                  >
+                    <Mic size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Куди */}
+              <div className="flex items-center gap-1 px-2 py-1.5">
+                <input
+                  type="text"
+                  value={toQuery}
+                  onChange={(e) => {
+                    setToQuery(e.target.value);
+                    setToPoint(null);
+                    setTripOptions(null);
+                  }}
+                  onFocus={() => {
+                    clearTimeout(blurTimeoutRef.current);
+                    setActiveField('to');
+                  }}
+                  onBlur={() => {
+                    blurTimeoutRef.current = setTimeout(() => setActiveField((f) => (f === 'to' ? null : f)), 200);
+                  }}
+                  placeholder="Куди: адреса, зупинка, маршрут..."
+                  className="w-full bg-transparent py-1.5 text-xs font-semibold text-ink-text placeholder:text-ink-text/40 focus:outline-none"
+                />
+                {toQuery && (
+                  <button
+                    onClick={() => {
+                      setToQuery('');
+                      setToPoint(null);
+                      setTripOptions(null);
+                    }}
+                    aria-label="Очистити"
+                    className="shrink-0 rounded-full p-1.5 text-ink-text/40 transition-colors hover:bg-surface-raised hover:text-ink-text"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+                {voiceSupported && (
+                  <button
+                    onClick={() => handleVoiceSearch('to')}
+                    aria-label="Голосовий пошук"
+                    className={`shrink-0 rounded-full p-1.5 transition-colors ${
+                      isListening && activeField === 'to' ? 'bg-primary/20 text-primary animate-pulse' : 'text-ink-text/50 hover:bg-primary/10 hover:text-primary'
+                    }`}
+                  >
+                    <Mic size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={handleSwapPoints}
+              aria-label="Поміняти місцями"
+              title="Поміняти місцями"
+              className="m-2 flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-full bg-surface-soft text-ink-text/60 transition-colors hover:bg-primary/10 hover:text-primary active:scale-95"
+            >
+              <ArrowUpDown size={16} />
+            </button>
           </div>
 
+          {fromPoint && toPoint && (
+            <div className="border-t border-border/40 p-2.5">
+              <button
+                onClick={handleBuildTrip}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-forest px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all active:scale-[0.98] hover:brightness-105"
+              >
+                <RouteIcon size={15} />
+                <span>Побудувати маршрут</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Швидкі фільтри */}
@@ -348,14 +460,65 @@ export function MapPage() {
           })}
         </div>
 
-        {suggestionsOpen && query.trim() && (
+        {activeField && fieldSuggestions.length > 0 && (
           <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden bg-white/95 backdrop-blur-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-150">
             <MapSearchSuggestions
-              stops={suggestedStops}
-              routes={suggestedRoutes}
-              onStopSelect={handleStopSelect}
-              onRouteSelect={handleRouteSelect}
+              stops={fieldSuggestions}
+              routes={[]}
+              onStopSelect={(stopId) => {
+                const stop = localStops.getById(stopId);
+                if (stop) handlePickPoint(activeField, stop);
+              }}
+              onRouteSelect={() => {}}
             />
+          </div>
+        )}
+
+        {activeField && fieldSuggestions.length === 0 && (activeField === 'from' ? fromQuery : toQuery).trim() && (
+          <div className="pointer-events-auto flex flex-col items-center justify-center gap-2 rounded-2xl border border-border/80 bg-surface/95 p-6 text-center shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150">
+            <MapPin className="h-6 w-6 text-ink-muted/60" />
+            <p className="font-body text-sm font-medium text-ink-muted">Зупинок не знайдено</p>
+          </div>
+        )}
+
+        {tripOptions !== null && (
+          <div className="pointer-events-auto max-h-[45vh] overflow-y-auto rounded-[24px] border border-white/50 bg-white/95 shadow-2xl backdrop-blur-2xl">
+            {tripOptions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
+                <RouteIcon className="h-6 w-6 text-slate-400" />
+                <p className="text-xs font-bold text-slate-700">Прямих маршрутів не знайдено</p>
+                <p className="text-[11px] text-slate-400">Спробуйте обрати точки ближче до зупинок громадського транспорту</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 p-2">
+                <p className="px-2.5 pb-1.5 pt-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  Варіанти маршруту ({tripOptions.length})
+                </p>
+                {tripOptions.map((option) => (
+                  <button
+                    key={option.route.id}
+                    onClick={() => handleSelectTripOption(option)}
+                    className="flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-colors hover:bg-emerald-50/70 active:scale-[0.99]"
+                  >
+                    <span
+                      className="flex h-9 w-11 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white shadow-xs"
+                      style={{ backgroundColor: option.route.color }}
+                    >
+                      {option.route.number}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-xs font-bold text-slate-800">
+                        {KIND_LABELS_UK[option.route.kind]} · {option.route.headsignForward}
+                      </div>
+                      <div className="truncate text-[11px] text-slate-400">
+                        Посадка: {option.boardStop.name} → Вихід: {option.alightStop.name}
+                      </div>
+                    </div>
+                    <ChevronRight size={14} className="shrink-0 text-slate-400" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -5,12 +5,10 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { DEFAULT_ZOOM, KHARKIV_CENTER, MAP_STYLES, MAX_ZOOM, MIN_ZOOM, TRANSPORT_COLORS } from '@/config/map';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import { useVehicleAnimation } from '@/hooks/useVehicleAnimation';
-import { TransportSprite } from '@/components/TransportSprite';
 import { buildRouteLinesGeoJson, buildStopsGeoJson } from '@/lib/mapLayers';
 import { assetUrl } from '@/lib/assetUrl';
 import { localRoutes } from '@/data/localData';
-import type { TransportKind, Vehicle } from '@/types/transport';
+import type { TransportKind } from '@/types/transport';
 
 const ROUTES_SOURCE_ID = 'khgo-routes';
 const ROUTES_LAYER_ID = 'khgo-routes-lines';
@@ -215,49 +213,43 @@ function updateStaticTransitLayers(
 }
 
 interface MapViewProps {
-  vehicles: Vehicle[];
   userPosition?: { lat: number; lng: number } | null;
   userHeading?: number | null;
   userIsMoving?: boolean;
-  onVehicleSelect?: (vehicleId: string) => void;
-  selectedVehicleId?: string | null;
   onStopSelect?: (stopId: string) => void;
   selectedRouteId?: string | null;
   onRouteSelect?: (routeId: string) => void;
   visibleKinds?: TransportKind[];
   showStops?: boolean;
   onMapReady?: (map: MapLibreMap | null) => void;
-}
-
-interface ScreenVehicle {
-  id: string;
-  x: number;
-  y: number;
+  /** Точка "Звідки" для побудови маршруту — позначається зеленим піном. */
+  fromPoint?: { lat: number; lng: number } | null;
+  /** Точка "Куди" для побудови маршруту — позначається червоним піном. */
+  toPoint?: { lat: number; lng: number } | null;
 }
 
 export function MapView({
-  vehicles,
   userPosition,
   userHeading = null,
   userIsMoving = false,
-  onVehicleSelect,
-  selectedVehicleId,
   onStopSelect,
   selectedRouteId = null,
   onRouteSelect,
   visibleKinds = ['metro', 'tram', 'trolleybus', 'bus'],
   showStops = true,
-  onMapReady
+  onMapReady,
+  fromPoint = null,
+  toPoint = null
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const userMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const fromMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const toMarkerRef = useRef<maplibregl.Marker | null>(null);
 
   const mapStyle = useSettingsStore((s) => s.mapStyle);
   const show3DBuildings = useSettingsStore((s) => s.is3DMode);
 
-  const animatedVehicles = useVehicleAnimation(vehicles);
-  const [screenPositions, setScreenPositions] = useState<Record<string, ScreenVehicle>>({});
   const [mapReady, setMapReady] = useState(false);
 
   const onStopSelectRef = useRef(onStopSelect);
@@ -413,49 +405,44 @@ export function MapView({
     }
   }, [userIsMoving, userHeading]);
 
-  // Синхронізація екранних координат транспорту (Viewport Culling + rAF)
+  // Маркери "Звідки" / "Куди" для побудови маршруту
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    if (!map) return;
 
-    let rafId: number | null = null;
-    const CULL_PADDING_PX = 120;
-
-    function computeAndSet() {
-      rafId = null;
-      const canvas = map!.getCanvas();
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      const positions: Record<string, ScreenVehicle> = {};
-
-      for (const v of animatedVehicles) {
-        const point = map!.project([v.animatedPosition.lng, v.animatedPosition.lat]);
-        if (
-          point.x < -CULL_PADDING_PX ||
-          point.y < -CULL_PADDING_PX ||
-          point.x > w + CULL_PADDING_PX ||
-          point.y > h + CULL_PADDING_PX
-        ) {
-          continue;
-        }
-        positions[v.id] = { id: v.id, x: point.x, y: point.y };
+    if (!fromPoint) {
+      fromMarkerRef.current?.remove();
+      fromMarkerRef.current = null;
+    } else {
+      if (!fromMarkerRef.current) {
+        const el = document.createElement('div');
+        el.className = 'flex h-8 w-8 items-center justify-center';
+        el.innerHTML = `<div style="width:16px;height:16px;border-radius:9999px;background:#059669;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`;
+        fromMarkerRef.current = new maplibregl.Marker({ element: el }).setLngLat([fromPoint.lng, fromPoint.lat]).addTo(map);
+      } else {
+        fromMarkerRef.current.setLngLat([fromPoint.lng, fromPoint.lat]);
       }
-      setScreenPositions(positions);
     }
+  }, [fromPoint]);
 
-    function scheduleUpdate() {
-      if (rafId !== null) return;
-      rafId = requestAnimationFrame(computeAndSet);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!toPoint) {
+      toMarkerRef.current?.remove();
+      toMarkerRef.current = null;
+    } else {
+      if (!toMarkerRef.current) {
+        const el = document.createElement('div');
+        el.className = 'flex h-8 w-8 items-center justify-center';
+        el.innerHTML = `<div style="width:16px;height:16px;border-radius:9999px;background:#e11d48;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`;
+        toMarkerRef.current = new maplibregl.Marker({ element: el }).setLngLat([toPoint.lng, toPoint.lat]).addTo(map);
+      } else {
+        toMarkerRef.current.setLngLat([toPoint.lng, toPoint.lat]);
+      }
     }
-
-    scheduleUpdate();
-    map.on('move', scheduleUpdate);
-
-    return () => {
-      map.off('move', scheduleUpdate);
-      if (rafId !== null) cancelAnimationFrame(rafId);
-    };
-  }, [animatedVehicles, mapReady]);
+  }, [toPoint]);
 
   function flyToUser() {
     if (mapRef.current && userPosition) {
@@ -477,30 +464,6 @@ export function MapView({
           зовнішній клас, тож карта відображається незалежно від порядку
           CSS-чанків у білді. */}
       <div ref={containerRef} className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} />
-
-      {/* Оверлей транспорту, спроєктований у пікселі поверх карты */}
-      <div className="pointer-events-none absolute inset-0 z-10">
-        {animatedVehicles.map((v) => {
-          const screen = screenPositions[v.id];
-          if (!screen) return null;
-          return (
-            <div key={v.id} className="pointer-events-auto">
-              <TransportSprite
-                kind={v.kind}
-                routeNumber={v.routeNumber}
-                headsign={v.headsign}
-                heading={v.animatedHeading}
-                speedKmh={v.speedKmh}
-                x={screen.x}
-                y={screen.y}
-                state={v.state}
-                selected={selectedVehicleId === v.id}
-                onClick={() => onVehicleSelect?.(v.id)}
-              />
-            </div>
-          );
-        })}
-      </div>
 
       {/* Плаваюча кнопка «Моє місцезнаходження» (FAB) */}
       {userPosition && (

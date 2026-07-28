@@ -72,6 +72,14 @@ export function RoutesPage() {
         </div>
       </div>
 
+      {/* Дисклеймер про точність даних */}
+      <div className="mx-auto max-w-md px-4 pt-3">
+        <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-700">
+          Дані про маршрути можуть бути неточними — вони взяті з відкритих джерел і можуть відрізнятися від
+          фактичного руху транспорту.
+        </div>
+      </div>
+
       {/* Active Tab Content */}
       <main className="relative">
         <TransportKindPage key={activeTab} kind={activeTab} />
