@@ -124,13 +124,13 @@ const VIEW_H = 900;
 const MIN_SCALE = 0.35;
 const MAX_SCALE = 5.0;
 
-const LINE_COLORS: Record<string, string> = {
+export const LINE_COLORS: Record<string, string> = {
   'route-metro-1': '#D92B27',
   'route-metro-2': '#0072BC',
   'route-metro-3': '#009640',
 };
 
-const LINE_NUMBERS: Record<string, number> = {
+export const LINE_NUMBERS: Record<string, number> = {
   'route-metro-1': 1,
   'route-metro-2': 2,
   'route-metro-3': 3,
@@ -784,17 +784,33 @@ function computeActiveTrains(nowSec: number, dayType: LiveMetroDayType): LiveMet
 
 const DWELL_HOLD_SEC = 45; // тримаємо потяг на кінцевій станції ще трохи після останнього відправлення в профілі
 
+/** Точний час доби (з дробовою частиною секунди) для плавної інтерполяції позиції потяга. */
+function preciseSecOfDay(date: Date): number {
+  return date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds() + date.getMilliseconds() / 1000;
+}
+
 export function useLiveMetroTrains(): LiveMetroTrain[] {
   const [trains, setTrains] = useState<LiveMetroTrain[]>(() =>
     computeActiveTrains(secOfDay(new Date()), dayTypeOf(new Date()))
   );
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      setTrains(computeActiveTrains(secOfDay(now), dayTypeOf(now)));
-    }, 1000);
-    return () => clearInterval(interval);
+    let rafId = 0;
+    let lastUpdate = 0;
+    // ~12 кадрів/с — достатньо плавно для ока, і не перевантажує рендер SVG.
+    const FRAME_INTERVAL_MS = 80;
+
+    const tick = (ts: number) => {
+      if (ts - lastUpdate >= FRAME_INTERVAL_MS) {
+        lastUpdate = ts;
+        const now = new Date();
+        setTrains(computeActiveTrains(preciseSecOfDay(now), dayTypeOf(now)));
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   return trains;

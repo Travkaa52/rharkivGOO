@@ -16,6 +16,7 @@ import {
   Star
 } from 'lucide-react';
 import { RouteCard } from '@/components/RouteCard';
+import { MetroLinesExplorer } from '@/components/MetroLinesExplorer';
 import { routesApi } from '@/api/routes';
 import type { TransportKind, TransportRoute } from '@/types/transport';
 
@@ -186,6 +187,12 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
                 <ArrowRight className="h-4 w-4" />
               </div>
             </Link>
+          </div>
+        )}
+
+        {kind === 'metro' && (
+          <div className="pt-1">
+            <MetroLinesExplorer />
           </div>
         )}
 
