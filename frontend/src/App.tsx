@@ -2,6 +2,7 @@ import { Suspense, lazy, useState, memo, startTransition } from 'react';
 import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
 import { TelegramGate } from '@/components/TelegramGate';
+import { Toast } from '@/components/ui';
 import { SplashScreen } from '@/components/SplashScreen';
 import { useTelegramEnvironment } from '@/hooks/useTelegramEnvironment';
 import { useThemeSync } from '@/hooks/useThemeSync';
@@ -99,6 +100,7 @@ export default function App() {
       {telegramStatus === 'outside' && <MemoizedTelegramGate />}
 
       <MemoizedBottomNav />
+      <Toast />
 
       {splashMounted && (
         <SplashScreen

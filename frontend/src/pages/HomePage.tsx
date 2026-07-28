@@ -24,6 +24,7 @@ import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useToastStore } from '@/store/useToastStore';
 import type { TransportKind } from '@/types/transport';
 
 const metroIcon = '/metroicono.png';
@@ -56,6 +57,7 @@ function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2:
 
 export function HomePage() {
   const profile = useAuthStore((s) => s.profile);
+  const showToast = useToastStore((s) => s.show);
   const favoriteRoutes = useFavoritesStore((s) => s.routes);
   const favoriteStops = useFavoritesStore((s) => s.stops);
   const { position, locate } = useGeolocation();
@@ -574,7 +576,7 @@ export function HomePage() {
             </p>
             <div className="pt-1">
               <button 
-                onClick={() => alert('Детальна інформація доступна в офіційному Telegram каналі Kharkiv GO.')}
+                onClick={() => showToast('Детальна інформація доступна в офіційному Telegram каналі Kharkiv GO.')}
                 className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700"
               >
                 <span>Детальніше</span>

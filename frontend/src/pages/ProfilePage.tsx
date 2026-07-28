@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useToastStore } from '@/store/useToastStore';
 import { 
   User, 
   Star, 
@@ -25,6 +26,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
+import { useSettingsStore } from '@/store/useSettingsStore';
 
 export function ProfilePage() {
   const profile = useAuthStore((s) => s.profile);
@@ -39,22 +41,25 @@ export function ProfilePage() {
     useHistoryStore.setState({ entries: [] });
   };
 
-  const [darkMode, setDarkMode] = useState(true);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const theme = useSettingsStore((s) => s.theme);
+  const setTheme = useSettingsStore((s) => s.setTheme);
+  const notificationsEnabled = useSettingsStore((s) => s.pushNotificationsEnabled);
+  const togglePushNotifications = useSettingsStore((s) => s.togglePushNotifications);
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
   const [cacheSize, setCacheSize] = useState('14.2 MB');
   const [isUpdating, setIsUpdating] = useState(false);
+  const showToast = useToastStore((s) => s.show);
 
   const handleClearCache = () => {
     setCacheSize('0 KB');
-    alert('Кеш успішно очищено!');
+    showToast('Кеш успішно очищено!', 'success');
   };
 
   const handleUpdateData = () => {
     setIsUpdating(true);
     setTimeout(() => {
       setIsUpdating(false);
-      alert('Дані успішно оновлено до актуальної версії.');
+      showToast('Дані успішно оновлено до актуальної версії.', 'success');
     }, 800);
   };
 
@@ -72,7 +77,7 @@ export function ProfilePage() {
       }
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('Посилання скопійовано в буфер обміну!');
+      showToast('Посилання скопійовано в буфер обміну!', 'success');
     }
   };
 
@@ -274,16 +279,16 @@ export function ProfilePage() {
                 <span className="text-xs font-bold text-ink-text">Темна тема</span>
               </div>
               <button
-                onClick={() => setDarkMode(!darkMode)}
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  darkMode ? 'bg-primary' : 'bg-border'
+                  theme !== 'light' ? 'bg-primary' : 'bg-border'
                 }`}
                 role="switch"
-                aria-checked={darkMode}
+                aria-checked={theme !== 'light'}
               >
                 <span
                   className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                    darkMode ? 'translate-x-5' : 'translate-x-0'
+                    theme !== 'light' ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
               </button>
@@ -346,7 +351,7 @@ export function ProfilePage() {
                 <span className="text-xs font-bold text-ink-text">Новини транспорту та метро</span>
               </div>
               <button
-                onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+                onClick={togglePushNotifications}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                   notificationsEnabled ? 'bg-primary' : 'bg-border'
                 }`}
@@ -370,7 +375,7 @@ export function ProfilePage() {
 
             <a
               href="#about"
-              onClick={(e) => { e.preventDefault(); alert('Kharkiv GO v1.2.0 — ваш надійний міський помічник.'); }}
+              onClick={(e) => { e.preventDefault(); showToast('Kharkiv GO v1.2.0 — ваш надійний міський помічник.'); }}
               className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
             >
               <div className="flex items-center gap-3">
@@ -384,7 +389,7 @@ export function ProfilePage() {
 
             <a
               href="#rate"
-              onClick={(e) => { e.preventDefault(); alert('Дякуємо за вашу підтримку! Оцінка доступна в Telegram Bot.'); }}
+              onClick={(e) => { e.preventDefault(); showToast('Дякуємо за вашу підтримку! Оцінка доступна в Telegram Bot.'); }}
               className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
             >
               <div className="flex items-center gap-3">
@@ -411,7 +416,7 @@ export function ProfilePage() {
 
             <a
               href="#privacy"
-              onClick={(e) => { e.preventDefault(); alert('Усі дані зберігаються локально відповідно до політики конфіденційності.'); }}
+              onClick={(e) => { e.preventDefault(); showToast('Усі дані зберігаються локально відповідно до політики конфіденційності.'); }}
               className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
             >
               <div className="flex items-center gap-3">
@@ -473,7 +478,7 @@ export function ProfilePage() {
               </button>
 
               <button
-                onClick={() => alert('Встановлено актуальну версію (v1.2.0). Оновлень немає.')}
+                onClick={() => showToast('Встановлено актуальну версію (v1.2.0). Оновлень немає.')}
                 className="flex items-center justify-center gap-2 rounded-[20px] bg-surface/80 border border-border/60 px-4 py-3.5 text-xs font-bold text-ink-text shadow-xs transition-all hover:bg-surface active:scale-98 min-h-[48px]"
               >
                 <Check className="h-4 w-4 text-emerald-500" />

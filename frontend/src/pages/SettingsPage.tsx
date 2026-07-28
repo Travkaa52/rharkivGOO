@@ -132,11 +132,11 @@ export function SettingsPage() {
                 value={settings.theme}
                 onChange={settings.setTheme}
                 options={[
-                  { value: 'system', label: 'Авто' },
                   { value: 'light', label: 'Світла' },
-                  { value: 'dark', label: 'Темна' }
+                  { value: 'dark', label: 'Темна' },
+                  { value: 'amoled', label: 'AMOLED' }
                 ]}
-                className="w-48 shadow-2xs"
+                className="w-60 shadow-2xs"
               />
             }
           />

@@ -93,6 +93,39 @@
   --glass-border-alpha: 0.5;
 }
 
+/* AMOLED — справжня третя тема: чистий чорний фон для OLED-екранів
+   і неоновий зелений акцент замість золотисто-лісового primary. Це не
+   аліас на темну тему — палітра свідомо інша (глибший чорний, яскравіший
+   акцент, різкіші тіні), щоб перемикач тем дійсно давав 3 різні вигляди. */
+[data-theme='amoled'] {
+  --color-primary: var(--color-neon);
+
+  --color-bg: 0 0 0;
+  --color-surface: 4 6 5;
+  --color-surface-soft: 2 4 3;
+  --color-surface-raised: 10 14 12;
+
+  --color-border: 57 255 148;
+  --color-border-alpha: 0.14;
+  --color-text: 255 255 255;
+  --color-text-muted: 255 255 255;
+  --color-text-muted-alpha: 0.6;
+  --color-text-inverted: 0 0 0;
+
+  --color-ink: var(--color-bg);
+  --color-ink-surface: var(--color-surface-raised);
+  --color-ink-border: 255 255 255 / 0.08;
+
+  --shadow-glass: 0 14px 40px -6px rgba(0, 0, 0, 0.8), 0 0 20px -4px rgba(57, 255, 148, 0.12);
+  --shadow-glass-lg: 0 24px 64px -8px rgba(0, 0, 0, 0.85), 0 0 28px -4px rgba(57, 255, 148, 0.16);
+  --shadow-glass-dark: 0 10px 30px -4px rgba(0, 0, 0, 0.9);
+
+  --glass-sheen-strong: 0.5;
+  --glass-sheen-soft: 0.16;
+  --glass-tint-top-alpha: 0.18;
+  --glass-border-alpha: 0.22;
+}
+
 /* Base resets & Mobile UX optimizations */
 @layer base {
   * {
