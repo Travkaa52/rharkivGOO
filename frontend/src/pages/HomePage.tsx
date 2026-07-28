@@ -25,9 +25,16 @@ import { useHistoryStore } from '@/store/useHistoryStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useToastStore } from '@/store/useToastStore';
+import { assetUrl } from '@/lib/assetUrl';
+import {
+  BUILT_LINES,
+  getActiveTrains,
+  getUpcomingArrivalsForStation,
+  formatEtaCountdown
+} from '@/liveMetro/liveMetroEngine';
 import type { TransportKind } from '@/types/transport';
 
-const metroIcon = '/metroicono.png';
+const metroIcon = assetUrl('/icons/metroicono.png');
 
 const KIND_ICON: Record<TransportKind, string> = {
   metro: '🚇',
@@ -91,6 +98,50 @@ export function HomePage() {
       minute: '2-digit' 
     });
   }, [currentTime]);
+
+  // --- Живі дані метро для картки "Метро онлайн" -------------------------
+  const activeMetroTrains = useMemo(() => getActiveTrains(currentTime), [currentTime]);
+  const isMetroServiceRunning = activeMetroTrains.length > 0;
+
+  const nearestMetroStation = useMemo(() => {
+    if (!position) return null;
+
+    let best: { id: string; name: string; distM: number; lineColor?: string } | null = null;
+
+    for (const { line } of BUILT_LINES) {
+      for (const s of line.stations) {
+        const stop = localStops.getById(s.id);
+        if (!stop) continue;
+
+        const distM = calculateDistanceMeters(
+          position.lat,
+          position.lng,
+          stop.position.lat,
+          stop.position.lng
+        );
+
+        if (!best || distM < best.distM) {
+          best = { id: s.id, name: stop.name, distM, lineColor: line.color };
+        }
+      }
+    }
+    return best;
+  }, [position]);
+
+  const nearestMetroArrivals = useMemo(() => {
+    if (!nearestMetroStation) return [];
+    return getUpcomingArrivalsForStation(nearestMetroStation.id, currentTime, 2);
+  }, [nearestMetroStation, currentTime]);
+
+  const metroTrackArrivals = useMemo(() => {
+    if (nearestMetroArrivals.length === 0) return { track1: null, track2: null };
+    const track1 = nearestMetroArrivals.find((a) => String(a.direction) === '0') ?? nearestMetroArrivals[0] ?? null;
+    const track2 = nearestMetroArrivals.find((a) => String(a.direction) === '1' && a !== track1) ?? null;
+    return { track1, track2 };
+  }, [nearestMetroArrivals]);
+
+  const metroNowSec =
+    currentTime.getHours() * 3600 + currentTime.getMinutes() * 60 + currentTime.getSeconds();
 
   // Search results calculation across routes, stops and metro
   const searchResults = useMemo(() => {
@@ -374,16 +425,47 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-3.5 border border-white/10">
-              <div className="text-2xl font-black tracking-tight">3</div>
-              <div className="text-[11px] text-emerald-100 font-medium">Діючі лінії</div>
+          {!isMetroServiceRunning ? (
+            <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-3.5 border border-white/10 mb-4 text-center">
+              <div className="text-xs font-bold text-emerald-100">🌙 Нічна перерва</div>
+              <div className="text-[11px] text-emerald-100/70 mt-0.5">Перші потяги о 05:30</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-3.5 border border-white/10">
-              <div className="text-2xl font-black tracking-tight">30</div>
-              <div className="text-[11px] text-emerald-100 font-medium">Станцій всього</div>
+          ) : !position ? (
+            <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-3.5 border border-white/10 mb-4 flex items-center justify-between gap-2">
+              <span className="text-[11px] font-medium text-emerald-100 flex items-center gap-1.5">
+                <MapPin size={13} className="text-emerald-200" />
+                Увімкніть геопозицію, щоб бачити рейси з найближчої станції
+              </span>
+              <button
+                onClick={() => locate()}
+                className="shrink-0 text-[11px] font-bold text-white bg-white/15 px-2.5 py-1 rounded-full hover:bg-white/25 transition-colors"
+              >
+                Дозволити
+              </button>
             </div>
-          </div>
+          ) : nearestMetroStation ? (
+            <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-3.5 border border-white/10 mb-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white/25"
+                    style={{ backgroundColor: nearestMetroStation.lineColor ?? '#ffffff' }}
+                  />
+                  <span className="truncate text-xs font-bold text-white">ст. {nearestMetroStation.name}</span>
+                </div>
+                <span className="shrink-0 text-[10px] font-semibold bg-white/15 px-2 py-0.5 rounded-full text-emerald-100">
+                  {formatDistance(nearestMetroStation.distM)}
+                </span>
+              </div>
+
+              <MetroTrackRow label="Колія 1" arrival={metroTrackArrivals.track1} nowSec={metroNowSec} />
+              <MetroTrackRow label="Колія 2" arrival={metroTrackArrivals.track2} nowSec={metroNowSec} />
+            </div>
+          ) : (
+            <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-3.5 border border-white/10 mb-4 text-center">
+              <div className="text-[11px] text-emerald-100">Не вдалось визначити найближчу станцію</div>
+            </div>
+          )}
 
           <Link
             to="/metro/live"
@@ -597,6 +679,46 @@ export function HomePage() {
         </footer>
 
       </div>
+    </div>
+  );
+}
+
+interface MetroTrackRowProps {
+  label: string;
+  arrival: ReturnType<typeof getUpcomingArrivalsForStation>[number] | null;
+  nowSec: number;
+}
+
+/** Один рядок картки "Метро онлайн" на головній — рейс по одній колії з відліком часу. */
+function MetroTrackRow({ label, arrival, nowSec }: MetroTrackRowProps) {
+  if (!arrival) {
+    return (
+      <div className="flex items-center justify-between rounded-xl bg-white/5 px-2.5 py-1.5 text-[10px] text-emerald-100/50">
+        <span className="font-semibold">{label}</span>
+        <span className="italic">Рейсів не очікується</span>
+      </div>
+    );
+  }
+
+  const isAtStation = arrival.etaSec <= 5 && arrival.etaSec >= -15;
+
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-xl bg-white/5 px-2.5 py-1.5">
+      <div className="flex items-center gap-1.5 min-w-0">
+        <span
+          className="h-1.5 w-1.5 shrink-0 rounded-full"
+          style={{ backgroundColor: arrival.lineColor }}
+        />
+        <span className="text-[10px] font-semibold text-emerald-100/70 shrink-0">{label}:</span>
+        <span className="truncate text-[11px] font-bold text-white">→ {arrival.headsign}</span>
+      </div>
+      <span
+        className={`shrink-0 text-[11px] font-black tabular-nums ${
+          isAtStation ? 'text-emerald-200 animate-pulse' : 'text-white'
+        }`}
+      >
+        {isAtStation ? 'На станції' : formatEtaCountdown(arrival.etaSec, nowSec)}
+      </span>
     </div>
   );
 }
