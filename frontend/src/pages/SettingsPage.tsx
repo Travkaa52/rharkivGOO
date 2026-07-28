@@ -160,9 +160,10 @@ export function SettingsPage() {
                 options={[
                   { value: 'light', label: 'Світла' },
                   { value: 'dark', label: 'Темна' },
-                  { value: 'amoled', label: 'AMOLED' }
+                  { value: 'amoled', label: 'AMOLED' },
+                  { value: 'auto', label: 'Авто' }
                 ]}
-                className="w-60 shadow-2xs"
+                className="w-full shadow-2xs"
               />
             }
           />

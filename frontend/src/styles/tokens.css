@@ -177,6 +177,13 @@
     line-height: 1.375rem;
   }
 
+  .text-body-lg {
+    font-family: theme('fontFamily.body', sans-serif);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    line-height: 1.5rem;
+  }
+
   .text-body {
     font-family: theme('fontFamily.body', sans-serif);
     font-weight: 400;

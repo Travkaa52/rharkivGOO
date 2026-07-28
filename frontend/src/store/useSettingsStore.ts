@@ -38,7 +38,13 @@ export const useSettingsStore = create<SettingsState>()(
       setTheme: (theme) =>
         set({
           theme,
-          mapStyle: theme === 'light' ? 'day' : 'night'
+          mapStyle:
+            theme === 'light' ||
+            (theme === 'auto' &&
+              typeof window !== 'undefined' &&
+              window.matchMedia?.('(prefers-color-scheme: dark)').matches === false)
+              ? 'day'
+              : 'night'
         }),
       setMapStyle: (mapStyle) => set({ mapStyle }),
       setLanguage: (language) => set({ language }),

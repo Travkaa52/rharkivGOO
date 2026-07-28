@@ -15,7 +15,7 @@ export interface UserProfile {
 }
 
 export interface AppSettings {
-  theme: 'light' | 'dark' | 'amoled';
+  theme: 'light' | 'dark' | 'amoled' | 'auto';
   mapStyle: 'day' | 'night';
   units: 'metric' | 'imperial';
   pushNotificationsEnabled: boolean;
