@@ -35,39 +35,39 @@ const TRANSPORT_META: Record<TransportKind, TransportMeta> = {
     title: 'Метро', 
     subtitle: '3 лінії · 30 станцій · Швидкісний підземний транспорт', 
     icon: TrainTrack,
-    badgeColor: 'text-purple-600 bg-purple-50 border-purple-200',
+    badgeColor: 'text-purple-600 bg-purple-500/10 border-purple-500/20',
     themeColor: 'from-purple-600 to-purple-800'
   },
   tram: { 
     title: 'Трамваї', 
     subtitle: 'Наземні рейкові маршрути міста', 
     icon: TrainTrack,
-    badgeColor: 'text-red-600 bg-red-50 border-red-200',
+    badgeColor: 'text-red-600 bg-red-500/10 border-red-500/20',
     themeColor: 'from-red-600 to-red-800'
   },
   trolleybus: { 
     title: 'Тролейбуси', 
     subtitle: 'Екологічний міський електротранспорт', 
     icon: Zap,
-    badgeColor: 'text-blue-600 bg-blue-50 border-blue-200',
+    badgeColor: 'text-blue-600 bg-blue-500/10 border-blue-500/20',
     themeColor: 'from-blue-600 to-blue-800'
   },
   bus: { 
     title: 'Автобуси', 
     subtitle: 'Міські та приміські маршрутні автобуси', 
     icon: Bus,
-    badgeColor: 'text-emerald-600 bg-emerald-50 border-emerald-200',
-    themeColor: 'from-emerald-600 to-emerald-800'
+    badgeColor: 'text-primary bg-primary/10 border-primary/20',
+    themeColor: 'from-primary to-forest-dark'
   }
 };
 
 function RouteSkeleton() {
   return (
-    <div className="flex items-center gap-4 rounded-[22px] border border-slate-100 bg-white p-4.5 shadow-sm animate-pulse">
-      <div className="h-12 w-12 shrink-0 rounded-2xl bg-slate-100" />
+    <div className="flex items-center gap-2.5 rounded-2xl border border-border/40 bg-surface-raised px-2.5 py-2 shadow-sm animate-pulse">
+      <div className="h-12 w-12 shrink-0 rounded-full bg-surface" />
       <div className="flex-1 space-y-2">
-        <div className="h-4 w-1/3 rounded-lg bg-slate-100" />
-        <div className="h-3 w-3/4 rounded-lg bg-slate-50" />
+        <div className="h-3.5 w-1/3 rounded-lg bg-surface" />
+        <div className="h-3 w-3/4 rounded-lg bg-surface-soft" />
       </div>
     </div>
   );
@@ -140,9 +140,9 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
   }, [routes, searchQuery, selectedFilter, sortAsc, favoriteRoutes, isRouteFavorite]);
 
   return (
-    <div className="min-h-dvh bg-slate-50 pb-28 pt-[max(0.75rem,env(safe-area-inset-top))] text-slate-900 selection:bg-emerald-500 selection:text-white font-sans antialiased">
+    <div className="min-h-dvh bg-surface-soft pb-28 pt-[max(0.75rem,env(safe-area-inset-top))] text-ink-text selection:bg-primary selection:text-white font-sans antialiased">
       
-      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
 
       <div className="mx-auto max-w-md space-y-4 px-4 relative z-10">
         
@@ -154,8 +154,8 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
                 <span>{meta.title}</span>
               </span>
             </div>
-            <h1 className="text-2xl font-black tracking-tight text-slate-900 mt-2">Маршрути</h1>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">Оберіть маршрут громадського транспорту</p>
+            <h1 className="font-display text-2xl font-black tracking-tight text-ink-text mt-2">Маршрути</h1>
+            <p className="text-xs text-ink-muted font-medium mt-0.5">Оберіть маршрут громадського транспорту</p>
           </div>
 
           <div className="relative flex items-center gap-2">
@@ -165,8 +165,8 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
               aria-pressed={isFiltersOpen}
               className={`p-2.5 rounded-full border shadow-sm transition-all active:scale-95 ${
                 isFiltersOpen
-                  ? 'bg-emerald-600 border-emerald-600 text-white'
-                  : 'bg-white border-slate-100 hover:bg-slate-100 text-slate-700'
+                  ? 'bg-primary border-primary/40 text-white'
+                  : 'bg-surface-raised border-border/40 hover:bg-surface text-ink-text'
               }`}
             >
               <SlidersHorizontal size={17} />
@@ -175,7 +175,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
               onClick={() => setSortAsc((v) => !v)}
               aria-label={sortAsc ? 'Сортування за зростанням' : 'Сортування за спаданням'}
               title={sortAsc ? 'За зростанням номера' : 'За спаданням номера'}
-              className="p-2.5 rounded-full bg-white border border-slate-100 hover:bg-slate-100 text-slate-700 shadow-sm transition-all active:scale-95"
+              className="p-2.5 rounded-full bg-surface-raised border border-border/40 hover:bg-surface text-ink-text shadow-sm transition-all active:scale-95"
             >
               <ArrowUpDown size={17} className={sortAsc ? '' : 'scale-y-[-1]'} />
             </button>
@@ -183,8 +183,8 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
             {isFiltersOpen && (
               <>
                 <div className="fixed inset-0 z-20" onClick={() => setIsFiltersOpen(false)} />
-                <div className="absolute right-0 top-12 z-30 w-52 rounded-2xl border border-slate-100 bg-white p-2 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
-                  <p className="px-2 pb-1.5 pt-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                <div className="absolute right-0 top-12 z-30 w-52 rounded-2xl border border-border/40 bg-surface-raised p-2 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
+                  <p className="px-2 pb-1.5 pt-1 text-[10px] font-black uppercase tracking-wider text-ink-muted">
                     Показувати
                   </p>
                   {(['all', 'favorites'] as const).map((f) => (
@@ -194,10 +194,10 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
                         setSelectedFilter(f);
                         setIsFiltersOpen(false);
                       }}
-                      className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs font-bold text-slate-700 transition-colors hover:bg-slate-50"
+                      className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs font-bold text-ink-text transition-colors hover:bg-surface-soft"
                     >
                       <span>{f === 'all' ? 'Усі маршрути' : 'Лише обране'}</span>
-                      {selectedFilter === f && <Check size={14} className="text-emerald-600" />}
+                      {selectedFilter === f && <Check size={14} className="text-primary" />}
                     </button>
                   ))}
                 </div>
@@ -207,7 +207,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
         </header>
 
         {kind === 'metro' && (
-          <div className="relative group overflow-hidden rounded-[22px] bg-gradient-to-r from-emerald-600 to-emerald-800 p-4 text-white shadow-lg shadow-emerald-900/10 transition-transform active:scale-[0.99]">
+          <div className="relative group overflow-hidden rounded-[22px] bg-gradient-to-r from-primary to-forest-dark p-4 text-white shadow-lg shadow-primary/10 transition-transform active:scale-[0.99]">
             <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
             
             <Link
@@ -246,18 +246,18 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
 
         {!loading && !errorMsg && routes.length > 0 && (
           <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Пошук маршруту..."
-              className="w-full rounded-[20px] border border-slate-100 bg-white py-3 pl-10 pr-10 text-xs font-semibold text-slate-900 placeholder:text-slate-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 transition-all"
+              className="w-full rounded-[20px] border border-border/40 bg-surface-raised py-3 pl-10 pr-10 text-xs font-semibold text-ink-text placeholder:text-ink-muted shadow-sm focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 hover:text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-ink-muted hover:text-ink-text bg-surface px-2 py-0.5 rounded-full"
               >
                 ✕
               </button>
@@ -271,8 +271,8 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
               onClick={() => setSelectedFilter('all')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 shadow-2xs ${
                 selectedFilter === 'all'
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                  : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-100'
+                  ? 'bg-primary text-white shadow-md shadow-primary/20'
+                  : 'bg-surface-raised text-ink-muted border border-border/40 hover:bg-surface'
               }`}
             >
               Усі маршрути ({routes.length})
@@ -282,7 +282,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1 shadow-2xs ${
                 selectedFilter === 'favorites'
                   ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                  : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-100'
+                  : 'bg-surface-raised text-ink-muted border border-border/40 hover:bg-surface'
               }`}
             >
               <Star size={13} className="fill-current" />
@@ -291,7 +291,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           </div>
         )}
 
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2">
           {loading && (
             <>
               <RouteSkeleton />
@@ -302,15 +302,15 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           )}
 
           {errorMsg && !loading && (
-            <div className="flex flex-col items-center justify-center rounded-[22px] border border-red-100 bg-white p-8 text-center shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-500 mb-3">
+            <div className="flex flex-col items-center justify-center rounded-[22px] border border-red-500/20 bg-surface-raised p-8 text-center shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-500 mb-3">
                 <AlertCircle className="h-6 w-6" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900 mb-1">Помилка завантаження</h3>
-              <p className="text-xs text-slate-500 max-w-xs mb-4">{errorMsg}</p>
+              <h3 className="text-sm font-bold text-ink-text mb-1">Помилка завантаження</h3>
+              <p className="text-xs text-ink-muted max-w-xs mb-4">{errorMsg}</p>
               <button
                 onClick={loadRoutes}
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-slate-800 active:scale-95 transition-all"
+                className="inline-flex items-center gap-2 rounded-xl bg-bg px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-surface-raised active:scale-95 transition-all"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 <span>Спробувати знову</span>
@@ -319,27 +319,27 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           )}
 
           {!loading && !errorMsg && routes.length === 0 && (
-            <div className="flex flex-col items-center justify-center rounded-[22px] border border-slate-100 bg-white p-8 text-center shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-400 mb-3">
+            <div className="flex flex-col items-center justify-center rounded-[22px] border border-border/40 bg-surface-raised p-8 text-center shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-soft text-ink-muted mb-3">
                 <Compass className="h-6 w-6" />
               </div>
-              <p className="text-sm font-bold text-slate-900 mb-1">Маршрутів не знайдено</p>
-              <p className="text-xs text-slate-500">Список наразі порожній.</p>
+              <p className="text-sm font-bold text-ink-text mb-1">Маршрутів не знайдено</p>
+              <p className="text-xs text-ink-muted">Список наразі порожній.</p>
             </div>
           )}
 
           {!loading && !errorMsg && routes.length > 0 && filteredRoutes.length === 0 && (
-            <div className="flex flex-col items-center justify-center rounded-[22px] border border-slate-100 bg-white p-8 text-center shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 mb-3">
+            <div className="flex flex-col items-center justify-center rounded-[22px] border border-border/40 bg-surface-raised p-8 text-center shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 mb-3">
                 <SearchX className="h-6 w-6" />
               </div>
-              <p className="text-sm font-bold text-slate-900 mb-1">Маршрутів не знайдено</p>
-              <p className="text-xs text-slate-500 mb-4">
+              <p className="text-sm font-bold text-ink-text mb-1">Маршрутів не знайдено</p>
+              <p className="text-xs text-ink-muted mb-4">
                 Спробуйте змінити параметри пошуку.
               </p>
               <button
                 onClick={() => setSearchQuery('')}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-emerald-700 active:scale-95 transition-all inline-flex items-center gap-1.5"
+                className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-bold shadow-sm hover:bg-primary active:scale-95 transition-all inline-flex items-center gap-1.5"
               >
                 <span>Скинути фільтри</span>
               </button>

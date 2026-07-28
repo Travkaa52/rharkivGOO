@@ -323,31 +323,31 @@ export function MapPage() {
   }, [isMapLoaded, mapError, mapKey]);
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-slate-900 text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-white">
+    <div className="relative h-dvh w-full overflow-hidden bg-bg text-ink-text font-sans antialiased selection:bg-primary selection:text-white">
       
       {/* 1. КАРТА ТА СКЕЛЕТОН */}
       <div className="absolute inset-0 z-0">
         {!isMapLoaded && !mapError && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md animate-pulse">
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center bg-bg/90 backdrop-blur-md animate-pulse">
             <div className="flex flex-col items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-2xl bg-primary/20 border border-primary/40 flex items-center justify-center">
                 <span className="text-xl">🗺️</span>
               </div>
-              <span className="text-xs font-bold tracking-wider uppercase text-slate-400">Завантаження карти Харкова...</span>
+              <span className="text-xs font-bold tracking-wider uppercase text-ink-muted">Завантаження карти Харкова...</span>
             </div>
           </div>
         )}
 
         {mapError && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-slate-900/95 px-6 text-center backdrop-blur-md">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-bg/95 px-6 text-center backdrop-blur-md">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-500/40 bg-rose-500/20">
               <span className="text-xl">⚠️</span>
             </div>
-            <p className="text-xs font-bold tracking-wide text-slate-200">Не вдалося завантажити карту</p>
-            <p className="max-w-xs text-[11px] text-slate-400">Перевірте з’єднання з інтернетом і спробуйте ще раз.</p>
+            <p className="text-xs font-bold tracking-wide text-ink-muted">Не вдалося завантажити карту</p>
+            <p className="max-w-xs text-[11px] text-ink-muted">Перевірте з’єднання з інтернетом і спробуйте ще раз.</p>
             <button
               onClick={handleRetryMap}
-              className="mt-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-emerald-700 active:scale-95"
+              className="mt-1 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-primary active:scale-95"
             >
               Спробувати знову
             </button>
@@ -377,7 +377,7 @@ export function MapPage() {
         <div className="pointer-events-auto relative rounded-[24px] border border-border/40 bg-surface/95 shadow-xl shadow-black/10 backdrop-blur-xl">
           <div className="flex items-stretch">
             <div className="flex flex-col items-center pl-4 pt-4 pb-4">
-              <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-primary ring-4 ring-primary/20" />
               <span className="my-1 h-6 w-px flex-1 border-l border-dashed border-ink-text/20" />
               <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-rose-500 ring-4 ring-rose-500/20" />
             </div>
@@ -505,11 +505,11 @@ export function MapPage() {
                 onClick={() => toggleChip(chip.id)}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all shrink-0 backdrop-blur-xl shadow-md ${
                   isActive
-                    ? 'bg-emerald-600 text-white shadow-emerald-600/30 border border-emerald-500'
-                    : 'bg-white/80 text-slate-700 border border-white/40 hover:bg-white'
+                    ? 'bg-primary text-white shadow-primary/30 border border-primary/40'
+                    : 'bg-white/80 text-ink-text border border-white/40 hover:bg-white'
                 }`}
               >
-                <Icon size={14} className={isActive ? 'text-white' : 'text-slate-500'} />
+                <Icon size={14} className={isActive ? 'text-white' : 'text-ink-muted'} />
                 <span>{chip.label}</span>
               </button>
             );
@@ -541,20 +541,20 @@ export function MapPage() {
           <div className="pointer-events-auto max-h-[45vh] overflow-y-auto rounded-[24px] border border-white/50 bg-white/95 shadow-2xl backdrop-blur-2xl">
             {tripOptions.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
-                <RouteIcon className="h-6 w-6 text-slate-400" />
-                <p className="text-xs font-bold text-slate-700">Прямих маршрутів не знайдено</p>
-                <p className="text-[11px] text-slate-400">Спробуйте обрати точки ближче до зупинок громадського транспорту</p>
+                <RouteIcon className="h-6 w-6 text-ink-muted" />
+                <p className="text-xs font-bold text-ink-text">Прямих маршрутів не знайдено</p>
+                <p className="text-[11px] text-ink-muted">Спробуйте обрати точки ближче до зупинок громадського транспорту</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100 p-2">
-                <p className="px-2.5 pb-1.5 pt-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+              <div className="divide-y divide-border/40 p-2">
+                <p className="px-2.5 pb-1.5 pt-1 text-[10px] font-black uppercase tracking-wider text-ink-muted">
                   Варіанти маршруту ({tripOptions.length})
                 </p>
                 {tripOptions.map((option) => (
                   <button
                     key={option.route.id}
                     onClick={() => handleSelectTripOption(option)}
-                    className="flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-colors hover:bg-emerald-50/70 active:scale-[0.99]"
+                    className="flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-colors hover:bg-primary/10 active:scale-[0.99]"
                   >
                     <span
                       className="flex h-9 w-11 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white shadow-xs"
@@ -563,14 +563,14 @@ export function MapPage() {
                       {option.route.number}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs font-bold text-slate-800">
+                      <div className="truncate text-xs font-bold text-ink-text">
                         {KIND_LABELS_UK[option.route.kind]} · {option.route.headsignForward}
                       </div>
-                      <div className="truncate text-[11px] text-slate-400">
+                      <div className="truncate text-[11px] text-ink-muted">
                         Посадка: {option.boardStop.name} → Вихід: {option.alightStop.name}
                       </div>
                     </div>
-                    <ChevronRight size={14} className="shrink-0 text-slate-400" />
+                    <ChevronRight size={14} className="shrink-0 text-ink-muted" />
                   </button>
                 ))}
               </div>
@@ -584,14 +584,14 @@ export function MapPage() {
         <div className="flex flex-col rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/10 overflow-hidden">
           <button
             onClick={() => map?.zoomIn({ duration: 300 })}
-            className="flex h-[52px] w-[52px] items-center justify-center text-slate-700 hover:bg-slate-100/60 active:bg-slate-200 transition-colors border-b border-slate-100/80"
+            className="flex h-[52px] w-[52px] items-center justify-center text-ink-text hover:bg-surface/60 active:bg-surface transition-colors border-b border-border/40"
             aria-label="Збільшити"
           >
             <Plus size={21} />
           </button>
           <button
             onClick={() => map?.zoomOut({ duration: 300 })}
-            className="flex h-[52px] w-[52px] items-center justify-center text-slate-700 hover:bg-slate-100/60 active:bg-slate-200 transition-colors"
+            className="flex h-[52px] w-[52px] items-center justify-center text-ink-text hover:bg-surface/60 active:bg-surface transition-colors"
             aria-label="Зменшити"
           >
             <Minus size={21} />
@@ -600,7 +600,7 @@ export function MapPage() {
 
         <button
           onClick={() => map?.resetNorthPitch({ duration: 400 })}
-          className="flex h-[52px] w-[52px] items-center justify-center rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 text-slate-700 shadow-xl shadow-black/10 hover:bg-white active:scale-95 transition-all"
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 text-ink-text shadow-xl shadow-black/10 hover:bg-white active:scale-95 transition-all"
           aria-label="Компас / Північ"
           title="Скинути нахил"
         >
@@ -635,7 +635,7 @@ export function MapPage() {
               <StopCard stop={selectedStop} onClick={() => setSelectedStopId(null)} />
               <button
                 onClick={() => setSelectedStopId(null)}
-                className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors active:scale-90 shadow-xs"
+                className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-surface text-ink-muted hover:bg-surface transition-colors active:scale-90 shadow-xs"
                 aria-label="Закрити"
               >
                 <X size={16} />
@@ -644,13 +644,13 @@ export function MapPage() {
 
             {arrivals.length > 0 && (
               <div className="overflow-hidden rounded-[24px] border border-white/50 bg-white/95 backdrop-blur-2xl p-4 shadow-2xl">
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 px-1">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
-                    <Clock className="h-4 w-4 text-emerald-600" />
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/40 px-1">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ink-muted">
+                    <Clock className="h-4 w-4 text-primary" />
                     <span>Прибуття транспорту</span>
                   </div>
-                  <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-600 border border-emerald-200">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-extrabold text-primary border border-primary/20">
+                    <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                     LIVE
                   </span>
                 </div>
@@ -668,7 +668,7 @@ export function MapPage() {
                           <button
                             type="button"
                             onClick={() => handleRouteSelect(a.routeId)}
-                            className="flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/80 px-3.5 py-2.5 text-xs transition-all hover:bg-emerald-50/60 hover:border-emerald-200 active:scale-[0.98]"
+                            className="flex w-full items-center justify-between rounded-2xl border border-border/40 bg-surface-soft/80 px-3.5 py-2.5 text-xs transition-all hover:bg-primary/10 hover:border-primary/20 active:scale-[0.98]"
                           >
                             <div className="flex items-center gap-3 min-w-0">
                               <span
@@ -678,7 +678,7 @@ export function MapPage() {
                                 {route.number}
                               </span>
                               <div className="flex flex-col text-left min-w-0">
-                                <span className="font-bold text-slate-800 truncate">
+                                <span className="font-bold text-ink-text truncate">
                                   {KIND_LABELS_UK[route.kind]}
                                 </span>
                               </div>
@@ -686,11 +686,11 @@ export function MapPage() {
 
                             <div className="flex items-center gap-2 shrink-0">
                               <span className={`font-extrabold ${
-                                isArrivingNow ? 'text-emerald-600 animate-pulse' : 'text-emerald-700'
+                                isArrivingNow ? 'text-primary animate-pulse' : 'text-primary'
                               }`}>
                                 {isArrivingNow ? 'Прибуває' : `≈ ${a.etaMinutes} хв`}
                               </span>
-                              <ChevronRight className="h-4 w-4 text-slate-400" />
+                              <ChevronRight className="h-4 w-4 text-ink-muted" />
                             </div>
                           </button>
                         </li>

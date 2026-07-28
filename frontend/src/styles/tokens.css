@@ -3,6 +3,20 @@
 @tailwind utilities;
 
 /**
+ * Шрифтова пара — Unbounded (заголовки, цифри маршрутів, дисплей) +
+ * Inter (основний текст інтерфейсу). Обидва мають повну підтримку
+ * кирилиці й читаються однаково чисто на всіх сторінках застосунку.
+ * Підключено напряму через @import і CSS-змінні, а не лише через
+ * tailwind.config, щоб пара гарантовано застосовувалась усюди.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --font-display: 'Unbounded', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/**
  * Kharkiv GO — єдина дизайн-система.
  * Всі кольори визначені як CSS-змінні для миттєвого перемикання тем.
  */
@@ -137,18 +151,54 @@
   body {
     background-color: rgb(var(--color-bg));
     color: rgb(var(--color-text));
-    font-family: theme('fontFamily.body', system-ui, -apple-system, sans-serif);
+    font-family: var(--font-body);
     overscroll-behavior-y: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Плавна зміна теми при перемиканні (light/dark/amoled) без різкого миготіння */
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+
+  /* Єдиний, помітний, але не крикливий фокус-стан для клавіатури/доступності —
+     однаковий на всіх сторінках і всіх інтерактивних елементах. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--color-primary) / 0.6);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Плавне з'явлення вмісту сторінки при навігації — робить перемикання
+     між екранами єдиним, "живим" відчуттям, а не різким перескоком. */
+  main,
+  #root > div {
+    animation: page-enter 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 /* Custom Utility Classes & Design System Typography */
 @layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-body,
+  .font-sans {
+    font-family: var(--font-body);
+  }
+
   /* Typography Scale */
   .text-display-xl {
-    font-family: theme('fontFamily.display', sans-serif);
+    font-family: var(--font-display);
     font-weight: 800;
     font-size: 2rem;
     line-height: 2.25rem;
@@ -156,7 +206,7 @@
   }
 
   .text-display-lg {
-    font-family: theme('fontFamily.display', sans-serif);
+    font-family: var(--font-display);
     font-weight: 800;
     font-size: 1.5rem;
     line-height: 1.875rem;
@@ -164,42 +214,42 @@
   }
 
   .text-display-md {
-    font-family: theme('fontFamily.display', sans-serif);
+    font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.25rem;
     line-height: 1.625rem;
   }
 
   .text-title {
-    font-family: theme('fontFamily.display', sans-serif);
+    font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.0625rem;
     line-height: 1.375rem;
   }
 
   .text-body-lg {
-    font-family: theme('fontFamily.body', sans-serif);
+    font-family: var(--font-body);
     font-weight: 500;
     font-size: 1.0625rem;
     line-height: 1.5rem;
   }
 
   .text-body {
-    font-family: theme('fontFamily.body', sans-serif);
+    font-family: var(--font-body);
     font-weight: 400;
     font-size: 0.9375rem;
     line-height: 1.375rem;
   }
 
   .text-body-sm {
-    font-family: theme('fontFamily.body', sans-serif);
+    font-family: var(--font-body);
     font-weight: 400;
     font-size: 0.8125rem;
     line-height: 1.125rem;
   }
 
   .text-caption {
-    font-family: theme('fontFamily.body', sans-serif);
+    font-family: var(--font-body);
     font-weight: 600;
     font-size: 0.6875rem;
     line-height: 0.875rem;

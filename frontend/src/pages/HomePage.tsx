@@ -204,29 +204,29 @@ export function HomePage() {
   const displayName = profile?.displayName || profile?.username || 'Гість';
 
   return (
-    <div className="relative min-h-dvh bg-[#F8FAFC] pb-32 pt-[max(0.75rem,env(safe-area-inset-top))] text-slate-900 overflow-x-hidden font-sans antialiased selection:bg-emerald-500 selection:text-white">
+    <div className="relative min-h-dvh bg-bg pb-32 pt-[max(0.75rem,env(safe-area-inset-top))] text-ink-text overflow-x-hidden font-sans antialiased selection:bg-primary selection:text-white">
       
       {/* Ambient background glow */}
-      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
 
       <div className="relative z-10 mx-auto max-w-md px-4 space-y-4">
         
         {/* 1. UPPER HEADER */}
         <header className="flex items-center justify-between pt-1 pb-1 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 font-black text-base tracking-tighter">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-forest-dark flex items-center justify-center text-white shadow-md shadow-primary/20 font-black text-base tracking-tighter">
               GO
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-sm tracking-tight text-slate-900">
-                  Kharkiv <span className="text-emerald-600">GO</span>
+                <span className="font-extrabold text-sm tracking-tight text-ink-text">
+                  Kharkiv <span className="text-primary">GO</span>
                 </span>
-                <span className="px-2 py-0.5 text-[9px] font-extrabold bg-emerald-500/10 text-emerald-700 rounded-full border border-emerald-500/20">
+                <span className="px-2 py-0.5 text-[9px] font-extrabold bg-primary/10 text-primary rounded-full border border-primary/20">
                   PRO
                 </span>
               </div>
-              <h1 className="text-lg font-black text-slate-900 mt-0.5 tracking-tight truncate max-w-[190px]">
+              <h1 className="font-display text-lg font-black text-ink-text mt-0.5 tracking-tight truncate max-w-[190px]">
                 {greeting}, {displayName}! 👋
               </h1>
             </div>
@@ -234,15 +234,15 @@ export function HomePage() {
 
           <div className="flex items-center gap-2">
             <div className="hidden xs:flex flex-col items-end text-right mr-1">
-              <span className="text-xs font-bold text-slate-800">{formattedTimeStr}</span>
-              <span className="text-[10px] font-medium text-slate-400 capitalize">{formattedDate}</span>
+              <span className="text-xs font-bold text-ink-text">{formattedTimeStr}</span>
+              <span className="text-[10px] font-medium text-ink-muted capitalize">{formattedDate}</span>
             </div>
             
             <button
               type="button"
               onClick={() => showToast('Нових сповіщень немає')}
               aria-label="Сповіщення"
-              className="relative p-2.5 rounded-2xl bg-white border border-slate-100 hover:bg-slate-50 transition-all active:scale-95 text-slate-700 shadow-xs"
+              className="relative p-2.5 rounded-2xl bg-surface-raised border border-border/40 hover:bg-surface-soft transition-all active:scale-95 text-ink-text shadow-xs"
             >
               <Bell size={18} />
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
@@ -251,7 +251,7 @@ export function HomePage() {
             <Link 
               to="/profile"
               aria-label="Налаштування"
-              className="p-2.5 rounded-2xl bg-white border border-slate-100 hover:bg-slate-50 transition-all active:scale-95 text-slate-700 shadow-xs"
+              className="p-2.5 rounded-2xl bg-surface-raised border border-border/40 hover:bg-surface-soft transition-all active:scale-95 text-ink-text shadow-xs"
             >
               <Settings size={18} />
             </Link>
@@ -260,10 +260,10 @@ export function HomePage() {
 
         {/* 2. ADVANCED REAL-TIME SEARCH BAR */}
         <div className="relative z-30">
-          <div className={`relative flex items-center bg-white rounded-[22px] border transition-all duration-200 shadow-sm ${
-            isSearchFocused ? 'border-emerald-500 ring-4 ring-emerald-500/10 shadow-md' : 'border-slate-100 hover:border-slate-200'
+          <div className={`relative flex items-center bg-surface-raised rounded-[22px] border transition-all duration-200 shadow-sm ${
+            isSearchFocused ? 'border-primary/40 ring-4 ring-primary/10 shadow-md' : 'border-border/40 hover:border-border/60'
           }`}>
-            <div className="pl-4 pr-2 text-slate-400">
+            <div className="pl-4 pr-2 text-ink-muted">
               <SearchIcon size={18} />
             </div>
             <input
@@ -273,12 +273,12 @@ export function HomePage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               placeholder="Пошук маршруту, зупинки, метро..."
-              className="w-full py-3.5 pr-4 text-xs font-semibold text-slate-800 bg-transparent outline-none placeholder:text-slate-400 placeholder:font-medium"
+              className="w-full py-3.5 pr-4 text-xs font-semibold text-ink-text bg-transparent outline-none placeholder:text-ink-muted placeholder:font-medium"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="p-2 mr-2 text-slate-400 hover:text-slate-600 rounded-full"
+                className="p-2 mr-2 text-ink-muted hover:text-ink-muted rounded-full"
               >
                 <X size={16} />
               </button>
@@ -290,22 +290,22 @@ export function HomePage() {
             <>
               {/* Backdrop to close search */}
               <div 
-                className="fixed inset-0 z-20 bg-slate-900/20 backdrop-blur-xs"
+                className="fixed inset-0 z-20 bg-ink-text/20 backdrop-blur-xs"
                 onClick={() => setIsSearchFocused(false)}
               />
               
-              <div className="absolute left-0 right-0 top-14 z-30 bg-white rounded-[22px] border border-slate-100 shadow-2xl p-3 max-h-[380px] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute left-0 right-0 top-14 z-30 bg-surface-raised rounded-[22px] border border-border/40 shadow-2xl p-3 max-h-[380px] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
                 {!hasSearchResults ? (
                   <div className="py-8 text-center">
-                    <p className="text-xs font-bold text-slate-700 mb-1">Нічого не знайдено</p>
-                    <p className="text-[11px] text-slate-400">Спробуйте змінити запит</p>
+                    <p className="text-xs font-bold text-ink-text mb-1">Нічого не знайдено</p>
+                    <p className="text-[11px] text-ink-muted">Спробуйте змінити запит</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {/* Routes */}
                     {searchResults.routes.length > 0 && (
                       <div>
-                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 mb-1.5">Маршрути</div>
+                        <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted px-2 mb-1.5">Маршрути</div>
                         <div className="space-y-1">
                           {searchResults.routes.map((r) => (
                             <Link
@@ -315,13 +315,13 @@ export function HomePage() {
                                 setIsSearchFocused(false);
                                 addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
                               }}
-                              className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
+                              className="flex items-center justify-between p-2 rounded-xl hover:bg-primary/10 transition-colors group"
                             >
                               <div className="flex items-center gap-2.5">
                                 <span className="text-sm">{KIND_ICON[r.kind]}</span>
-                                <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900">{r.number} — {r.name}</span>
+                                <span className="font-bold text-xs text-ink-text group-hover:text-primary">{r.number} — {r.name}</span>
                               </div>
-                              <ChevronRight size={14} className="text-slate-400" />
+                              <ChevronRight size={14} className="text-ink-muted" />
                             </Link>
                           ))}
                         </div>
@@ -331,7 +331,7 @@ export function HomePage() {
                     {/* Stops */}
                     {searchResults.stops.length > 0 && (
                       <div>
-                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 mb-1.5">Зупинки</div>
+                        <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted px-2 mb-1.5">Зупинки</div>
                         <div className="space-y-1">
                           {searchResults.stops.map((s) => (
                             <Link
@@ -341,13 +341,13 @@ export function HomePage() {
                                 setIsSearchFocused(false);
                                 addHistoryEntry({ query: s.name, type: 'stop' });
                               }}
-                              className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
+                              className="flex items-center justify-between p-2 rounded-xl hover:bg-primary/10 transition-colors group"
                             >
                               <div className="flex items-center gap-2.5">
-                                <span className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">🚏</span>
-                                <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900">{s.name}</span>
+                                <span className="w-6 h-6 rounded-lg bg-primary/15 text-primary flex items-center justify-center text-xs">🚏</span>
+                                <span className="font-bold text-xs text-ink-text group-hover:text-primary">{s.name}</span>
                               </div>
-                              <ChevronRight size={14} className="text-slate-400" />
+                              <ChevronRight size={14} className="text-ink-muted" />
                             </Link>
                           ))}
                         </div>
@@ -357,7 +357,7 @@ export function HomePage() {
                     {/* Metro Stations */}
                     {searchResults.metro.length > 0 && (
                       <div>
-                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 mb-1.5">Метро</div>
+                        <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted px-2 mb-1.5">Метро</div>
                         <div className="space-y-1">
                           {searchResults.metro.map((m) => (
                             <Link
@@ -367,16 +367,16 @@ export function HomePage() {
                                 setIsSearchFocused(false);
                                 addHistoryEntry({ query: m.name, type: 'route' });
                               }}
-                              className="flex items-center justify-between p-2 rounded-xl hover:bg-emerald-50 transition-colors group"
+                              className="flex items-center justify-between p-2 rounded-xl hover:bg-primary/10 transition-colors group"
                             >
                               <div className="flex items-center gap-2.5">
                                 <img src={metroIcon} alt="Метро" className="w-6 h-6 rounded-lg object-contain bg-amber-100 p-0.5" />
                                 <div>
-                                  <span className="font-bold text-xs text-slate-800 group-hover:text-emerald-900 block">{m.name}</span>
-                                  {m.lineName && <span className="text-[10px] text-slate-400">{m.lineName}</span>}
+                                  <span className="font-bold text-xs text-ink-text group-hover:text-primary block">{m.name}</span>
+                                  {m.lineName && <span className="text-[10px] text-ink-muted">{m.lineName}</span>}
                                 </div>
                               </div>
-                              <ChevronRight size={14} className="text-slate-400" />
+                              <ChevronRight size={14} className="text-ink-muted" />
                             </Link>
                           ))}
                         </div>
@@ -396,7 +396,7 @@ export function HomePage() {
         <section className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
             { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-blue-50 text-blue-600 border-blue-100', isImage: false },
-            { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-emerald-50 text-emerald-600 border-emerald-100', isImage: false },
+            { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-primary/10 text-primary border-primary/15', isImage: false },
             { label: 'Метро', icon: null, to: '/metro/live', color: 'bg-amber-50 text-amber-600 border-amber-100', isImage: true },
             { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-purple-50 text-purple-600 border-purple-100', isImage: false },
           ].map((item, index) => {
@@ -405,7 +405,7 @@ export function HomePage() {
               <Link
                 key={index}
                 to={item.to}
-                className="bg-white rounded-[22px] p-4 flex items-center gap-3.5 border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200 active:scale-[0.98] transition-all duration-200 group"
+                className="bg-surface-raised rounded-[22px] p-4 flex items-center gap-3.5 border border-border/40 shadow-sm hover:shadow-md hover:border-border/60 active:scale-[0.98] transition-all duration-200 group"
               >
                 <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
                   {item.isImage ? (
@@ -414,14 +414,14 @@ export function HomePage() {
                     Icon && <Icon size={30} />
                   )}
                 </div>
-                <span className="font-extrabold text-slate-800 text-xs tracking-tight">{item.label}</span>
+                <span className="font-extrabold text-ink-text text-xs tracking-tight">{item.label}</span>
               </Link>
             );
           })}
         </section>
 
         {/* 4. LIVE METRO CARD */}
-        <section className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white p-5 shadow-xl shadow-emerald-900/10 transition-transform duration-300">
+        <section className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-primary via-forest-dark to-forest-dark text-white p-5 shadow-xl shadow-primary/10 transition-transform duration-300">
           <div className="absolute -right-6 -bottom-6 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none" />
 
           <div className="flex items-center justify-between mb-3">
@@ -479,26 +479,26 @@ export function HomePage() {
 
           <Link
             to="/metro/live"
-            className="w-full py-3.5 px-4 bg-white text-emerald-900 rounded-[18px] font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg hover:bg-emerald-50 active:scale-[0.98] transition-all duration-200"
+            className="w-full py-3.5 px-4 bg-surface-raised text-primary rounded-[18px] font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg hover:bg-primary/10 active:scale-[0.98] transition-all duration-200"
           >
             <img src={metroIcon} alt="Метро" className="w-4 h-4 object-contain" />
             <span>Відкрити карту метро</span>
-            <ArrowUpRight size={16} className="text-emerald-700" />
+            <ArrowUpRight size={16} className="text-primary" />
           </Link>
         </section>
 
         {/* 5. NEAREST STOPS WITH GEO PERMISSION/STATE */}
-        <section className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
+        <section className="bg-surface-raised rounded-[22px] p-4 border border-border/40 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-xl">
+              <div className="p-1.5 bg-primary/10 text-primary rounded-xl">
                 <Navigation size={16} />
               </div>
-              <h2 className="font-extrabold text-slate-900 text-xs">Ближайшие остановки</h2>
+              <h2 className="font-extrabold text-ink-text text-xs">Ближайшие остановки</h2>
             </div>
             <Link 
               to="/map"
-              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 active:scale-95 transition-transform"
+              className="text-xs font-bold text-primary hover:text-primary flex items-center gap-0.5 active:scale-95 transition-transform"
             >
               <span>На карті</span>
               <ChevronRight size={14} />
@@ -506,23 +506,23 @@ export function HomePage() {
           </div>
 
           {!position ? (
-            <div className="flex flex-col items-center justify-center py-6 text-center bg-slate-50 rounded-[18px] border border-dashed border-slate-200 px-4">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
+            <div className="flex flex-col items-center justify-center py-6 text-center bg-surface-soft rounded-[18px] border border-dashed border-border/60 px-4">
+              <div className="w-10 h-10 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-2">
                 <Compass size={20} className="animate-spin" />
               </div>
-              <p className="text-xs font-bold text-slate-800 mb-1">Геолокація вимкнена або не дозволена</p>
-              <p className="text-[11px] text-slate-400 mb-3 max-w-[240px]">Увімкніть доступ до GPS, щоб бачити зупинки поруч з вами</p>
+              <p className="text-xs font-bold text-ink-text mb-1">Геолокація вимкнена або не дозволена</p>
+              <p className="text-[11px] text-ink-muted mb-3 max-w-[240px]">Увімкніть доступ до GPS, щоб бачити зупинки поруч з вами</p>
               <button
                 onClick={() => locate()}
-                className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-emerald-700 active:scale-95 transition-all inline-flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-sm hover:bg-primary active:scale-95 transition-all inline-flex items-center gap-1.5"
               >
                 <MapPin size={14} />
                 <span>Увімкнути геолокацію</span>
               </button>
             </div>
           ) : nearbyStopsWithDistance.length === 0 ? (
-            <div className="py-4 text-center bg-slate-50 rounded-[18px] border border-slate-100">
-              <p className="text-xs font-medium text-slate-500">Поблизу зупинок не знайдено</p>
+            <div className="py-4 text-center bg-surface-soft rounded-[18px] border border-border/40">
+              <p className="text-xs font-medium text-ink-muted">Поблизу зупинок не знайдено</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -531,18 +531,18 @@ export function HomePage() {
                   key={stop.id}
                   to={`/map?q=${encodeURIComponent(stop.name)}`}
                   onClick={() => addHistoryEntry({ query: stop.name, type: 'stop' })}
-                  className="flex items-center justify-between p-3 rounded-[18px] bg-slate-50 hover:bg-emerald-50/50 transition-colors border border-transparent hover:border-emerald-100 group"
+                  className="flex items-center justify-between p-3 rounded-[18px] bg-surface-soft hover:bg-primary/10 transition-colors border border-transparent hover:border-primary/15 group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-white shadow-xs flex items-center justify-center text-emerald-600 font-bold text-xs shrink-0 border border-slate-100">
+                    <div className="w-9 h-9 rounded-xl bg-surface-raised shadow-xs flex items-center justify-center text-primary font-bold text-xs shrink-0 border border-border/40">
                       🚏
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold text-slate-800 text-xs truncate group-hover:text-emerald-900">{stop.name}</div>
-                      <div className="text-[10px] text-slate-400 font-medium">Зупинка громадського транспорту</div>
+                      <div className="font-bold text-ink-text text-xs truncate group-hover:text-primary">{stop.name}</div>
+                      <div className="text-[10px] text-ink-muted font-medium">Зупинка громадського транспорту</div>
                     </div>
                   </div>
-                  <span className="text-xs font-extrabold text-emerald-700 bg-emerald-100/70 px-3 py-1 rounded-full shrink-0">
+                  <span className="text-xs font-extrabold text-primary bg-primary/15 px-3 py-1 rounded-full shrink-0">
                     {formatDistance(stop.distance)}
                   </span>
                 </Link>
@@ -552,13 +552,13 @@ export function HomePage() {
         </section>
 
         {/* 6. FAVORITES SECTION */}
-        <section className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
+        <section className="bg-surface-raised rounded-[22px] p-4 border border-border/40 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="p-1.5 bg-amber-50 text-amber-600 rounded-xl">
                 <Star size={16} className="fill-amber-400 text-amber-400" />
               </div>
-              <h2 className="font-extrabold text-slate-900 text-xs">Обране</h2>
+              <h2 className="font-extrabold text-ink-text text-xs">Обране</h2>
             </div>
             {(favoriteRouteDetails.length > 0 || favoriteStopDetails.length > 0) && (
               <Link to="/favorites" className="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-0.5">
@@ -569,13 +569,13 @@ export function HomePage() {
           </div>
 
           {favoriteRouteDetails.length === 0 && favoriteStopDetails.length === 0 ? (
-            <div className="text-center py-6 px-4 bg-slate-50 rounded-[18px] border border-dashed border-slate-200">
+            <div className="text-center py-6 px-4 bg-surface-soft rounded-[18px] border border-dashed border-border/60">
               <div className="text-2xl mb-1">⭐</div>
-              <p className="text-xs font-extrabold text-slate-800 mb-1">У вас ще немає обраного</p>
-              <p className="text-[11px] text-slate-400 mb-3 max-w-[220px]">Закріплюйте маршрути та зупинки для швидкого доступу</p>
+              <p className="text-xs font-extrabold text-ink-text mb-1">У вас ще немає обраного</p>
+              <p className="text-[11px] text-ink-muted mb-3 max-w-[220px]">Закріплюйте маршрути та зупинки для швидкого доступу</p>
               <Link 
                 to="/routes"
-                className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-emerald-700 active:scale-95 transition-all inline-flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-sm hover:bg-primary active:scale-95 transition-all inline-flex items-center gap-1.5"
               >
                 <Plus size={14} />
                 <span>Додати маршрути</span>
@@ -588,7 +588,7 @@ export function HomePage() {
                   key={r.id}
                   to={`/routes/${r.id}`}
                   onClick={() => addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' })}
-                  className="flex items-center justify-between p-3 rounded-[18px] bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-100"
+                  className="flex items-center justify-between p-3 rounded-[18px] bg-surface-soft hover:bg-surface transition-colors border border-border/40"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {r.kind === 'metro' ? (
@@ -597,10 +597,10 @@ export function HomePage() {
                       <span className="text-base">{KIND_ICON[r.kind]}</span>
                     )}
                     <div className="truncate">
-                      <span className="font-extrabold text-slate-800 text-xs truncate block">{r.number} — {r.name}</span>
+                      <span className="font-extrabold text-ink-text text-xs truncate block">{r.number} — {r.name}</span>
                     </div>
                   </div>
-                  <ChevronRight size={14} className="text-slate-400 shrink-0" />
+                  <ChevronRight size={14} className="text-ink-muted shrink-0" />
                 </Link>
               ))}
 
@@ -609,13 +609,13 @@ export function HomePage() {
                   key={s.id}
                   to={`/map?q=${encodeURIComponent(s.name)}`}
                   onClick={() => addHistoryEntry({ query: s.name, type: 'stop' })}
-                  className="flex items-center justify-between p-3 rounded-[18px] bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-100"
+                  className="flex items-center justify-between p-3 rounded-[18px] bg-surface-soft hover:bg-surface transition-colors border border-border/40"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">🚏</span>
-                    <span className="font-extrabold text-slate-800 text-xs truncate">{s.name}</span>
+                    <span className="w-6 h-6 rounded-lg bg-primary/15 text-primary flex items-center justify-center text-xs">🚏</span>
+                    <span className="font-extrabold text-ink-text text-xs truncate">{s.name}</span>
                   </div>
-                  <ChevronRight size={14} className="text-slate-400 shrink-0" />
+                  <ChevronRight size={14} className="text-ink-muted shrink-0" />
                 </Link>
               ))}
             </div>
@@ -624,24 +624,24 @@ export function HomePage() {
 
         {/* 7. RECENT HISTORY SECTION */}
         {historyEntries.length > 0 && (
-          <section className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
+          <section className="bg-surface-raised rounded-[22px] p-4 border border-border/40 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-slate-100 text-slate-700 rounded-xl">
+                <div className="p-1.5 bg-surface text-ink-text rounded-xl">
                   <History size={16} />
                 </div>
-                <h2 className="font-extrabold text-slate-900 text-xs">Останні переглянуті</h2>
+                <h2 className="font-extrabold text-ink-text text-xs">Останні переглянуті</h2>
               </div>
             </div>
 
             <div className="space-y-1.5 max-h-52 overflow-y-auto no-scrollbar">
               {historyEntries.slice(0, 5).map((entry, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-[16px] bg-slate-50 hover:bg-slate-100 transition-colors">
+                <div key={idx} className="flex items-center justify-between p-2.5 rounded-[16px] bg-surface-soft hover:bg-surface transition-colors">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Clock size={14} className="text-slate-400 shrink-0" />
-                    <span className="font-bold text-xs text-slate-800 truncate">{entry.query}</span>
+                    <Clock size={14} className="text-ink-muted shrink-0" />
+                    <span className="font-bold text-xs text-ink-text truncate">{entry.query}</span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-medium">Щойно</span>
+                  <span className="text-[10px] text-ink-muted font-medium">Щойно</span>
                 </div>
               ))}
             </div>
@@ -649,21 +649,21 @@ export function HomePage() {
         )}
 
         {/* 8. TRANSPORT NEWS & ANNOUNCEMENTS */}
-        <section className="bg-white rounded-[22px] p-4 border border-slate-100 shadow-sm">
+        <section className="bg-surface-raised rounded-[22px] p-4 border border-border/40 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 bg-blue-50 text-blue-600 rounded-xl">
               <AlertCircle size={16} />
             </div>
-            <h2 className="font-extrabold text-slate-900 text-xs">Новини транспорту</h2>
+            <h2 className="font-extrabold text-ink-text text-xs">Новини транспорту</h2>
           </div>
 
           <div className="p-3.5 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 rounded-[18px] border border-blue-100/60 space-y-2">
             <div className="flex items-center justify-between">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-700">Офіційно</span>
-              <span className="text-[10px] font-semibold text-slate-400">Сьогодні, 08:00</span>
+              <span className="text-[10px] font-semibold text-ink-muted">Сьогодні, 08:00</span>
             </div>
-            <h3 className="font-extrabold text-slate-900 text-xs">Зміни в розкладі рухів тролейбусів у місті</h3>
-            <p className="text-[11px] text-slate-600 leading-relaxed">
+            <h3 className="font-extrabold text-ink-text text-xs">Зміни в розкладі рухів тролейбусів у місті</h3>
+            <p className="text-[11px] text-ink-muted leading-relaxed">
               Інформація щодо оновлення маршрутів громадського транспорту Харкова в умовах воєнного стану.
             </p>
             <div className="pt-1">
@@ -689,12 +689,12 @@ export function HomePage() {
 
         {/* 10. FOOTER */}
         <footer className="text-center py-4 space-y-1">
-          <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700">
+          <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-ink-text">
             <span>Kharkiv GO</span>
             <span>•</span>
-            <span className="text-emerald-600">v1.3.0 Pro</span>
+            <span className="text-primary">v1.3.0 Pro</span>
           </div>
-          <p className="text-[10px] text-slate-400 font-medium">Найнадійніший міський навігатор Харкова</p>
+          <p className="text-[10px] text-ink-muted font-medium">Найнадійніший міський навігатор Харкова</p>
         </footer>
 
       </div>

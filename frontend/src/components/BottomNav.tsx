@@ -34,10 +34,10 @@ export function BottomNav() {
               end={item.exact}
               className={({ isActive }) =>
                 clsx(
-                  'group relative z-[2] flex flex-1 flex-col items-center justify-center gap-1 rounded-full py-1.5 transition-all duration-200 active:scale-95',
+                  'group relative z-[2] flex flex-1 flex-col items-center justify-center gap-1 rounded-full py-1.5 transition-all duration-300 ease-out active:scale-90',
                   isActive
-                    ? 'text-primary font-bold [box-shadow:inset_0_1px_0.5px_rgb(255_255_255_/_0.5)] bg-gradient-to-b from-white/70 to-white/30 dark:from-white/25 dark:to-white/5'
-                    : 'text-ink-muted hover:text-ink-text'
+                    ? 'text-primary font-bold bg-primary/12 shadow-[inset_0_1px_0.5px_rgb(255_255_255_/_0.35)]'
+                    : 'text-ink-muted hover:text-ink-text hover:bg-primary/5'
                 )
               }
             >

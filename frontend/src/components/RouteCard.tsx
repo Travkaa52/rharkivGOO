@@ -26,25 +26,24 @@ export function RouteCard({ route }: { route: TransportRoute }) {
           navigate(`/routes/${route.id}`);
         }
       }}
-      className="flex cursor-pointer items-center gap-3 rounded-xl2 border border-white/60 bg-white/90 p-3 shadow-glass transition hover:shadow-glass-lg active:scale-[0.99]"
+      className="flex cursor-pointer items-center gap-2.5 rounded-2xl border border-border/40 bg-surface-raised px-2.5 py-2 shadow-sm transition hover:shadow-md hover:border-border/60 active:scale-[0.98]"
     >
       <div className="relative shrink-0">
         <div
-          className="flex h-10 w-10 items-center justify-center rounded-full font-display text-sm font-bold text-white"
+          className="flex h-12 w-12 items-center justify-center rounded-full font-display text-base font-extrabold text-white shadow-sm"
           style={{ backgroundColor: route.color }}
         >
           {route.number}
         </div>
-        {/* Іконка виду транспорту поверх бейджа з номером — без спрайту/анімації,
-            лише щоб користувач одразу бачив: автобус, тролейбус, трамвай чи метро.
-            Збільшено у 2.5 рази для кращої впізнаваності. */}
-        <div className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-white shadow-glass">
-          <TransportKindIcon kind={route.kind} size={30} />
+        {/* Іконка виду транспорту поверх бейджа з номером — збільшена, щоб
+            залишатись головним візуальним акцентом навіть у компактній картці. */}
+        <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-surface-raised bg-surface-raised shadow-sm">
+          <TransportKindIcon kind={route.kind} size={34} />
         </div>
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-body text-sm font-semibold text-graphite">{route.name}</p>
-        <p className="truncate text-xs text-graphite/50">
+        <p className="truncate font-body text-sm font-semibold text-ink-text">{route.name}</p>
+        <p className="truncate text-[11px] text-ink-muted">
           {route.headsignForward} ↔ {route.headsignBackward}
         </p>
       </div>

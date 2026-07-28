@@ -106,7 +106,7 @@ export function ProfilePage() {
                 )}
                 
                 <div 
-                  className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white ring-2 ring-surface shadow-xs"
+                  className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white ring-2 ring-surface shadow-xs"
                   title="Авторизовано через Telegram"
                 >
                   <ShieldCheck className="h-3.5 w-3.5" />
@@ -114,7 +114,7 @@ export function ProfilePage() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 mb-1">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 mb-1">
                   Користувач Kharkiv GO
                 </span>
                 <h2 className="text-lg font-extrabold text-ink-text truncate leading-tight">
@@ -130,8 +130,8 @@ export function ProfilePage() {
 
             <div className="mt-5 pt-4 border-t border-border/40 flex items-center justify-between">
               <span className="text-xs font-semibold text-ink-muted">Статус акаунта</span>
-              <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
+                <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                 Активний сеанс
               </span>
             </div>
@@ -148,7 +148,7 @@ export function ProfilePage() {
           </div>
         ) : (
           <div className="relative overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 p-6 text-center backdrop-blur-2xl shadow-xl">
-            <div className="absolute -left-12 -bottom-12 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+            <div className="absolute -left-12 -bottom-12 h-40 w-40 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
 
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 border border-primary/20">
               <Sparkles className="h-7 w-7" />
