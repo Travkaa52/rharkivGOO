@@ -20,13 +20,22 @@ import {
   FileText,
   Award,
   ExternalLink,
-  Check
+  Check,
+  LifeBuoy,
+  Heart
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import {
+  AboutAppModal,
+  RateAppModal,
+  PrivacyPolicyModal,
+  SupportModal,
+  SupportProjectModal
+} from '@/components/ProfileModals';
 
 export function ProfilePage() {
   const profile = useAuthStore((s) => s.profile);
@@ -49,6 +58,12 @@ export function ProfilePage() {
   const [cacheSize, setCacheSize] = useState('14.2 MB');
   const [isUpdating, setIsUpdating] = useState(false);
   const showToast = useToastStore((s) => s.show);
+
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isRateOpen, setIsRateOpen] = useState(false);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [isSupportProjectOpen, setIsSupportProjectOpen] = useState(false);
 
   const handleClearCache = () => {
     setCacheSize('0 KB');
@@ -294,7 +309,10 @@ export function ProfilePage() {
               </button>
             </div>
 
-            <div className="flex items-center justify-between p-4 min-h-[48px]">
+            <button
+              onClick={() => showToast('Наразі доступна лише українська мова інтерфейсу.')}
+              className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
+            >
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
                   <Globe className="h-4 w-4" />
@@ -304,7 +322,7 @@ export function ProfilePage() {
               <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                 Українська
               </span>
-            </div>
+            </button>
           </div>
 
           <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
@@ -373,10 +391,9 @@ export function ProfilePage() {
               <span>Додаток</span>
             </div>
 
-            <a
-              href="#about"
-              onClick={(e) => { e.preventDefault(); showToast('Kharkiv GO v1.2.0 — ваш надійний міський помічник.'); }}
-              className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
+            <button
+              onClick={() => setIsAboutOpen(true)}
+              className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
@@ -385,12 +402,11 @@ export function ProfilePage() {
                 <span className="text-xs font-bold text-ink-text">Про програму</span>
               </div>
               <ChevronRight className="h-4 w-4 text-ink-muted" />
-            </a>
+            </button>
 
-            <a
-              href="#rate"
-              onClick={(e) => { e.preventDefault(); showToast('Дякуємо за вашу підтримку! Оцінка доступна в Telegram Bot.'); }}
-              className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
+            <button
+              onClick={() => setIsRateOpen(true)}
+              className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
@@ -399,7 +415,7 @@ export function ProfilePage() {
                 <span className="text-xs font-bold text-ink-text">Оцінити застосунок</span>
               </div>
               <ChevronRight className="h-4 w-4 text-ink-muted" />
-            </a>
+            </button>
 
             <button
               onClick={handleShareApp}
@@ -414,10 +430,9 @@ export function ProfilePage() {
               <ChevronRight className="h-4 w-4 text-ink-muted" />
             </button>
 
-            <a
-              href="#privacy"
-              onClick={(e) => { e.preventDefault(); showToast('Усі дані зберігаються локально відповідно до політики конфіденційності.'); }}
-              className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
+            <button
+              onClick={() => setIsPrivacyOpen(true)}
+              className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
@@ -425,8 +440,44 @@ export function ProfilePage() {
                 </div>
                 <span className="text-xs font-bold text-ink-text">Політика конфіденційності</span>
               </div>
-              <ExternalLink className="h-4 w-4 text-ink-muted" />
-            </a>
+              <ChevronRight className="h-4 w-4 text-ink-muted" />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
+            Підтримка
+          </span>
+          <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
+            <button
+              onClick={() => setIsSupportOpen(true)}
+              className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                  <LifeBuoy className="h-4 w-4" />
+                </div>
+                <div>
+                  <span className="block text-xs font-bold text-ink-text">Зв'язок з підтримкою</span>
+                  <span className="text-[11px] text-ink-muted">Напишіть — повідомлення піде адміну</span>
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-ink-muted" />
+            </button>
+
+            <button
+              onClick={() => setIsSupportProjectOpen(true)}
+              className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                  <Heart className="h-4 w-4" />
+                </div>
+                <span className="text-xs font-bold text-ink-text">Підтримати проект</span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-ink-muted" />
+            </button>
           </div>
         </div>
 
@@ -489,6 +540,12 @@ export function ProfilePage() {
         </div>
 
       </div>
+
+      <AboutAppModal open={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+      <RateAppModal open={isRateOpen} onClose={() => setIsRateOpen(false)} />
+      <PrivacyPolicyModal open={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
+      <SupportModal open={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
+      <SupportProjectModal open={isSupportProjectOpen} onClose={() => setIsSupportProjectOpen(false)} />
     </div>
   );
 }
