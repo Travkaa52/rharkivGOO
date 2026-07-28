@@ -36,6 +36,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // <--- Додайте цей рядок сюди
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
@@ -48,8 +49,6 @@ export default defineConfig({
           }
         ]
       }
-    })
-  ],
   build: {
     rollupOptions: {
       output: {
