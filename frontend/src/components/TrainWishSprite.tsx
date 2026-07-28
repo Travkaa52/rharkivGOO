@@ -1,17 +1,59 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { assetUrl } from '@/lib/assetUrl';
 
-const trainSprite = assetUrl('/images/train-wish-banner.png');
-
 /**
- * Спрайт: 2172×724, полотно транспаранту (заміряно програмно по пікселях зображення):
- *  left: 81.95%, width: 16.11%, top: 42.68%, height: 15.47%
- * Якщо картинку колись заміните на іншу — перевимірте координати заново.
+ * СКЛАДИ ПОЇЗДІВ
+ * ---------------------------------------------------------------------
+ * Кожен елемент — окрема готова картинка цілого складу (як твій
+ * sostavbazhan.png), з власним порожнім полотном транспаранту в кінці.
+ * На кожен прогін випадково береться один зі складів.
+ *
+ * naturalWidth / naturalHeight — реальні пікселі файлу (потрібні, щоб
+ * порахувати аспект і не спотворити картинку).
+ *
+ * bannerRect — координати порожнього полотна ВСЕРЕДИНІ конкретного
+ * файлу, у відсотках від його ширини/висоти. Заміряй скриптом:
+ *
+ *   from PIL import Image
+ *   import numpy as np
+ *   from scipy import ndimage
+ *   im = Image.open('train-N.png').convert('RGBA')
+ *   w, h = im.size
+ *   arr = np.array(im)
+ *   r, g, b, a = arr[...,0], arr[...,1], arr[...,2], arr[...,3]
+ *   mask = (a > 200) & (r > 235) & (g > 235) & (b > 235)
+ *   labeled, n = ndimage.label(mask)
+ *   sizes = ndimage.sum(mask, labeled, range(1, n + 1))
+ *   biggest = np.argmax(sizes) + 1
+ *   ys, xs = np.where(labeled == biggest)
+ *   print('left%', xs.min()/w*100, 'width%', (xs.max()-xs.min())/w*100)
+ *   print('top%', ys.min()/h*100, 'height%', (ys.max()-ys.min())/h*100)
+ *
+ * Щоб додати новий склад — просто додай новий об'єкт у масив TRAINS,
+ * покласти файл у public/images/train/, більше нічого міняти не треба.
  */
-const BANNER_RECT = { left: 81.95, width: 16.11, top: 42.68, height: 15.47 };
+interface TrainDef {
+  src: string;
+  naturalWidth: number;
+  naturalHeight: number;
+  bannerRect: { left: number; width: number; top: number; height: number };
+}
 
-const SPRITE_ASPECT_RATIO = 2172 / 724; // ширина / висота
-const SPRITE_HEIGHT_PX = 112; // висота спрайту на екрані; ширина рахується з аспекту
+const TRAINS: TrainDef[] = [
+  {
+    src: assetUrl('/images/train/train-1.png'),
+    naturalWidth: 2172,
+    naturalHeight: 724,
+    bannerRect: { left: 81.95, width: 16.11, top: 42.68, height: 15.47 }
+  }
+  // Додавай наступні готові склади сюди, наприклад:
+  // {
+  //   src: assetUrl('/images/train/train-2.png'),
+  //   naturalWidth: ...,
+  //   naturalHeight: ...,
+  //   bannerRect: { left: 81.95, width: 16.11, top: 42.68, height: 15.47 }
+  // }
+];
 
 const WISHES: string[] = [
   'Гарного дня, Харків! 🌤️',
@@ -44,6 +86,7 @@ const MIN_INTERVAL_MS = 2 * 60 * 60 * 1000; // 2 години
 const MAX_INTERVAL_MS = 3 * 60 * 60 * 1000; // 3 години
 const FIRST_RUN_DELAY_MS = 3000; // невелика пауза після завантаження сторінки
 const ANIMATION_DURATION_MS = 13000; // час проїзду через екран
+const SPRITE_HEIGHT_PX = 112; // висота складу на екрані
 const STORAGE_KEY = 'kharkivgo_train_wish_last_shown_at';
 
 function randomInterval(): number {
@@ -52,6 +95,10 @@ function randomInterval(): number {
 
 function pickWish(): string {
   return WISHES[Math.floor(Math.random() * WISHES.length)];
+}
+
+function pickTrain(): TrainDef {
+  return TRAINS[Math.floor(Math.random() * TRAINS.length)];
 }
 
 function readLastShown(): number {
@@ -67,18 +114,20 @@ function writeLastShown(ts: number) {
   try {
     localStorage.setItem(STORAGE_KEY, String(ts));
   } catch {
-    // localStorage недоступний (приватний режим тощо) — просто ігноруємо
+    // localStorage недоступний (приватний режим тощо) — ігноруємо
   }
 }
 
 /**
- * Потяг із транспарантом, що зрідка (раз на 2–3 години) проїжджає через
- * головний екран одразу після заходу, з випадковим побажанням на банері.
- * Поки неактивний — не рендериться і не займає місця в лейауті.
+ * Потяг, що зрідка (раз на 2–3 години) проїжджає через головний екран
+ * одразу після заходу. Кожен прогін — випадковий склад із TRAINS і нове
+ * побажання на транспаранті. Без рамок і обрізань: картинка вільно
+ * рухається поверх сторінки.
  */
 export function TrainWishSprite() {
   const [visible, setVisible] = useState(false);
   const [wish, setWish] = useState('');
+  const [train, setTrain] = useState<TrainDef | null>(null);
   const scheduleTimeoutRef = useRef<number | null>(null);
   const hideTimeoutRef = useRef<number | null>(null);
 
@@ -90,6 +139,7 @@ export function TrainWishSprite() {
 
   const runTrain = useCallback(() => {
     setWish(pickWish());
+    setTrain(pickTrain());
     setVisible(true);
     writeLastShown(Date.now());
 
@@ -118,14 +168,12 @@ export function TrainWishSprite() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!visible) return null;
+  if (!visible || !train) return null;
+
+  const aspectRatio = train.naturalWidth / train.naturalHeight;
 
   return (
-    <div
-      className="relative left-1/2 right-1/2 -mx-[50vw] w-screen overflow-hidden pointer-events-none z-30"
-      style={{ height: SPRITE_HEIGHT_PX }}
-      aria-hidden="true"
-    >
+    <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen pointer-events-none z-30" aria-hidden="true">
       <style>{`
         @keyframes train-wish-move {
           0% { transform: translateX(100vw); }
@@ -136,24 +184,19 @@ export function TrainWishSprite() {
         }
       `}</style>
 
-      <div className="absolute top-0 left-0 inline-block train-wish-track">
-        <div
-          className="relative inline-block"
-          style={{ height: SPRITE_HEIGHT_PX, width: SPRITE_HEIGHT_PX * SPRITE_ASPECT_RATIO }}
-        >
-          <img
-            src={trainSprite}
-            alt=""
-            draggable={false}
-            className="block h-full w-full select-none"
-          />
+      <div
+        className="absolute top-0 left-0 train-wish-track"
+        style={{ height: SPRITE_HEIGHT_PX, width: SPRITE_HEIGHT_PX * aspectRatio }}
+      >
+        <div className="relative h-full w-full">
+          <img src={train.src} alt="" draggable={false} className="block h-full w-full select-none" />
           <div
             className="absolute flex items-center justify-center text-center px-1"
             style={{
-              left: `${BANNER_RECT.left}%`,
-              width: `${BANNER_RECT.width}%`,
-              top: `${BANNER_RECT.top}%`,
-              height: `${BANNER_RECT.height}%`
+              left: `${train.bannerRect.left}%`,
+              width: `${train.bannerRect.width}%`,
+              top: `${train.bannerRect.top}%`,
+              height: `${train.bannerRect.height}%`
             }}
           >
             <span className="text-[7px] font-extrabold text-slate-800 leading-[1.15] line-clamp-3">
