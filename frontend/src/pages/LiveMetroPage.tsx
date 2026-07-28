@@ -860,12 +860,32 @@ export function LiveMetroPage() {
 
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null);
-  const pinchState = useRef<{ distance: number; scale: number } | null>(null);
+  // pinchState тепер утримує ще й екранну середину жесту та поточний зсув (x, y) на момент старту —
+  // це потрібно, щоб масштабування відбувалось відносно точки між пальцями, а не відносно (0,0).
+  const pinchState = useRef<{ distance: number; scale: number; midX: number; midY: number; tx: number; ty: number } | null>(null);
   const activePointers = useRef<Map<number, { x: number; y: number }>>(new Map());
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Safari (iOS) генерує окремі gesturestart/gesturechange/gestureend поза
+  // Pointer Events API — саме вони, а не touch-action, іноді викликають
+  // "стрибок" нативного масштабу сторінки поверх нашого зуму схеми.
+  // Слухачі не-пасивні й безумовно гасять дефолт, поки палець над картою.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const blockGesture = (e: Event) => e.preventDefault();
+    el.addEventListener('gesturestart', blockGesture as EventListener, { passive: false });
+    el.addEventListener('gesturechange', blockGesture as EventListener, { passive: false });
+    el.addEventListener('touchmove', blockGesture as EventListener, { passive: false });
+    return () => {
+      el.removeEventListener('gesturestart', blockGesture as EventListener);
+      el.removeEventListener('gesturechange', blockGesture as EventListener);
+      el.removeEventListener('touchmove', blockGesture as EventListener);
+    };
   }, []);
 
   useEffect(() => {
@@ -933,7 +953,12 @@ export function LiveMetroPage() {
     } else if (activePointers.current.size === 2) {
       const pts = Array.from(activePointers.current.values());
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      pinchState.current = { distance: dist, scale: currentTransform.scale };
+      const rect = containerRef.current?.getBoundingClientRect();
+      const midX = (pts[0].x + pts[1].x) / 2 - (rect?.left ?? 0);
+      const midY = (pts[0].y + pts[1].y) / 2 - (rect?.top ?? 0);
+      pinchState.current = { distance: dist, scale: currentTransform.scale, midX, midY, tx: currentTransform.x, ty: currentTransform.y };
+      // Скидаємо однопальцевий drag, щоб не «стрибав» transform у момент постановки другого пальця.
+      isDraggingRef.current = false;
       dragStartRef.current = null;
     }
   }, []);
@@ -945,7 +970,17 @@ export function LiveMetroPage() {
       const pts = Array.from(activePointers.current.values());
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
       const ratio = dist / (pinchState.current.distance || 1);
-      setTransform((t) => ({ ...t, scale: clampScale(pinchState.current!.scale * ratio) }));
+      const { scale: startScale, midX, midY, tx, ty } = pinchState.current;
+      const newScale = clampScale(startScale * ratio);
+      // Утримуємо нерухомою точку схеми, що була між пальцями на старті жесту —
+      // саме тому масштабування раніше «зʼїжджало» в кут замість зуму в місці пальців.
+      const scaleRatio = newScale / startScale;
+      setTransform({
+        x: midX - (midX - tx) * scaleRatio,
+        y: midY - (midY - ty) * scaleRatio,
+        scale: newScale
+      });
+      isDraggingRef.current = true;
       return;
     }
     const drag = dragStartRef.current;
@@ -1053,6 +1088,13 @@ export function LiveMetroPage() {
       <div
         ref={containerRef}
         className="relative mx-4 mb-4 flex-1 overflow-hidden rounded-2xl border border-white/10 bg-[#0B120F] shadow-2xl touch-none"
+        // Інлайн-стиль дублює touch-none навмисно: на деяких Android WebView
+        // (особливо в Telegram Mini App) сама CSS-властивість touch-action не
+        // застосовується, якщо контейнер отримав її лише через клас Tailwind
+        // до першого repaint — інлайн-стиль гарантовано має найвищий пріоритет
+        // і застосовується одразу, тому нативний пінч-зум сторінки більше не
+        // конфліктує з нашим власним масштабуванням схеми.
+        style={{ touchAction: 'none', overscrollBehavior: 'contain', WebkitUserSelect: 'none', userSelect: 'none' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endPointer}
@@ -1114,7 +1156,7 @@ export function LiveMetroPage() {
 
           {/* Заголовок */}
           <g transform="translate(60, 70)">
-            <path d="M 0 0 L 12 -24 L 24 0 L 36 -24 L 48 0 L 38 0 L 30 -16 L 24 -4 L 18 -16 L 10 0 Z" fill="#D92B27" />
+            <image href={assetUrl('/icons/kharkiv-metro-logo.png')} x={-6} y={-40} width={48} height={40} preserveAspectRatio="xMidYMid meet" />
             <text x={64} y={-5} className="font-display font-extrabold" fontSize={32} fill="#F5F7F6">Харківський метрополітен</text>
             <text x={64} y={18} className="font-sans font-medium" fontSize={16} fill="#9FB3A9">Kharkiv subway system · 30 stations · 38.1 km</text>
           </g>
@@ -1287,6 +1329,8 @@ function StationMarker({
   const offsetY = station.labelOffset?.y ?? -18;
 
   const textAnchor = offsetX > 10 ? 'start' : offsetX < -10 ? 'end' : 'middle';
+  // Пересадочні станції — більший логотип-бейдж, звичайні — компактний, але завжди чіткий.
+  const logoSize = isInterchange ? 22 : 16;
 
   return (
     <g
@@ -1297,22 +1341,29 @@ function StationMarker({
       }}
       className="cursor-pointer"
     >
-      {/* Прозора зона для тапа */}
-      <circle r={26} fill="transparent" />
+      {/* Прозора зона для тапа — збільшена, щоб влучати пальцем було легше на будь-якому зумі */}
+      <circle r={30} fill="transparent" />
 
       {/* Світіння при виборі */}
       {selected && (
-        <circle r={isInterchange ? 16 : 14} fill="none" stroke="#C6A552" strokeWidth={3} opacity={0.8}>
-          <animate attributeName="r" values={`${isInterchange ? 14 : 12};${isInterchange ? 18 : 16};${isInterchange ? 14 : 12}`} dur="2s" repeatCount="indefinite" />
+        <circle r={isInterchange ? 20 : 16} fill="none" stroke="#C6A552" strokeWidth={3} opacity={0.8}>
+          <animate attributeName="r" values={`${isInterchange ? 18 : 14};${isInterchange ? 24 : 19};${isInterchange ? 18 : 14}`} dur="2s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite" />
         </circle>
       )}
 
-      {/* Маркер станції */}
-      <circle r={isInterchange ? 7.5 : 6} fill="#FFFFFF" stroke={color} strokeWidth={3.5} />
-      {isInterchange && (
-        <circle r={4} fill={color} />
-      )}
+      {/* Біла підкладка під логотипом — щоб станція завжди читалась поверх ліній і фону */}
+      <circle r={logoSize / 2 + 3.5} fill="#FFFFFF" stroke={color} strokeWidth={isInterchange ? 3.5 : 2.5} />
+
+      {/* Логотип Харківського метрополітену на місці кожної станції */}
+      <image
+        href={assetUrl('/icons/kharkiv-metro-logo.png')}
+        x={-logoSize / 2}
+        y={-logoSize / 2}
+        width={logoSize}
+        height={logoSize}
+        preserveAspectRatio="xMidYMid meet"
+      />
 
       {/* Підпис */}
       <g transform={`translate(${offsetX}, ${offsetY})`} className="pointer-events-none select-none">
