@@ -838,7 +838,7 @@ interface Transform {
   scale: number;
 }
 
-const TRAIN_SPRITES: Record<string, string> = {
+export const TRAIN_SPRITES: Record<string, string> = {
   'route-metro-1': assetUrl('/sprites/metro-red-line.jpg'),
   'route-metro-2': assetUrl('/sprites/metro-blue-line.jpg'),
   'route-metro-3': assetUrl('/sprites/metro-green-line.jpg'),

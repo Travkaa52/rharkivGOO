@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { Clock3, MapPin, TrainFront, CalendarDays } from 'lucide-react';
+import { Clock3, MapPin, CalendarDays } from 'lucide-react';
 import { Sheet } from '@/components/ui/Sheet';
 import {
   BUILT_LINES,
   LINE_COLORS,
+  TRAIN_SPRITES,
   getStationDayTimetable,
   dayTypeOf,
   secOfDay,
@@ -16,6 +17,64 @@ function timeStrToSec(time: string): number {
   const m = /^(\d{1,2}):(\d{2})$/.exec(time.trim());
   if (!m) return -1;
   return Number(m[1]) * 3600 + Number(m[2]) * 60;
+}
+
+/** Плоский список усіх станцій з усіх ліній — для пошуку станції пересадки за id. */
+const ALL_STATIONS = BUILT_LINES.flatMap(({ line }) =>
+  line.stations.map((s) => ({ ...s, lineId: line.id }))
+);
+
+function findStationById(id: string) {
+  return ALL_STATIONS.find((s) => s.id === id);
+}
+
+/** З якого боку показувати кружечок лінії пересадки біля назви станції. */
+const INTERCHANGE_SIDE: Record<string, 'left' | 'right'> = {
+  'stop-metro-sportyvna': 'right',
+  'stop-metro-metrobudivnykiv': 'left',
+  'stop-metro-maidan-konstytutsii': 'right',
+  'stop-metro-istorychnyi-muzei': 'left',
+  'stop-metro-derzhprom': 'right',
+  'stop-metro-universytet': 'left',
+};
+
+/** 2-3 сірі пунктирні крапки між кружечками ліній пересадки. */
+function DashDots() {
+  return (
+    <span className="flex items-center gap-0.5">
+      {[0, 1, 2].map((i) => (
+        <span key={i} className="h-0.5 w-1.5 rounded-full bg-ink-muted/40" />
+      ))}
+    </span>
+  );
+}
+
+function InterchangeBadge({ stationId }: { stationId: string }) {
+  const targetIds = findStationById(stationId)?.interchangeWith;
+  if (!targetIds || targetIds.length === 0) return null;
+  const targetId = targetIds[0];
+  const target = findStationById(targetId);
+  if (!target) return null;
+
+  const targetColor = LINE_COLORS[target.lineId];
+  const side = INTERCHANGE_SIDE[stationId] ?? 'right';
+
+  const dot = <span className="h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-surface" style={{ backgroundColor: targetColor }} />;
+  const label = (
+    <span className="truncate text-caption font-semibold text-ink-muted">
+      Перехід на станцію {target.name}
+    </span>
+  );
+
+  return (
+    <div className="mt-0.5 flex items-center gap-1.5">
+      {side === 'left' && dot}
+      {side === 'left' && <DashDots />}
+      {label}
+      {side === 'right' && <DashDots />}
+      {side === 'right' && dot}
+    </div>
+  );
 }
 
 /** Одна колонка розкладу (один напрямок) з підсвіткою відносно поточного часу. */
@@ -148,7 +207,11 @@ export function MetroLinesExplorer() {
     <div className="space-y-3">
       <div className="flex items-center justify-between px-1">
         <h2 className="text-body font-bold text-ink-text flex items-center gap-2">
-          <TrainFront className="h-4 w-4" style={{ color }} />
+          <img
+            src={TRAIN_SPRITES[activeLine.id]}
+            alt={activeLine.name}
+            className="h-6 w-9 shrink-0 rounded-md object-cover"
+          />
           Лінії метро
         </h2>
         <span className="text-caption font-semibold text-ink-muted">Оберіть гілку</span>
@@ -203,9 +266,7 @@ export function MetroLinesExplorer() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <span className="truncate text-body-sm font-semibold text-ink-text">{station.name}</span>
-                  {station.interchangeWith && station.interchangeWith.length > 0 && (
-                    <span className="ml-2 text-caption font-semibold text-ink-muted">пересадка</span>
-                  )}
+                  <InterchangeBadge stationId={station.id} />
                 </div>
                 <MapPin className="h-4 w-4 shrink-0 text-ink-muted/50" />
               </button>
