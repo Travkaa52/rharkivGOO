@@ -19,6 +19,11 @@ const STOPS_SOURCE_ID = 'khgo-stops';
 const STOPS_LAYER_ID = 'khgo-stops-circles';
 const STOPS_HALO_LAYER_ID = 'khgo-stops-halo';
 const STOP_HIGHLIGHT_LAYER_ID = 'khgo-stops-highlight';
+// Метро — окремі шари без minzoom-обмеження: станції метро мають лишатись
+// видимими на будь-якому масштабі карти, на відміну від трамвайних/тролейбусних/
+// автобусних зупинок, яких на віддаленому зумі забагато й вони заховані навмисно.
+const METRO_STOPS_HALO_LAYER_ID = 'khgo-stops-metro-halo';
+const METRO_STOPS_LAYER_ID = 'khgo-stops-metro-circles';
 
 const STOP_COLOR_MATCH: maplibregl.ExpressionSpecification = [
   'match',
@@ -133,6 +138,34 @@ function addStaticTransitLayers(
         'circle-stroke-width': 2.5
       }
     });
+
+    // Метро — без minzoom, завжди видимі, поки showStops увімкнено.
+    map.addLayer({
+      id: METRO_STOPS_HALO_LAYER_ID,
+      type: 'circle',
+      source: STOPS_SOURCE_ID,
+      filter: ['==', ['get', 'dominantKind'], 'metro'],
+      layout: { visibility: showStops ? 'visible' : 'none' },
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 4.5, 17, 11],
+        'circle-color': '#FFFFFF',
+        'circle-opacity': 0.95
+      }
+    });
+
+    map.addLayer({
+      id: METRO_STOPS_LAYER_ID,
+      type: 'circle',
+      source: STOPS_SOURCE_ID,
+      filter: ['==', ['get', 'dominantKind'], 'metro'],
+      layout: { visibility: showStops ? 'visible' : 'none' },
+      paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 3.5, 17, 8],
+        'circle-color': TRANSPORT_COLORS.metro,
+        'circle-stroke-color': '#FFFFFF',
+        'circle-stroke-width': 2
+      }
+    });
   }
 }
 
@@ -174,7 +207,7 @@ function updateStaticTransitLayers(
 
   updateRouteStopHighlight(map, selectedRouteId);
 
-  for (const layerId of [STOPS_LAYER_ID, STOPS_HALO_LAYER_ID]) {
+  for (const layerId of [STOPS_LAYER_ID, STOPS_HALO_LAYER_ID, METRO_STOPS_LAYER_ID, METRO_STOPS_HALO_LAYER_ID]) {
     if (map.getLayer(layerId)) {
       map.setLayoutProperty(layerId, 'visibility', showStops ? 'visible' : 'none');
     }
@@ -261,12 +294,17 @@ export function MapView({
         if (stopId) onStopSelectRef.current?.(stopId);
       });
 
+      map.on('click', METRO_STOPS_LAYER_ID, (e) => {
+        const stopId = e.features?.[0]?.properties?.stopId as string | undefined;
+        if (stopId) onStopSelectRef.current?.(stopId);
+      });
+
       map.on('click', ROUTES_LAYER_ID, (e) => {
         const routeId = e.features?.[0]?.properties?.routeId as string | undefined;
         if (routeId) onRouteSelectRef.current?.(routeId);
       });
 
-      for (const layerId of [STOPS_LAYER_ID, ROUTES_LAYER_ID]) {
+      for (const layerId of [STOPS_LAYER_ID, METRO_STOPS_LAYER_ID, ROUTES_LAYER_ID]) {
         map.on('mouseenter', layerId, () => {
           map.getCanvas().style.cursor = 'pointer';
         });
