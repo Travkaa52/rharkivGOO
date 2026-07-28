@@ -490,28 +490,101 @@ const baseRoutes = [
   }
 ];
 
-// Витягуємо координати з масиву у routeGeometries.json
-let coordsList: number[][] = [];
-if (Array.isArray(routeGeometries)) {
-  if (Array.isArray(routeGeometries[0])) {
-    // Якщо це масив масивів координат [[lng, lat], [lng, lat], ...]
-    coordsList = routeGeometries as number[][];
-  }
+// Реальна геометрія маршрутів (координати вздовж вулиць), розшифрована з
+// офіційних KML-схем. Формат: { [routeId]: [lng, lat][][] } — масив
+// сегментів полілінії (кожен сегмент — послідовність точок [lng, lat]).
+const ROUTE_GEOMETRIES = routeGeometries as unknown as Record<string, [number, number][][]>;
+
+/** Відстань між двома геоточками (метри), формула гаверсинуса. */
+function haversineMeters(a: [number, number], b: [number, number]): number {
+  const R = 6371000;
+  const [lng1, lat1] = a;
+  const [lng2, lat2] = b;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const rLat1 = (lat1 * Math.PI) / 180;
+  const rLat2 = (lat2 * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 + Math.cos(rLat1) * Math.cos(rLat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-baseRoutes.forEach((baseRoute, index) => {
+/** Розгортає всі сегменти геометрії маршруту в одну послідовність точок [lng, lat]. */
+function flattenGeometry(segments: [number, number][][]): [number, number][] {
+  const points: [number, number][] = [];
+  for (const segment of segments) {
+    for (const point of segment) {
+      points.push(point);
+    }
+  }
+  return points;
+}
+
+/** Точка на ламаній лінії на заданій відстані (у метрах) від початку. */
+function pointAtDistance(
+  points: [number, number][],
+  cumulative: number[],
+  targetDist: number
+): [number, number] {
+  const total = cumulative[cumulative.length - 1];
+  const d = Math.max(0, Math.min(targetDist, total));
+
+  for (let i = 1; i < cumulative.length; i++) {
+    if (d <= cumulative[i]) {
+      const segStart = cumulative[i - 1];
+      const segLen = cumulative[i] - segStart;
+      const t = segLen === 0 ? 0 : (d - segStart) / segLen;
+      const [lng1, lat1] = points[i - 1];
+      const [lng2, lat2] = points[i];
+      return [lng1 + (lng2 - lng1) * t, lat1 + (lat2 - lat1) * t];
+    }
+  }
+  return points[points.length - 1];
+}
+
+baseRoutes.forEach((baseRoute) => {
   const routeStops: string[] = [];
 
-  // Генеруємо основні зупинки для кожного маршруту, використовуючи реальні координати з файлу (або дефолтні у разі нестачі)
-  const startCoord = coordsList[index * 2] || [36.23, 50.00];
-  const midCoord = coordsList[Math.floor(coordsList.length / 2)] || [36.25, 50.01];
-  const endCoord = coordsList[index * 2 + 1] || [36.27, 50.02];
+  const rawSegments = ROUTE_GEOMETRIES[baseRoute.id];
+  const points = rawSegments && rawSegments.length > 0 ? flattenGeometry(rawSegments) : [];
 
-  const generatedStops = [
-    { id: `${baseRoute.id}-stop-start`, name: baseRoute.headsignForward, lng: startCoord[0], lat: startCoord[1] },
-    { id: `${baseRoute.id}-stop-mid`, name: `Проміжна зупинка (${baseRoute.number})`, lng: midCoord[0], lat: midCoord[1] },
-    { id: `${baseRoute.id}-stop-end`, name: baseRoute.headsignBackward, lng: endCoord[0], lat: endCoord[1] }
-  ];
+  if (points.length < 2) {
+    // Немає реальної геометрії для цього маршруту — пропускаємо генерацію
+    // зупинок (маршрут просто не матиме ліній/зупинок на карті), щоб не
+    // засмічувати дані вигаданими координатами.
+    routesMap.push({
+      ...baseRoute,
+      stopIds: [],
+      schedule: [],
+    });
+    return;
+  }
+
+  // Кумулятивна довжина ламаної для рівномірного розподілу зупинок.
+  const cumulative: number[] = [0];
+  for (let i = 1; i < points.length; i++) {
+    cumulative.push(cumulative[i - 1] + haversineMeters(points[i - 1], points[i]));
+  }
+  const totalLength = cumulative[cumulative.length - 1] || 0;
+
+  // Одна зупинка приблизно на кожні ~500м реального маршруту, але не менше
+  // 4 і не більше 18, щоб карта лишалась читабельною.
+  const stopsCount = Math.max(4, Math.min(18, Math.round(totalLength / 500) + 1));
+
+  const generatedStops = Array.from({ length: stopsCount }, (_, i) => {
+    const isFirst = i === 0;
+    const isLast = i === stopsCount - 1;
+    const targetDist = (i / (stopsCount - 1)) * totalLength;
+    const [lng, lat] = pointAtDistance(points, cumulative, targetDist);
+
+    const name = isFirst
+      ? baseRoute.headsignForward
+      : isLast
+        ? baseRoute.headsignBackward
+        : `Зупинка ${i} (${baseRoute.number})`;
+
+    return { id: `${baseRoute.id}-stop-${i}`, name, lng, lat };
+  });
 
   generatedStops.forEach((stop) => {
     routeStops.push(stop.id);

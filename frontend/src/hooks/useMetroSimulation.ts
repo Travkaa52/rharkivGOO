@@ -8,7 +8,7 @@ import type { MetroRenderFrame } from '@/metro/MetroRenderer';
  * React-хук над MetroSimulationEngine + MetroRenderer.
  *
  * - Рушій (MetroSimulationEngine) будується ОДИН РАЗ (useMemo) з локальних
- *   даних routes.json/stops.json — жодних мережевих запитів.
+ *   даних localData.ts (routeGeometries.json) — жодних мережевих запитів.
  * - Рендерер (MetroRenderer) керує власним requestAnimationFrame-циклом і
  *   на кожному кадрі перераховує точні позиції потягів аналітично (без
  *   GPS, без випадковості) — хук лише підписується на готові кадри й
