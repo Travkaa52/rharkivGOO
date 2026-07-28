@@ -1,40 +1,39 @@
 import { useState } from 'react';
 import clsx from 'clsx';
-import { TrainTrack, Bus, Zap } from 'lucide-react';
 import { TransportKindPage } from '@/pages/TransportKindPage';
 import type { TransportKind } from '@/types/transport';
 
 interface TabItem {
   kind: TransportKind;
   label: string;
-  icon: typeof TrainTrack;
+  iconSrc: string;
   activeColor: string;
 }
 
 const TABS: TabItem[] = [
-  { 
-    kind: 'bus', 
-    label: 'Автобуси', 
-    icon: Bus, 
-    activeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' 
+  {
+    kind: 'bus',
+    label: 'Автобуси',
+    iconSrc: '/icons/transporticono.png',
+    activeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
   },
-  { 
-    kind: 'trolleybus', 
-    label: 'Тролейбуси', 
-    icon: Zap, 
-    activeColor: 'bg-blue-500/15 text-blue-400 border-blue-500/30' 
+  {
+    kind: 'trolleybus',
+    label: 'Тролейбуси',
+    iconSrc: '/icons/troleyicono.png',
+    activeColor: 'bg-blue-500/15 text-blue-400 border-blue-500/30'
   },
-  { 
-    kind: 'tram', 
-    label: 'Трамваї', 
-    icon: TrainTrack, 
-    activeColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30' 
+  {
+    kind: 'tram',
+    label: 'Трамваї',
+    iconSrc: '/icons/tramwaiicono.png',
+    activeColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30'
   },
-  { 
-    kind: 'metro', 
-    label: 'Метро', 
-    icon: TrainTrack, 
-    activeColor: 'bg-red-500/15 text-red-400 border-red-500/30' 
+  {
+    kind: 'metro',
+    label: 'Метро',
+    iconSrc: '/icons/metroicono.png',
+    activeColor: 'bg-red-500/15 text-red-400 border-red-500/30'
   },
 ];
 
@@ -47,7 +46,6 @@ export function RoutesPage() {
       <div className="sticky top-0 z-30 border-b border-border/40 bg-bg/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-md items-center gap-2 overflow-x-auto px-4 py-3 no-scrollbar">
           {TABS.map((tab) => {
-            const Icon = tab.icon;
             const isActive = activeTab === tab.kind;
 
             return (
@@ -61,7 +59,11 @@ export function RoutesPage() {
                     : 'border-border/40 bg-surface/50 text-ink-muted hover:bg-surface/80 hover:text-ink-text backdrop-blur-sm'
                 )}
               >
-                <Icon className={clsx('h-4 w-4', isActive ? 'opacity-100' : 'opacity-60')} />
+                <img
+                  src={tab.iconSrc}
+                  alt=""
+                  className={clsx('h-6 w-6 object-contain', isActive ? 'opacity-100' : 'opacity-70')}
+                />
                 <span>{tab.label}</span>
               </button>
             );
