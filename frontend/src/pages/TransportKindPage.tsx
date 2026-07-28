@@ -13,11 +13,13 @@ import {
   Compass,
   SlidersHorizontal,
   ArrowUpDown,
-  Star
+  Star,
+  Check
 } from 'lucide-react';
 import { RouteCard } from '@/components/RouteCard';
 import { MetroLinesExplorer } from '@/components/MetroLinesExplorer';
 import { routesApi } from '@/api/routes';
+import { useFavoritesStore } from '@/store/useFavoritesStore';
 import type { TransportKind, TransportRoute } from '@/types/transport';
 
 interface TransportMeta {
@@ -77,6 +79,11 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'favorites'>('all');
+  const [sortAsc, setSortAsc] = useState(true);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  const favoriteRoutes = useFavoritesStore((s) => s.routes);
+  const isRouteFavorite = useFavoritesStore((s) => s.isRouteFavorite);
 
   const meta = TRANSPORT_META[kind] || TRANSPORT_META.bus;
   const TransportIcon = meta.icon;
@@ -110,7 +117,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
 
   const filteredRoutes = useMemo(() => {
     let result = routes;
-    
+
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       result = result.filter((r) => {
@@ -120,8 +127,17 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
       });
     }
 
+    if (selectedFilter === 'favorites') {
+      result = result.filter((r) => isRouteFavorite(r.id));
+    }
+
+    result = [...result].sort((a, b) => {
+      const cmp = String(a.number ?? '').localeCompare(String(b.number ?? ''), 'uk', { numeric: true, sensitivity: 'base' });
+      return sortAsc ? cmp : -cmp;
+    });
+
     return result;
-  }, [routes, searchQuery]);
+  }, [routes, searchQuery, selectedFilter, sortAsc, favoriteRoutes, isRouteFavorite]);
 
   return (
     <div className="min-h-dvh bg-slate-50 pb-28 pt-[max(0.75rem,env(safe-area-inset-top))] text-slate-900 selection:bg-emerald-500 selection:text-white font-sans antialiased">
@@ -142,19 +158,51 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
             <p className="text-xs text-slate-500 font-medium mt-0.5">Оберіть маршрут громадського транспорту</p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button 
+          <div className="relative flex items-center gap-2">
+            <button
+              onClick={() => setIsFiltersOpen((v) => !v)}
               aria-label="Фільтри"
-              className="p-2.5 rounded-full bg-white border border-slate-100 hover:bg-slate-100 text-slate-700 shadow-sm transition-all active:scale-95"
+              aria-pressed={isFiltersOpen}
+              className={`p-2.5 rounded-full border shadow-sm transition-all active:scale-95 ${
+                isFiltersOpen
+                  ? 'bg-emerald-600 border-emerald-600 text-white'
+                  : 'bg-white border-slate-100 hover:bg-slate-100 text-slate-700'
+              }`}
             >
               <SlidersHorizontal size={17} />
             </button>
-            <button 
-              aria-label="Сортування"
+            <button
+              onClick={() => setSortAsc((v) => !v)}
+              aria-label={sortAsc ? 'Сортування за зростанням' : 'Сортування за спаданням'}
+              title={sortAsc ? 'За зростанням номера' : 'За спаданням номера'}
               className="p-2.5 rounded-full bg-white border border-slate-100 hover:bg-slate-100 text-slate-700 shadow-sm transition-all active:scale-95"
             >
-              <ArrowUpDown size={17} />
+              <ArrowUpDown size={17} className={sortAsc ? '' : 'scale-y-[-1]'} />
             </button>
+
+            {isFiltersOpen && (
+              <>
+                <div className="fixed inset-0 z-20" onClick={() => setIsFiltersOpen(false)} />
+                <div className="absolute right-0 top-12 z-30 w-52 rounded-2xl border border-slate-100 bg-white p-2 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
+                  <p className="px-2 pb-1.5 pt-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    Показувати
+                  </p>
+                  {(['all', 'favorites'] as const).map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => {
+                        setSelectedFilter(f);
+                        setIsFiltersOpen(false);
+                      }}
+                      className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs font-bold text-slate-700 transition-colors hover:bg-slate-50"
+                    >
+                      <span>{f === 'all' ? 'Усі маршрути' : 'Лише обране'}</span>
+                      {selectedFilter === f && <Check size={14} className="text-emerald-600" />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </header>
 

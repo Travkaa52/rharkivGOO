@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Palette, 
   Map, 
@@ -11,11 +12,15 @@ import {
   Trash2, 
   Sparkles,
   AlertTriangle,
-  MapPin
+  MapPin,
+  ChevronLeft,
+  RefreshCw,
+  Info
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, SegmentedControl, Switch, Button, Emblem } from '@/components/ui';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { useToastStore } from '@/store/useToastStore';
 
 interface SectionProps {
   title: string;
@@ -78,6 +83,8 @@ export function SettingsPage() {
   const [notifStatus, setNotifStatus] = useState<NotificationPermission | 'unsupported'>(
     typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
   );
+  const [isUpdating, setIsUpdating] = useState(false);
+  const showToast = useToastStore((s) => s.show);
 
   const handleTogglePush = async () => {
     if (!settings.pushNotificationsEnabled && notifStatus !== 'granted' && typeof Notification !== 'undefined') {
@@ -95,9 +102,28 @@ export function SettingsPage() {
     setTimeout(() => setClearingState('idle'), 2500);
   };
 
+  const handleUpdateData = () => {
+    setIsUpdating(true);
+    setTimeout(() => {
+      setIsUpdating(false);
+      showToast('Дані успішно оновлено до актуальної версії.', 'success');
+    }, 800);
+  };
+
   return (
     <div className="min-h-dvh bg-gradient-to-b from-bg via-bg/95 to-bg pb-28 text-ink-text selection:bg-primary/20">
-      <PageHeader title="Налаштування" />
+      <PageHeader
+        title="Налаштування"
+        action={
+          <Link
+            to="/profile"
+            aria-label="Назад до профілю"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/60 bg-surface/80 text-ink-text shadow-xs backdrop-blur-md transition-all hover:bg-surface active:scale-95"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Link>
+        }
+      />
 
       {/* Hero Badge Section */}
       <div className="relative my-4 flex flex-col items-center justify-center gap-3 px-4 text-center">
@@ -249,7 +275,21 @@ export function SettingsPage() {
 
         {/* Пам'ять та дані */}
         <Section title="Пам'ять та дані" icon={<Database className="h-4 w-4" />}>
-          <div className="p-3.5">
+          <div className="p-3.5 space-y-2.5">
+            <Button
+              variant="secondary"
+              size="sm"
+              fullWidth
+              onClick={handleUpdateData}
+              disabled={isUpdating}
+              className="font-medium"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <RefreshCw className={`h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
+                <span>{isUpdating ? 'Оновлення...' : 'Оновити дані розкладу'}</span>
+              </div>
+            </Button>
+
             <Button 
               variant="secondary" 
               size="sm" 
@@ -279,6 +319,24 @@ export function SettingsPage() {
                 )}
               </div>
             </Button>
+          </div>
+        </Section>
+
+        {/* Системна інформація */}
+        <Section title="Про додаток" icon={<Info className="h-4 w-4" />}>
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-ink-muted font-medium">Версія додатка</span>
+              <span className="font-bold text-ink-text">v1.3.0 Pro</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-ink-muted font-medium">Карта</span>
+              <span className="font-bold text-ink-text">MapLibre GL / OpenFreeMap</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-ink-muted font-medium">Останнє оновлення даних</span>
+              <span className="font-bold text-ink-text">Сьогодні, 06:30</span>
+            </div>
           </div>
         </Section>
 

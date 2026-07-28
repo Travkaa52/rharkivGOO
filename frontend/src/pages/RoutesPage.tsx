@@ -54,7 +54,7 @@ export function RoutesPage() {
                 key={tab.kind}
                 onClick={() => setActiveTab(tab.kind)}
                 className={clsx(
-                  'flex shrink-0 items-center gap-2 rounded-xl border px-3.5 py-2 text-body-sm font-semibold transition-all duration-200 active:scale-95',
+                  'flex shrink-0 items-center gap-2.5 rounded-xl border px-3.5 py-2 text-body-sm font-semibold transition-all duration-200 active:scale-95',
                   isActive
                     ? clsx('shadow-sm backdrop-blur-md', tab.activeColor)
                     : 'border-border/40 bg-surface/50 text-ink-muted hover:bg-surface/80 hover:text-ink-text backdrop-blur-sm'
@@ -63,7 +63,7 @@ export function RoutesPage() {
                 <img
                   src={tab.iconSrc}
                   alt=""
-                  className={clsx('h-6 w-6 object-contain', isActive ? 'opacity-100' : 'opacity-70')}
+                  className={clsx('h-14 w-14 object-contain', isActive ? 'opacity-100' : 'opacity-70')}
                 />
                 <span>{tab.label}</span>
               </button>

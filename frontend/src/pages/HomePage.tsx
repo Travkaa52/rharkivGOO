@@ -238,14 +238,15 @@ export function HomePage() {
               <span className="text-[10px] font-medium text-slate-400 capitalize">{formattedDate}</span>
             </div>
             
-            <Link 
-              to="/notifications"
+            <button
+              type="button"
+              onClick={() => showToast('Нових сповіщень немає')}
               aria-label="Сповіщення"
               className="relative p-2.5 rounded-2xl bg-white border border-slate-100 hover:bg-slate-50 transition-all active:scale-95 text-slate-700 shadow-xs"
             >
               <Bell size={18} />
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            </Link>
+            </button>
 
             <Link 
               to="/profile"
@@ -406,11 +407,11 @@ export function HomePage() {
                 to={item.to}
                 className="bg-white rounded-[22px] p-4 flex items-center gap-3.5 border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200 active:scale-[0.98] transition-all duration-200 group"
               >
-                <div className={`w-11 h-11 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
+                <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
                   {item.isImage ? (
-                    <img src={metroIcon} alt="Метро" className="w-6 h-6 object-contain" />
+                    <img src={metroIcon} alt="Метро" className="w-12 h-12 object-contain" />
                   ) : (
-                    Icon && <Icon size={21} />
+                    Icon && <Icon size={30} />
                   )}
                 </div>
                 <span className="font-extrabold text-slate-800 text-xs tracking-tight">{item.label}</span>

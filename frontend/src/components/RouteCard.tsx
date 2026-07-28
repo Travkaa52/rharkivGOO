@@ -36,9 +36,10 @@ export function RouteCard({ route }: { route: TransportRoute }) {
           {route.number}
         </div>
         {/* Іконка виду транспорту поверх бейджа з номером — без спрайту/анімації,
-            лише щоб користувач одразу бачив: автобус, тролейбус, трамвай чи метро. */}
-        <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-white shadow-glass">
-          <TransportKindIcon kind={route.kind} size={13} />
+            лише щоб користувач одразу бачив: автобус, тролейбус, трамвай чи метро.
+            Збільшено у 2.5 рази для кращої впізнаваності. */}
+        <div className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-white shadow-glass">
+          <TransportKindIcon kind={route.kind} size={30} />
         </div>
       </div>
       <div className="min-w-0 flex-1">

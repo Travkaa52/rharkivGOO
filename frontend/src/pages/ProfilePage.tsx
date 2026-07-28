@@ -9,18 +9,12 @@ import {
   ChevronRight, 
   ShieldCheck,
   Sparkles,
-  Moon,
-  Globe,
-  Bell,
-  MapPin,
+  Settings as SettingsIcon,
   Info,
   Trash2,
-  RefreshCw,
   Share2,
   FileText,
   Award,
-  ExternalLink,
-  Check,
   LifeBuoy,
   Heart
 } from 'lucide-react';
@@ -28,7 +22,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
-import { useSettingsStore } from '@/store/useSettingsStore';
 import {
   AboutAppModal,
   RateAppModal,
@@ -50,13 +43,6 @@ export function ProfilePage() {
     useHistoryStore.setState({ entries: [] });
   };
 
-  const theme = useSettingsStore((s) => s.theme);
-  const setTheme = useSettingsStore((s) => s.setTheme);
-  const notificationsEnabled = useSettingsStore((s) => s.pushNotificationsEnabled);
-  const togglePushNotifications = useSettingsStore((s) => s.togglePushNotifications);
-  const [geolocationEnabled, setGeolocationEnabled] = useState(true);
-  const [cacheSize, setCacheSize] = useState('14.2 MB');
-  const [isUpdating, setIsUpdating] = useState(false);
   const showToast = useToastStore((s) => s.show);
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
@@ -64,19 +50,6 @@ export function ProfilePage() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
   const [isSupportProjectOpen, setIsSupportProjectOpen] = useState(false);
-
-  const handleClearCache = () => {
-    setCacheSize('0 KB');
-    showToast('Кеш успішно очищено!', 'success');
-  };
-
-  const handleUpdateData = () => {
-    setIsUpdating(true);
-    setTimeout(() => {
-      setIsUpdating(false);
-      showToast('Дані успішно оновлено до актуальної версії.', 'success');
-    }, 800);
-  };
 
   const handleShareApp = async () => {
     const shareData = {
@@ -98,7 +71,19 @@ export function ProfilePage() {
 
   return (
     <div className="min-h-dvh bg-bg text-ink-text selection:bg-primary/20 pb-32">
-      <PageHeader title="Профіль" subtitle="Особистий кабінет та керування" />
+      <PageHeader
+        title="Профіль"
+        subtitle="Особистий кабінет та керування"
+        action={
+          <Link
+            to="/settings"
+            aria-label="Налаштування"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/60 bg-surface/80 text-ink-text shadow-xs backdrop-blur-md transition-all hover:bg-surface active:scale-95"
+          >
+            <SettingsIcon className="h-4.5 w-4.5" />
+          </Link>
+        }
+      />
 
       <div className="mx-auto max-w-md space-y-5 px-4 pt-2">
         
@@ -275,122 +260,35 @@ export function ProfilePage() {
           </div>
         </div>
 
+        <div className="space-y-2">
+          <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
+            Керування
+          </span>
+          <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm">
+            <Link
+              to="/settings"
+              className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+                  <SettingsIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-ink-text">Налаштування</h4>
+                  <p className="text-[11px] text-ink-muted">Тема, карта, мова, сповіщення, кеш</p>
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-ink-muted" />
+            </Link>
+          </div>
+        </div>
+
         <div className="space-y-3">
           <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
-            Налаштування
+            Про додаток
           </span>
 
           <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
-            <div className="p-4 font-bold text-xs text-ink-muted bg-surface-muted/30 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span>Зовнішній вигляд</span>
-            </div>
-
-            <div className="flex items-center justify-between p-4 min-h-[48px]">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
-                  <Moon className="h-4 w-4" />
-                </div>
-                <span className="text-xs font-bold text-ink-text">Темна тема</span>
-              </div>
-              <button
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  theme !== 'light' ? 'bg-primary' : 'bg-border'
-                }`}
-                role="switch"
-                aria-checked={theme !== 'light'}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                    theme !== 'light' ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-            </div>
-
-            <button
-              onClick={() => showToast('Наразі доступна лише українська мова інтерфейсу.')}
-              className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
-                  <Globe className="h-4 w-4" />
-                </div>
-                <span className="text-xs font-bold text-ink-text">Мова інтерфейсу</span>
-              </div>
-              <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-                Українська
-              </span>
-            </button>
-          </div>
-
-          <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
-            <div className="p-4 font-bold text-xs text-ink-muted bg-surface-muted/30 flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-emerald-500" />
-              <span>Карта</span>
-            </div>
-
-            <div className="flex items-center justify-between p-4 min-h-[48px]">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
-                  <MapPin className="h-4 w-4" />
-                </div>
-                <span className="text-xs font-bold text-ink-text">Використовувати геолокацію</span>
-              </div>
-              <button
-                onClick={() => setGeolocationEnabled(!geolocationEnabled)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  geolocationEnabled ? 'bg-primary' : 'bg-border'
-                }`}
-                role="switch"
-                aria-checked={geolocationEnabled}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                    geolocationEnabled ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-
-          <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
-            <div className="p-4 font-bold text-xs text-ink-muted bg-surface-muted/30 flex items-center gap-2">
-              <Bell className="h-4 w-4 text-blue-500" />
-              <span>Сповіщення</span>
-            </div>
-
-            <div className="flex items-center justify-between p-4 min-h-[48px]">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-border/40 text-ink-text">
-                  <Bell className="h-4 w-4" />
-                </div>
-                <span className="text-xs font-bold text-ink-text">Новини транспорту та метро</span>
-              </div>
-              <button
-                onClick={togglePushNotifications}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  notificationsEnabled ? 'bg-primary' : 'bg-border'
-                }`}
-                role="switch"
-                aria-checked={notificationsEnabled}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                    notificationsEnabled ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-
-          <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm divide-y divide-border/40">
-            <div className="p-4 font-bold text-xs text-ink-muted bg-surface-muted/30 flex items-center gap-2">
-              <Info className="h-4 w-4 text-amber-500" />
-              <span>Додаток</span>
-            </div>
-
             <button
               onClick={() => setIsAboutOpen(true)}
               className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
@@ -478,64 +376,6 @@ export function ProfilePage() {
               </div>
               <ChevronRight className="h-4 w-4 text-ink-muted" />
             </button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
-            Системна інформація
-          </span>
-          <div className="overflow-hidden rounded-[22px] border border-border/60 bg-surface/80 backdrop-blur-2xl shadow-sm p-4 space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-ink-muted font-medium">Версія додатка</span>
-              <span className="font-bold text-ink-text">v1.2.0 (Build 420)</span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-ink-muted font-medium">Існуюча карта</span>
-              <span className="font-bold text-ink-text">Leaflet / OpenStreetMap</span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-ink-muted font-medium">Останнє оновлення даних</span>
-              <span className="font-bold text-ink-text">Сьогодні, 06:30</span>
-            </div>
-            <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
-              <span className="text-ink-muted font-medium">Розмір кэшу</span>
-              <span className="font-bold text-emerald-600">{cacheSize}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <span className="px-1 text-[11px] font-bold uppercase tracking-wider text-ink-muted/80">
-            Швидкі дії
-          </span>
-          <div className="grid grid-cols-1 gap-2.5">
-            <button
-              onClick={handleUpdateData}
-              disabled={isUpdating}
-              className="flex items-center justify-center gap-2 w-full rounded-[20px] bg-primary px-4 py-3.5 text-xs font-extrabold text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-98 min-h-[48px]"
-            >
-              <RefreshCw className={`h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
-              <span>{isUpdating ? 'Оновлення...' : 'Оновити дані розкладу'}</span>
-            </button>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                onClick={handleClearCache}
-                className="flex items-center justify-center gap-2 rounded-[20px] bg-surface/80 border border-border/60 px-4 py-3.5 text-xs font-bold text-ink-text shadow-xs transition-all hover:bg-surface active:scale-98 min-h-[48px]"
-              >
-                <Trash2 className="h-4 w-4 text-rose-500" />
-                <span>Очистити кеш</span>
-              </button>
-
-              <button
-                onClick={() => showToast('Встановлено актуальну версію (v1.2.0). Оновлень немає.')}
-                className="flex items-center justify-center gap-2 rounded-[20px] bg-surface/80 border border-border/60 px-4 py-3.5 text-xs font-bold text-ink-text shadow-xs transition-all hover:bg-surface active:scale-98 min-h-[48px]"
-              >
-                <Check className="h-4 w-4 text-emerald-500" />
-                <span>Перевірити оновлення</span>
-              </button>
-            </div>
           </div>
         </div>
 

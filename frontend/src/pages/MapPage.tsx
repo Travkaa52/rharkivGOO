@@ -54,6 +54,9 @@ export function MapPage() {
 
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [mapKey, setMapKey] = useState(0);
+  const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
@@ -277,6 +280,7 @@ export function MapPage() {
   const handleMapReady = useCallback((mapInstance: MapLibreMap | null) => {
     if (!mapInstance) return;
     setMap(mapInstance);
+    setMapError(null);
     if (mapInstance.isStyleLoaded()) {
       setIsMapLoaded(true);
     } else {
@@ -284,13 +288,47 @@ export function MapPage() {
     }
   }, []);
 
+  const handleMapError = useCallback((message: string) => {
+    // Помилка стилю карти (мережа/CORS/недоступний тайл-сервер) — раніше в цьому
+    // випадку спінер "Завантаження карти..." лишався назавжди і поверх нього
+    // висів непрозорий блокуючий шар, який не давав користуватись картою.
+    setMapError(message);
+  }, []);
+
+  const handleRetryMap = useCallback(() => {
+    setMapError(null);
+    setIsMapLoaded(false);
+    setMap(null);
+    // Перемонтовуємо <MapView> заново — інакше застряглий екземпляр MapLibre
+    // (наприклад, після обірваного запиту стилю) не зробить повторну спробу сам.
+    setMapKey((k) => k + 1);
+  }, []);
+
+  // Запобіжник: якщо подія 'load' від MapLibre з якоїсь причини не настає
+  // (повільна мережа, застряглий запит спрайту/шрифтів тощо), не тримаємо
+  // користувача вічно за блокуючим екраном завантаження — знімаємо його через
+  // 8 секунд і даємо картою користуватись; шари та зупинки доопрацюються самі,
+  // коли/якщо стиль усе ж довантажиться.
+  useEffect(() => {
+    if (isMapLoaded || mapError) {
+      if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+      return;
+    }
+    loadTimeoutRef.current = setTimeout(() => {
+      setIsMapLoaded(true);
+    }, 8000);
+    return () => {
+      if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+    };
+  }, [isMapLoaded, mapError, mapKey]);
+
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-slate-900 text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-white">
       
       {/* 1. КАРТА ТА СКЕЛЕТОН */}
       <div className="absolute inset-0 z-0">
-        {!isMapLoaded && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md animate-pulse">
+        {!isMapLoaded && !mapError && (
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md animate-pulse">
             <div className="flex flex-col items-center gap-3">
               <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
                 <span className="text-xl">🗺️</span>
@@ -300,7 +338,24 @@ export function MapPage() {
           </div>
         )}
 
+        {mapError && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-slate-900/95 px-6 text-center backdrop-blur-md">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-500/40 bg-rose-500/20">
+              <span className="text-xl">⚠️</span>
+            </div>
+            <p className="text-xs font-bold tracking-wide text-slate-200">Не вдалося завантажити карту</p>
+            <p className="max-w-xs text-[11px] text-slate-400">Перевірте з’єднання з інтернетом і спробуйте ще раз.</p>
+            <button
+              onClick={handleRetryMap}
+              className="mt-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-emerald-700 active:scale-95"
+            >
+              Спробувати знову
+            </button>
+          </div>
+        )}
+
         <MapView
+          key={mapKey}
           userPosition={position}
           userHeading={heading}
           userIsMoving={isMoving}
@@ -310,6 +365,7 @@ export function MapPage() {
           visibleKinds={visibleKinds}
           showStops={showStops}
           onMapReady={handleMapReady}
+          onMapError={handleMapError}
           fromPoint={fromPoint}
           toPoint={toPoint}
         />

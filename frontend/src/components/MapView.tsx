@@ -222,6 +222,8 @@ interface MapViewProps {
   visibleKinds?: TransportKind[];
   showStops?: boolean;
   onMapReady?: (map: MapLibreMap | null) => void;
+  /** Викликається, якщо стиль карти не вдалось завантажити (мережа/CORS/недоступний тайл-сервер). */
+  onMapError?: (message: string) => void;
   /** Точка "Звідки" для побудови маршруту — позначається зеленим піном. */
   fromPoint?: { lat: number; lng: number } | null;
   /** Точка "Куди" для побудови маршруту — позначається червоним піном. */
@@ -238,6 +240,7 @@ export function MapView({
   visibleKinds = ['metro', 'tram', 'trolleybus', 'bus'],
   showStops = true,
   onMapReady,
+  onMapError,
   fromPoint = null,
   toPoint = null
 }: MapViewProps) {
@@ -258,6 +261,8 @@ export function MapView({
   onRouteSelectRef.current = onRouteSelect;
   const onMapReadyRef = useRef(onMapReady);
   onMapReadyRef.current = onMapReady;
+  const onMapErrorRef = useRef(onMapError);
+  onMapErrorRef.current = onMapError;
 
   // Ініціалізація карти
   useEffect(() => {
@@ -276,6 +281,16 @@ export function MapView({
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+
+    // Карта лишається інтерактивною (панорамування/зум) навіть до фінального 'load' —
+    // раніше повноекранний оверлей завантаження блокував кліки по канвасу карти,
+    // і якщо стиль не завантажувався (нестабільна мережа, заблокований тайл-сервер),
+    // користувач взагалі не міг користуватись картою. Тепер помилку стилю ловимо
+    // явно і повідомляємо викликача замість вічного спінера.
+    map.on('error', (e) => {
+      const message = e?.error?.message || 'Не вдалося завантажити стиль карти';
+      onMapErrorRef.current?.(message);
+    });
 
     map.on('load', () => {
       ensureBuildingsLayer(map, show3DBuildings);
