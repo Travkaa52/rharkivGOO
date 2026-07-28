@@ -14,6 +14,8 @@ import { localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { TransportKindIcon, KIND_LABELS_UK } from '@/components/TransportKindIcon';
 import { getStationPhoto } from '@/data/stationPhotos';
+import { trolleyTimetables } from '@/data/trolleyTimetables';
+import { RouteTimetable } from '@/components/RouteTimetable';
 import type { TransportRoute } from '@/types/transport';
 
 function RouteDetailSkeleton() {
@@ -336,6 +338,14 @@ export function RouteDetailPage() {
             </ol>
           </div>
         </div>
+
+        {/* Trolleybus schedule (if data available for this route) */}
+        {route.kind === 'trolleybus' && (() => {
+          const timetable = trolleyTimetables.getByRouteNumber(route.number);
+          if (!timetable || timetable.stations.length === 0) return null;
+          const info = trolleyTimetables.getInfoByRouteNumber(route.number);
+          return <RouteTimetable timetable={timetable} info={info} accentColor={routeColor} />;
+        })()}
       </div>
     </div>
   );

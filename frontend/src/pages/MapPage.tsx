@@ -1,7 +1,20 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
-import { Clock, X, ChevronRight, Mic, Plus, Minus, Compass, Navigation, Star, Bus, Zap, TrainTrack } from 'lucide-react';
+import { 
+  Clock, 
+  X, 
+  ChevronRight, 
+  Mic, 
+  Plus, 
+  Minus, 
+  Compass, 
+  Navigation, 
+  Star, 
+  Bus, 
+  Zap, 
+  TrainTrack 
+} from 'lucide-react';
 import { MapView } from '@/components/MapView';
 import { MetroLayer } from '@/components/MetroLayer';
 import { StopCard } from '@/components/StopCard';
@@ -18,7 +31,6 @@ import { useSettingsStore } from '@/store/useSettingsStore';
 import { KIND_LABELS_UK } from '@/components/TransportKindIcon';
 import type { TransportKind } from '@/types/transport';
 
-const GOOGLE_API_KEY = "AIzaSyBvblf4V12ylZAeAetlBJdDo0BmGjJ0tV0";
 const SUGGESTIONS_LIMIT = 6;
 const STORAGE_PREFIX = 'kharkiv_go_map_state_';
 
@@ -51,58 +63,6 @@ export function MapPage() {
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Стейт для результатов поиска Google Places
-  const [googlePredictions, setGooglePredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
-  const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesService = useRef<google.maps.places.PlacesService | null>(null);
-
-  // Загрузка Google Maps SDK асинхронно
-  useEffect(() => {
-    if (window.google && window.google.maps) {
-      autocompleteService.current = new window.google.maps.places.AutocompleteService();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places&language=uk`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      if (window.google && window.google.maps) {
-        autocompleteService.current = new window.google.maps.places.AutocompleteService();
-      }
-    };
-    document.head.appendChild(script);
-  }, []);
-
-  // Обработка ввода с запросом к Google Places API (ограничено полем зрения Харкова)
-  useEffect(() => {
-    if (!query.trim() || !autocompleteService.current) {
-      setGooglePredictions([]);
-      return;
-    }
-
-    const bounds = new window.google.maps.LatLngBounds(
-      new window.google.maps.LatLng(49.9, 36.1), // Юго-запад Харкова
-      new window.google.maps.LatLng(50.1, 36.4)  // Северо-восток Харкова
-    );
-
-    autocompleteService.current.getPlacePredictions(
-      {
-        input: query,
-        locationRestriction: bounds,
-        componentRestrictions: { country: 'ua' },
-      },
-      (predictions, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-          setGooglePredictions(predictions);
-        } else {
-          setGooglePredictions([]);
-        }
-      }
-    );
-  }, [query]);
-
   const [activeFilterChips, setActiveFilterChips] = useState<Record<string, boolean>>(() => {
     try {
       const cached = localStorage.getItem(`${STORAGE_PREFIX}filters`);
@@ -110,13 +70,22 @@ export function MapPage() {
     } catch {
       // fallback
     }
-    return { bus: true, trolleybus: true, tram: true, metro: true, favorites: false, stops: true };
+    return {
+      bus: true,
+      trolleybus: true,
+      tram: true,
+      metro: true,
+      favorites: false,
+      stops: true,
+    };
   });
 
   useEffect(() => {
     try {
       localStorage.setItem(`${STORAGE_PREFIX}filters`, JSON.stringify(activeFilterChips));
-    } catch {}
+    } catch {
+      // quota exceeded or private mode
+    }
   }, [activeFilterChips]);
 
   const visibleKinds = useMemo(() => {
@@ -188,31 +157,14 @@ export function MapPage() {
         const lngs = coords.map((c) => c[0]);
         const lats = coords.map((c) => c[1]);
         map.fitBounds(
-          [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+          [
+            [Math.min(...lngs), Math.min(...lats)],
+            [Math.max(...lngs), Math.max(...lats)]
+          ],
           { padding: { top: 140, bottom: 280, left: 40, right: 40 }, duration: 700, maxZoom: 16 }
         );
       }
     }
-  }, [map]);
-
-  // Обработка выбора места из Google Places
-  const handleGooglePlaceSelect = useCallback((placeId: string, description: string) => {
-    setQuery(description);
-    setSuggestionsOpen(false);
-
-    if (!window.google || !map) return;
-
-    // Создаем временный элемент для PlacesService (требует DOM-элемент или карту)
-    const dummyDiv = document.createElement('div');
-    const service = new window.google.maps.places.PlacesService(dummyDiv);
-
-    service.getDetails({ placeId, fields: ['geometry'] }, (place, status) => {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-        map.flyTo({ center: [lng, lat], zoom: 16, essential: true });
-      }
-    });
   }, [map]);
 
   const handleTrainSelect = useCallback((trainId: string) => {
@@ -233,6 +185,7 @@ export function MapPage() {
 
   useEffect(() => {
     if (!map) return;
+
     try {
       const cachedState = localStorage.getItem(`${STORAGE_PREFIX}camera`);
       if (cachedState) {
@@ -241,18 +194,24 @@ export function MapPage() {
           map.jumpTo({ center, zoom });
         }
       }
-    } catch {}
+    } catch {
+      // Ignore
+    }
 
     const handleMoveEnd = () => {
       try {
         const center = map.getCenter().toArray();
         const zoom = map.getZoom();
         localStorage.setItem(`${STORAGE_PREFIX}camera`, JSON.stringify({ center, zoom }));
-      } catch {}
+      } catch {
+        // Ignore
+      }
     };
 
     map.on('moveend', handleMoveEnd);
-    return () => { map.off('moveend', handleMoveEnd); };
+    return () => {
+      map.off('moveend', handleMoveEnd);
+    };
   }, [map]);
 
   useEffect(() => {
@@ -319,7 +278,9 @@ export function MapPage() {
         
         <div className="pointer-events-auto flex items-center gap-2.5">
           <div className="glass-surface relative flex-1 rounded-[24px] border border-border/40 bg-surface/90 shadow-xl shadow-black/10 backdrop-blur-xl transition-all focus-within:ring-2 focus-within:ring-primary/30">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-text/40">🔍</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-text/40">
+              🔍
+            </span>
             <input
               type="text"
               value={query}
@@ -334,7 +295,7 @@ export function MapPage() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSearchSubmit(query);
               }}
-              placeholder="Адреса, зупинка або маршрут (Google Places)..."
+              placeholder="Зупинка, станція метро або маршрут..."
               className="w-full bg-transparent py-3.5 pl-11 pr-24 text-xs font-semibold text-ink-text placeholder:text-ink-text/40 focus:outline-none"
             />
             
@@ -362,6 +323,7 @@ export function MapPage() {
               )}
             </div>
           </div>
+
         </div>
 
         {/* Швидкі фільтри */}
@@ -387,34 +349,13 @@ export function MapPage() {
         </div>
 
         {suggestionsOpen && query.trim() && (
-          <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden bg-white/95 backdrop-blur-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-150 max-h-64 overflow-y-auto">
-            {/* Локальные подсказки */}
+          <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden bg-white/95 backdrop-blur-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-150">
             <MapSearchSuggestions
               stops={suggestedStops}
               routes={suggestedRoutes}
               onStopSelect={handleStopSelect}
               onRouteSelect={handleRouteSelect}
             />
-
-            {/* Подсказки из Google Places API */}
-            {googlePredictions.length > 0 && (
-              <div className="border-t border-slate-100 p-2">
-                <div className="px-3 py-1 text-[10px] font-bold uppercase text-slate-400 tracking-wider flex items-center justify-between">
-                  <span>Google Places</span>
-                  <span className="text-emerald-600">Maps API</span>
-                </div>
-                {googlePredictions.map((prediction) => (
-                  <button
-                    key={prediction.place_id}
-                    onClick={() => handleGooglePlaceSelect(prediction.place_id, prediction.description)}
-                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700"
-                  >
-                    <span className="text-slate-400 shrink-0">📍</span>
-                    <span className="truncate font-medium">{prediction.description}</span>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         )}
       </div>
