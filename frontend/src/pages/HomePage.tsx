@@ -21,6 +21,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { ReportDelayModal } from '@/components/ReportDelayModal';
+import { TrainWishSprite } from '@/components/TrainWishSprite';
 import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
@@ -386,6 +387,9 @@ export function HomePage() {
             </>
           )}
         </div>
+
+        {/* 2.5. TRAIN WISH SPRITE — проїжджає раз на 2–3 години після заходу, тягне банер з побажанням */}
+        <TrainWishSprite />
 
         {/* 3. QUICK ACTIONS GRID (2x2) */}
         <section className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
