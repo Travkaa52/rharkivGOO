@@ -11,10 +11,10 @@ interface ModalProps {
 }
 
 /**
- * Єдине центроване модальне вікно застосунку (на відміну від <Sheet />, яка
- * завжди виїжджає знизу, цей компонент — класичний діалог по центру екрана,
- * для коротких інформаційних та формних модалок з профілю: "Про програму",
- * "Оцінити застосунок", "Політика конфіденційності", підтримка тощо).
+ * Єдине модальне вікно застосунку. Як і <Sheet />, завжди виїжджає знизу
+ * екрана з плавною анімацією (slide-up + fade), використовується для
+ * коротких інформаційних та формних модалок з профілю: "Про програму",
+ * "Оцінити застосунок", "Політика конфіденційності", підтримка тощо.
  */
 export function Modal({ open, onClose, title, icon, children }: ModalProps) {
   useEffect(() => {
@@ -35,7 +35,7 @@ export function Modal({ open, onClose, title, icon, children }: ModalProps) {
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
       <div
         className="absolute inset-0 animate-in fade-in duration-200 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
@@ -45,10 +45,12 @@ export function Modal({ open, onClose, title, icon, children }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="glass-surface relative flex max-h-[85vh] w-full max-w-sm flex-col overflow-hidden rounded-xl3 shadow-glass-lg animate-in fade-in zoom-in-95 duration-200"
+        className="glass-surface relative flex max-h-[85vh] w-full max-w-sm flex-col overflow-hidden rounded-t-xl3 shadow-glass-lg animate-sheet-up pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:rounded-xl3 sm:animate-in sm:fade-in sm:zoom-in-95 sm:duration-200 sm:pb-0"
       >
+        <div className="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-ink-text/20 sm:hidden" />
+
         {(title || icon) && (
-          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/40 px-5 py-4">
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/40 px-5 py-3 sm:py-4">
             <div className="flex min-w-0 items-center gap-2.5">
               {icon && <span className="shrink-0 text-primary/80">{icon}</span>}
               {title && <h2 className="truncate text-title text-ink-text">{title}</h2>}
