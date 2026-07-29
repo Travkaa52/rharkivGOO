@@ -13,6 +13,7 @@ import type { TransportKind } from '@/types/transport';
 const ROUTES_SOURCE_ID = 'khgo-routes';
 const ROUTES_LAYER_ID = 'khgo-routes-lines';
 const ROUTES_CASING_LAYER_ID = 'khgo-routes-casing';
+const ROUTES_HITBOX_LAYER_ID = 'khgo-routes-hitbox';
 const STOPS_SOURCE_ID = 'khgo-stops';
 const STOPS_LAYER_ID = 'khgo-stops-circles';
 const STOPS_HALO_LAYER_ID = 'khgo-stops-halo';
@@ -75,6 +76,23 @@ function addStaticTransitLayers(
         'line-opacity': ['case', ['get', 'dimmed'], 0.12, 0.9]
       }
     });
+
+    // Невидимий, але значно ширший шар-"мішень" під видимою лінією маршруту.
+    // Раніше клікабельним був лише сам ROUTES_LAYER_ID шириною 1.4–6.5px —
+    // на телефоні потрапити пальцем у тонку лінію тролейбуса/трамвая було
+    // практично неможливо, тому побудова маршруту на карті "не працювала".
+    // Цей шар нічого не малює (line-opacity: 0), лише розширює ділянку кліку.
+    map.addLayer({
+      id: ROUTES_HITBOX_LAYER_ID,
+      type: 'line',
+      source: ROUTES_SOURCE_ID,
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#000000',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 11, 18, 17, 26],
+        'line-opacity': 0
+      }
+    }, ROUTES_LAYER_ID);
   }
 
   if (!map.getSource(STOPS_SOURCE_ID)) {
@@ -306,12 +324,12 @@ export function MapView({
         if (stopId) onStopSelectRef.current?.(stopId);
       });
 
-      map.on('click', ROUTES_LAYER_ID, (e) => {
+      map.on('click', ROUTES_HITBOX_LAYER_ID, (e) => {
         const routeId = e.features?.[0]?.properties?.routeId as string | undefined;
         if (routeId) onRouteSelectRef.current?.(routeId);
       });
 
-      for (const layerId of [STOPS_LAYER_ID, METRO_STOPS_LAYER_ID, ROUTES_LAYER_ID]) {
+      for (const layerId of [STOPS_LAYER_ID, METRO_STOPS_LAYER_ID, ROUTES_HITBOX_LAYER_ID]) {
         map.on('mouseenter', layerId, () => {
           map.getCanvas().style.cursor = 'pointer';
         });
