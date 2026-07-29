@@ -1,4 +1,5 @@
-import { Clock, Timer, MapPin } from 'lucide-react';
+import { Clock, Timer, MapPin, Map as MapIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { localStops } from '@/data/localData';
 import { TransportKindIcon, KIND_LABELS_UK } from '@/components/TransportKindIcon';
 import { getStationPhoto } from '@/data/stationPhotos';
@@ -14,8 +15,24 @@ import type { TransportRoute } from '@/types/transport';
  * в модальному вікні <RouteDetailModal /> — одним тапом по картці, без
  * переходу на весь застосунок.
  */
-export function RouteDetailContent({ route }: { route: TransportRoute }) {
+export function RouteDetailContent({ route, onNavigate }: { route: TransportRoute; onNavigate?: () => void }) {
   const routeColor = route.color || '#10b981';
+  const navigate = useNavigate();
+
+  // Клік на "Показати на карті" (для будь-якого виду — автобус, тролейбус,
+  // трамвай, метро) веде на /map?route=<id>: карта одразу підсвічує лінію
+  // маршруту, підганяє камеру під його межі (fitBounds) і підсвічує його
+  // зупинки. Раніше такої кнопки не існувало — маршрут можна було побачити
+  // на карті лише випадково натиснувши точно на тонку лінію.
+  const handleShowOnMap = () => {
+    onNavigate?.();
+    navigate(`/map?route=${route.id}`);
+  };
+
+  const handleStopOnMap = (stopId: string) => {
+    onNavigate?.();
+    navigate(`/map?route=${route.id}&stop=${stopId}`);
+  };
   const timetable = route.kind === 'trolleybus' ? trolleyTimetables.getByRouteNumber(route.number) : null;
   const timetableInfo = route.kind === 'trolleybus' ? trolleyTimetables.getInfoByRouteNumber(route.number) : undefined;
   const hasTimetable = !!timetable && timetable.stations.length > 0;
@@ -78,6 +95,16 @@ export function RouteDetailContent({ route }: { route: TransportRoute }) {
             <span>{route.stopIds.length} зупинок</span>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleShowOnMap}
+          className="mt-3.5 flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-white shadow-md transition-all active:scale-[0.98]"
+          style={{ backgroundColor: routeColor }}
+        >
+          <MapIcon className="h-4 w-4" />
+          Показати на карті
+        </button>
       </div>
 
       {/* Route Stops Interactive Timeline */}
@@ -104,7 +131,16 @@ export function RouteDetailContent({ route }: { route: TransportRoute }) {
               return (
                 <li
                   key={`${stopId}-${idx}`}
-                  className="relative flex items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-surface/80"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleStopOnMap(stopId)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleStopOnMap(stopId);
+                    }
+                  }}
+                  className="relative flex cursor-pointer items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-surface/80 active:scale-[0.99]"
                 >
                   <div className="relative z-10 flex h-5 w-5 shrink-0 items-center justify-center">
                     <div
