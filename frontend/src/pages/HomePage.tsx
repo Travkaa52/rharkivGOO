@@ -18,7 +18,8 @@ import {
   Compass,
   CheckCircle2,
   ExternalLink,
-  AlertTriangle
+  AlertTriangle,
+  TrainTrack
 } from 'lucide-react';
 import { ReportDelayModal } from '@/components/ReportDelayModal';
 import { RouteDetailModal } from '@/components/RouteDetailModal';
@@ -38,7 +39,12 @@ import {
 } from '@/liveMetro/liveMetroEngine';
 import type { TransportKind, TransportRoute } from '@/types/transport';
 
-const metroIcon = assetUrl('/icons/metroicono.png');
+// metroicono.png ще не покладений у public/icons (див. README.txt там же) —
+// доки його не додадуть, для ВСІХ згадок метро на головній сторінці
+// використовуємо вже наявний, гарантовано робочий kharkiv-metro-logo.png.
+const metroIconPrimary = assetUrl('/icons/metroicono.png');
+const metroIconFallback = assetUrl('/icons/kharkiv-metro-logo.png');
+const metroIcon = metroIconFallback;
 const routesIcon = assetUrl('/icons/marshryticono.png');
 const mapIcon = assetUrl('/icons/kartaicono.png');
 const favoritesIcon = assetUrl('/icons/obraneicono.png');
@@ -401,12 +407,13 @@ export function HomePage() {
         {/* 3. QUICK ACTIONS GRID (2x2) — кнопки зменшені (менше padding/gap), іконки того самого розміру */}
         <section className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
-            { label: 'Маршрути', icon: Navigation, image: routesIcon, to: '/routes', color: 'bg-surface-soft text-ink-text border-border/40' },
-            { label: 'Карта', icon: MapIcon, image: mapIcon, to: '/map', color: 'bg-surface-soft text-ink-text border-border/40' },
-            { label: 'Метро', icon: null, image: metroIcon, to: '/metro/live', color: 'bg-surface-soft text-ink-text border-border/40' },
-            { label: 'Обране', icon: Star, image: favoritesIcon, to: '/favorites', color: 'bg-surface-soft text-ink-text border-border/40' },
+            { label: 'Маршрути', icon: Navigation, image: routesIcon, imageFallback: undefined as string | undefined, to: '/routes', color: 'bg-surface-soft text-ink-text border-border/40' },
+            { label: 'Карта', icon: MapIcon, image: mapIcon, imageFallback: undefined as string | undefined, to: '/map', color: 'bg-surface-soft text-ink-text border-border/40' },
+            { label: 'Метро', icon: TrainTrack, image: metroIconPrimary, imageFallback: metroIconFallback as string | undefined, to: '/metro/live', color: 'bg-surface-soft text-ink-text border-border/40' },
+            { label: 'Обране', icon: Star, image: favoritesIcon, imageFallback: undefined as string | undefined, to: '/favorites', color: 'bg-surface-soft text-ink-text border-border/40' },
           ].map((item, index) => {
             const Icon = item.icon;
+            const fallback = item.imageFallback;
             return (
               <Link
                 key={index}
@@ -420,11 +427,19 @@ export function HomePage() {
                       alt={item.label}
                       className="w-[4.5rem] h-[4.5rem] object-contain scale-125"
                       onError={(e) => {
-                        // Якщо PNG-іконку ще не поклали в public/icons — тихо ховаємо
-                        // зображення і показуємо запасну lucide-іконку замість неї.
-                        (e.currentTarget as HTMLImageElement).style.display = 'none';
-                        const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
-                        if (fallback) fallback.style.display = 'flex';
+                        const img = e.currentTarget as HTMLImageElement & { dataset: { triedFallback?: string } };
+                        // Спочатку, якщо є запасний PNG (напр. лого метро замість
+                        // ще не завантаженого metroicono.png) — пробуємо його.
+                        if (fallback && img.dataset.triedFallback !== '1') {
+                          img.dataset.triedFallback = '1';
+                          img.src = fallback;
+                          return;
+                        }
+                        // Якщо і запасний PNG не завантажився — ховаємо картинку
+                        // і показуємо lucide-іконку замість неї.
+                        img.style.display = 'none';
+                        const iconFallback = img.nextElementSibling as HTMLElement | null;
+                        if (iconFallback) iconFallback.style.display = 'flex';
                       }}
                     />
                   ) : null}

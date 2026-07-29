@@ -20,6 +20,7 @@ import { MapView } from '@/components/MapView';
 import { StopDetailModal } from '@/components/StopDetailModal';
 import { TripPlanSheet } from '@/components/TripPlanSheet';
 import { RouteSheet } from '@/components/RouteSheet';
+import { Sheet } from '@/components/ui/Sheet';
 import { MapSearchSuggestions } from '@/components/MapSearchSuggestions';
 import { GpsButton } from '@/components/GpsButton';
 import { MapModeButton } from '@/components/MapModeButton';
@@ -27,6 +28,7 @@ import { TransportLayersPanel } from '@/components/TransportLayersPanel';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { localRoutes, localStops, type TripPlan, type StopItem } from '@/data/localData';
 import { getRouteBounds } from '@/lib/mapLayers';
+import { refineTripPlansWithOSM } from '@/lib/tripPlanRefine';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import type { TransportKind } from '@/types/transport';
 
@@ -66,6 +68,8 @@ export function MapPage() {
   const [toPoint, setToPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [activeField, setActiveField] = useState<'from' | 'to' | null>(null);
   const [tripPlans, setTripPlans] = useState<TripPlan[] | null>(null);
+  const [isRefiningTrip, setIsRefiningTrip] = useState(false);
+  const refineRequestIdRef = useRef(0);
   const [selectedPlanIndex, setSelectedPlanIndex] = useState<number | null>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -229,12 +233,39 @@ export function MapPage() {
         { padding: { top: 160, bottom: 320, left: 60, right: 60 }, duration: 700, maxZoom: 15 }
       );
     }
+
+    // Перший показ — миттєвий (побудований по прямій відстані). Одразу
+    // після цього запускаємо другий, уточнюючий прохід через OpenStreetMap
+    // (реальна пішохідна мережа вулиць), який тихо підправляє цифри ходьби
+    // і, за потреби, переставляє варіанти місцями — без блокування UI.
+    if (plans.length > 0) {
+      const requestId = ++refineRequestIdRef.current;
+      setIsRefiningTrip(true);
+      refineTripPlansWithOSM(plans, fromPoint, toPoint)
+        .then((refined) => {
+          // Ігноруємо застарілу відповідь, якщо користувач встиг побудувати
+          // ще один маршрут, поки цей запит ще виконувався.
+          if (refineRequestIdRef.current !== requestId) return;
+          setTripPlans(refined);
+          setSelectedPlanIndex(refined.length > 0 ? 0 : null);
+        })
+        .finally(() => {
+          if (refineRequestIdRef.current === requestId) setIsRefiningTrip(false);
+        });
+    }
   }, [fromPoint, toPoint, map, clearSelection]);
 
   const selectedTripPlan = useMemo(
     () => (tripPlans && selectedPlanIndex !== null ? tripPlans[selectedPlanIndex] : null),
     [tripPlans, selectedPlanIndex]
   );
+
+  useEffect(() => {
+    if (tripPlans === null) {
+      refineRequestIdRef.current += 1;
+      setIsRefiningTrip(false);
+    }
+  }, [tripPlans]);
 
   const handleSelectTripOption = useCallback((index: number) => {
     setSelectedPlanIndex(index);
@@ -590,12 +621,6 @@ export function MapPage() {
             <p className="font-body text-sm font-medium text-ink-muted">Зупинок не знайдено</p>
           </div>
         )}
-
-        {tripPlans !== null && (
-          <div className="pointer-events-auto max-h-[45vh] overflow-y-auto rounded-[24px] glass-surface shadow-2xl">
-            <TripPlanSheet plans={tripPlans} selectedIndex={selectedPlanIndex} onSelect={handleSelectTripOption} />
-          </div>
-        )}
       </div>
 
       {/* 3. КНОПКИ КАРТИ */}
@@ -637,14 +662,35 @@ export function MapPage() {
 
       <TransportLayersPanel />
 
-      {/* 4. НИЖНЯ КАРТОЧКА: Маршрут */}
-      {selectedRoute && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] will-change-transform">
-          <div className="pointer-events-auto mx-auto max-w-md animate-in slide-in-from-bottom-6 duration-300">
-            <RouteSheet route={selectedRoute} onClose={clearSelection} onStopSelect={handleStopSelect} />
+      {/* 4. НИЖНЯ ШТОРКА: Маршрут (обраний на карті/зупинці) — виїжджає знизу */}
+      <Sheet open={!!selectedRoute} onClose={clearSelection}>
+        {selectedRoute && <RouteSheet route={selectedRoute} onClose={clearSelection} onStopSelect={handleStopSelect} />}
+      </Sheet>
+
+      {/* 4б. НИЖНЯ ШТОРКА: варіанти побудованої поїздки — теж виїжджає знизу */}
+      <Sheet
+        open={tripPlans !== null}
+        onClose={() => {
+          setTripPlans(null);
+          setSelectedPlanIndex(null);
+        }}
+        title="Варіанти поїздки"
+      >
+        {tripPlans !== null && (
+          <div className="-mx-5 -mt-2">
+            {isRefiningTrip && (
+              <div className="mx-5 mb-2 flex items-center gap-2 rounded-xl bg-primary/10 px-3 py-2 text-[11px] font-semibold text-primary">
+                <span className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                <span>Уточнюємо пішохідні відстані по картах OpenStreetMap...</span>
+              </div>
+            )}
+            <div className="max-h-[50vh] overflow-y-auto">
+              <TripPlanSheet plans={tripPlans} selectedIndex={selectedPlanIndex} onSelect={handleSelectTripOption} />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </Sheet>
+
 
       {/* 5. МОДАЛКА ЗУПИНКИ */}
       <StopDetailModal
