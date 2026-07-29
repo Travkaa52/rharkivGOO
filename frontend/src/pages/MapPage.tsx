@@ -506,7 +506,7 @@ export function MapPage() {
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all shrink-0 backdrop-blur-xl shadow-md ${
                   isActive
                     ? 'bg-primary text-white shadow-primary/30 border border-primary/40'
-                    : 'bg-white/80 text-ink-text border border-white/40 hover:bg-white'
+                    : 'glass-surface text-ink-text hover:brightness-105'
                 }`}
               >
                 <Icon size={14} className={isActive ? 'text-white' : 'text-ink-muted'} />
@@ -517,7 +517,7 @@ export function MapPage() {
         </div>
 
         {activeField && fieldSuggestions.length > 0 && (
-          <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden bg-white/95 backdrop-blur-2xl border border-white/50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden glass-surface animate-in fade-in zoom-in-95 duration-150">
             <MapSearchSuggestions
               stops={fieldSuggestions}
               routes={[]}
@@ -538,7 +538,7 @@ export function MapPage() {
         )}
 
         {tripOptions !== null && (
-          <div className="pointer-events-auto max-h-[45vh] overflow-y-auto rounded-[24px] border border-white/50 bg-white/95 shadow-2xl backdrop-blur-2xl">
+          <div className="pointer-events-auto max-h-[45vh] overflow-y-auto rounded-[24px] glass-surface shadow-2xl">
             {tripOptions.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
                 <RouteIcon className="h-6 w-6 text-ink-muted" />
@@ -581,7 +581,7 @@ export function MapPage() {
 
       {/* 3. КНОПКИ КАРТИ */}
       <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-2.5 will-change-transform">
-        <div className="flex flex-col rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/10 overflow-hidden">
+        <div className="flex flex-col rounded-[24px] glass-surface shadow-xl shadow-black/10 overflow-hidden">
           <button
             onClick={() => map?.zoomIn({ duration: 300 })}
             className="flex h-[52px] w-[52px] items-center justify-center text-ink-text hover:bg-surface/60 active:bg-surface transition-colors border-b border-border/40"
@@ -600,7 +600,7 @@ export function MapPage() {
 
         <button
           onClick={() => map?.resetNorthPitch({ duration: 400 })}
-          className="flex h-[52px] w-[52px] items-center justify-center rounded-[24px] bg-white/90 backdrop-blur-xl border border-white/40 text-ink-text shadow-xl shadow-black/10 hover:bg-white active:scale-95 transition-all"
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-[24px] glass-surface text-ink-text shadow-xl shadow-black/10 hover:brightness-105 active:scale-95 transition-all"
           aria-label="Компас / Північ"
           title="Скинути нахил"
         >
@@ -631,7 +631,7 @@ export function MapPage() {
       {selectedStop && !selectedRoute && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] will-change-transform">
           <div className="pointer-events-auto mx-auto max-w-md space-y-3 animate-in slide-in-from-bottom-6 duration-300">
-            <div className="relative rounded-[24px] overflow-hidden shadow-2xl bg-white/95 backdrop-blur-2xl border border-white/50">
+            <div className="relative rounded-[24px] overflow-hidden shadow-2xl glass-surface">
               <StopCard stop={selectedStop} onClick={() => setSelectedStopId(null)} />
               <button
                 onClick={() => setSelectedStopId(null)}
@@ -643,7 +643,7 @@ export function MapPage() {
             </div>
 
             {arrivals.length > 0 && (
-              <div className="overflow-hidden rounded-[24px] border border-white/50 bg-white/95 backdrop-blur-2xl p-4 shadow-2xl">
+              <div className="overflow-hidden rounded-[24px] glass-surface p-4 shadow-2xl">
                 <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/40 px-1">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ink-muted">
                     <Clock className="h-4 w-4 text-primary" />

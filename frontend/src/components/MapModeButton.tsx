@@ -17,8 +17,8 @@ export function MapModeButton() {
       aria-label={is3D ? 'Перемкнути на 2D-вигляд' : 'Перемкнути на 3D-вигляд'}
       aria-pressed={is3D}
       className={clsx(
-        'flex h-11 w-11 shrink-0 items-center justify-center rounded-full shadow-glass transition',
-        'bg-white/80 backdrop-blur-xs hover:scale-105 active:scale-95 font-display text-[11px] font-extrabold text-forest'
+        'glass-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-full shadow-glass transition',
+        'hover:scale-105 active:scale-95 font-display text-[11px] font-extrabold text-primary'
       )}
     >
       {is3D ? '3D' : '2D'}

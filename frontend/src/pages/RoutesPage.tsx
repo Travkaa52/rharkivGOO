@@ -71,7 +71,7 @@ export function RoutesPage() {
 
       {/* Дисклеймер про точність даних */}
       <div className="mx-auto max-w-md px-4 pt-3">
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-700">
+        <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-400">
           Дані про маршрути можуть бути неточними — дані взяті з відкритих джерел і можуть відрізнятися від
           фактичного руху транспорту.
         </div>

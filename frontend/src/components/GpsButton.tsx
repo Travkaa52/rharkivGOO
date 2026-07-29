@@ -13,8 +13,8 @@ export function GpsButton({ onClick, isLocating, hasError }: GpsButtonProps) {
       onClick={onClick}
       aria-label="Визначити моє місцезнаходження"
       className={clsx(
-        'flex h-11 w-11 shrink-0 items-center justify-center rounded-full shadow-glass transition',
-        'bg-white/80 backdrop-blur-xs hover:scale-105 active:scale-95',
+        'glass-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-full shadow-glass transition',
+        'hover:scale-105 active:scale-95',
         hasError && 'ring-2 ring-red-400'
       )}
     >

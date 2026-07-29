@@ -373,7 +373,7 @@ export function HomePage() {
                               className="flex items-center justify-between p-2 rounded-xl hover:bg-primary/10 transition-colors group"
                             >
                               <div className="flex items-center gap-2.5">
-                                <img src={metroIcon} alt="Метро" className="w-6 h-6 rounded-lg object-contain bg-amber-100 p-0.5" />
+                                <img src={metroIcon} alt="Метро" className="w-6 h-6 rounded-lg object-contain bg-gold/15 p-0.5" />
                                 <div>
                                   <span className="font-bold text-xs text-ink-text group-hover:text-primary block">{m.name}</span>
                                   {m.lineName && <span className="text-[10px] text-ink-muted">{m.lineName}</span>}
@@ -398,10 +398,10 @@ export function HomePage() {
         {/* 3. QUICK ACTIONS GRID (2x2) — кнопки зменшені (менше padding/gap), іконки того самого розміру */}
         <section className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
-            { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-blue-50 text-blue-600 border-blue-100', isImage: false },
+            { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-blue-500/10 text-blue-500 border-blue-500/15', isImage: false },
             { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-primary/10 text-primary border-primary/15', isImage: false },
-            { label: 'Метро', icon: null, to: '/metro/live', color: 'bg-amber-50 text-amber-600 border-amber-100', isImage: true },
-            { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-purple-50 text-purple-600 border-purple-100', isImage: false },
+            { label: 'Метро', icon: null, to: '/metro/live', color: 'bg-gold/10 text-gold border-gold/15', isImage: true },
+            { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-purple-500/10 text-purple-400 border-purple-500/15', isImage: false },
           ].map((item, index) => {
             const Icon = item.icon;
             return (
@@ -517,7 +517,7 @@ export function HomePage() {
               <p className="text-[11px] text-ink-muted mb-3 max-w-[240px]">Увімкніть доступ до GPS, щоб бачити зупинки поруч з вами</p>
               <button
                 onClick={() => locate()}
-                className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-sm hover:bg-primary active:scale-95 transition-all inline-flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all inline-flex items-center gap-1.5"
               >
                 <MapPin size={14} />
                 <span>Увімкнути геолокацію</span>
@@ -558,13 +558,13 @@ export function HomePage() {
         <section className="bg-surface-raised rounded-[22px] p-4 border border-border/40 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-amber-50 text-amber-600 rounded-xl">
-                <Star size={16} className="fill-amber-400 text-amber-400" />
+              <div className="p-1.5 bg-gold/10 text-gold rounded-xl">
+                <Star size={16} className="fill-gold text-gold" />
               </div>
               <h2 className="font-extrabold text-ink-text text-xs">Обране</h2>
             </div>
             {(favoriteRouteDetails.length > 0 || favoriteStopDetails.length > 0) && (
-              <Link to="/favorites" className="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-0.5">
+              <Link to="/favorites" className="text-xs font-bold text-gold hover:brightness-110 flex items-center gap-0.5">
                 <span>Усі ({favoriteRouteDetails.length + favoriteStopDetails.length})</span>
                 <ChevronRight size={14} />
               </Link>
@@ -578,7 +578,7 @@ export function HomePage() {
               <p className="text-[11px] text-ink-muted mb-3 max-w-[220px]">Закріплюйте маршрути та зупинки для швидкого доступу</p>
               <Link 
                 to="/routes"
-                className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-sm hover:bg-primary active:scale-95 transition-all inline-flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all inline-flex items-center gap-1.5"
               >
                 <Plus size={14} />
                 <span>Додати маршрути</span>
@@ -657,15 +657,15 @@ export function HomePage() {
         {/* 8. TRANSPORT NEWS & ANNOUNCEMENTS */}
         <section className="bg-surface-raised rounded-[22px] p-4 border border-border/40 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-xl">
+            <div className="p-1.5 bg-blue-500/10 text-blue-500 rounded-xl">
               <AlertCircle size={16} />
             </div>
             <h2 className="font-extrabold text-ink-text text-xs">Новини транспорту</h2>
           </div>
 
-          <div className="p-3.5 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 rounded-[18px] border border-blue-100/60 space-y-2">
+          <div className="p-3.5 bg-blue-500/[0.06] rounded-[18px] border border-blue-500/15 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-700">Офіційно</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/15 text-blue-500">Офіційно</span>
               <span className="text-[10px] font-semibold text-ink-muted">Сьогодні, 08:00</span>
             </div>
             <h3 className="font-extrabold text-ink-text text-xs">Зміни в розкладі рухів тролейбусів у місті</h3>
@@ -675,7 +675,7 @@ export function HomePage() {
             <div className="pt-1">
               <button 
                 onClick={() => showToast('Детальна інформація доступна в офіційному Telegram каналі Kharkiv GO.')}
-                className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700"
+                className="inline-flex items-center gap-1 text-xs font-bold text-blue-500 hover:brightness-110"
               >
                 <span>Детальніше</span>
                 <ExternalLink size={13} />
@@ -687,7 +687,7 @@ export function HomePage() {
         {/* 9. REPORT DELAY CTA */}
         <button
           onClick={() => setIsReportDelayOpen(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-[22px] border border-amber-200 bg-amber-50 py-3.5 text-xs font-extrabold text-amber-700 shadow-sm transition-all active:scale-[0.98] hover:bg-amber-100"
+          className="flex w-full items-center justify-center gap-2 rounded-[22px] border border-gold/25 bg-gold/10 py-3.5 text-xs font-extrabold text-gold shadow-sm transition-all active:scale-[0.98] hover:bg-gold/15"
         >
           <AlertTriangle size={16} />
           <span>Повідомити про затримку</span>

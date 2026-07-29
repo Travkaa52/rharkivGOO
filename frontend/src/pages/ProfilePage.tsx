@@ -203,7 +203,7 @@ export function ProfilePage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-extrabold text-amber-600">
+                <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-extrabold text-amber-400">
                   {favoritesCount}
                 </span>
                 <ChevronRight className="h-4 w-4 text-ink-muted" />

@@ -70,8 +70,8 @@ export function ReportDelayModal({ open, onClose }: ReportDelayModalProps) {
   return (
     <Sheet open={open} onClose={handleClose} title="Повідомити про затримку">
       <div className="space-y-4">
-        <div className="flex items-start gap-2.5 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-800">
-          <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-500" />
+        <div className="flex items-start gap-2.5 rounded-2xl border border-gold/25 bg-gold/10 p-3 text-[11px] leading-relaxed text-ink-text">
+          <AlertTriangle size={16} className="mt-0.5 shrink-0 text-gold" />
           <span>
             Розкажіть, який транспорт затримується — повідомлення одразу піде адміністратору Kharkiv GO в
             особисті повідомлення в Telegram.
