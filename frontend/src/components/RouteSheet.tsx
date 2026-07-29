@@ -27,8 +27,8 @@ export function RouteSheet({ route, onClose, onStopSelect }: RouteSheetProps) {
   const stops = route.stopIds.map((id) => localStops.getById(id)).filter((s): s is NonNullable<typeof s> => !!s);
 
   return (
-    <div className="flex max-h-[70vh] flex-col overflow-hidden rounded-xl2 border border-white/60 bg-white/95 shadow-glass-lg backdrop-blur-xs">
-      <div className="flex items-start gap-3 border-b border-graphite/10 p-3">
+    <div className="-mx-5 -mt-2 flex max-h-[70vh] flex-col overflow-hidden">
+      <div className="flex items-start gap-3 border-b border-graphite/10 px-5 py-3">
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold text-white"
           style={{ backgroundColor: route.color }}
