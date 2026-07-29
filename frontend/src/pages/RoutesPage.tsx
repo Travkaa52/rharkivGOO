@@ -1,35 +1,41 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { TransportKindPage } from '@/pages/TransportKindPage';
-import { TransportKindIcon } from '@/components/TransportKindIcon';
+import { assetUrl } from '@/lib/assetUrl';
 import type { TransportKind } from '@/types/transport';
 
 interface TabItem {
   kind: TransportKind;
   label: string;
   activeColor: string;
+  /** Файл іконки виду транспорту з /public/icons — авторські PNG без фону. */
+  icon: string;
 }
 
 const TABS: TabItem[] = [
   {
     kind: 'bus',
     label: 'Автобуси',
-    activeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+    activeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    icon: 'avtobusicono.png'
   },
   {
     kind: 'trolleybus',
     label: 'Тролейбуси',
-    activeColor: 'bg-blue-500/15 text-blue-400 border-blue-500/30'
+    activeColor: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+    icon: 'troleyicono.png'
   },
   {
     kind: 'tram',
     label: 'Трамваї',
-    activeColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+    activeColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+    icon: 'tramwaiicono.png'
   },
   {
     kind: 'metro',
     label: 'Метро',
-    activeColor: 'bg-red-500/15 text-red-400 border-red-500/30'
+    activeColor: 'bg-red-500/15 text-red-400 border-red-500/30',
+    icon: 'metroicono.png'
   },
 ];
 
@@ -70,7 +76,7 @@ export function RoutesPage() {
       {/* Дисклеймер про точність даних */}
       <div className="mx-auto max-w-md px-4 pt-3">
         <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-700">
-          Дані про маршрути можуть бути неточними — вони взяті з відкритих джерел і можуть відрізнятися від
+          Дані про маршрути можуть бути неточними — дані взяті з відкритих джерел і можуть відрізнятися від
           фактичного руху транспорту.
         </div>
       </div>
