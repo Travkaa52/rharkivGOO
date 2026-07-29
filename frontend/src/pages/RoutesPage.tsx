@@ -21,7 +21,7 @@ const TABS: TabItem[] = [
   {
     kind: 'trolleybus',
     label: 'Тролейбуси',
-    iconSrc: assetUrl('/icons/troleyicono.png'),
+    iconSrc: assetUrl('/icons/trolleyicono.png'),
     activeColor: 'bg-blue-500/15 text-blue-400 border-blue-500/30'
   },
   {
