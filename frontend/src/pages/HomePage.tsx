@@ -497,7 +497,7 @@ export function HomePage() {
               <div className="p-1.5 bg-primary/10 text-primary rounded-xl">
                 <Navigation size={16} />
               </div>
-              <h2 className="font-extrabold text-ink-text text-xs">Ближайшие остановки</h2>
+              <h2 className="font-extrabold text-ink-text text-xs">Найближчі зупинки</h2>
             </div>
             <Link 
               to="/map"
