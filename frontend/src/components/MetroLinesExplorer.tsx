@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Clock3, MapPin, CalendarDays } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Clock3, CalendarDays } from 'lucide-react';
 import { Sheet } from '@/components/ui/Sheet';
 import {
   BUILT_LINES,
@@ -9,6 +9,7 @@ import {
   dayTypeOf,
   secOfDay,
   formatEtaClock,
+  formatEtaCountdown,
   type LiveMetroDayType,
   type StationDayTimetableEntry,
 } from '@/pages/LiveMetroPage';
@@ -17,6 +18,57 @@ function timeStrToSec(time: string): number {
   const m = /^(\d{1,2}):(\d{2})$/.exec(time.trim());
   if (!m) return -1;
   return Number(m[1]) * 3600 + Number(m[2]) * 60;
+}
+
+/** Секундний "тікер" поточного часу доби — щоб таймери прибуття оновлювались живо. */
+function useNowSec(): number {
+  const [nowSec, setNowSec] = useState(() => secOfDay(new Date()));
+  useEffect(() => {
+    const id = setInterval(() => setNowSec(secOfDay(new Date())), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return nowSec;
+}
+
+/**
+ * Таймер відправлення наступного потяга в обидва боки для конкретної станції.
+ * `getStationDayTimetable` повертає щонайбільше 2 записи для станції однієї лінії:
+ * спершу пряме відправлення (index 0 → вперед), потім зворотне (index 1 → назад).
+ * Між двома напрямками — тонка вертикальна риска, що імітує другу колію.
+ */
+function StationNextTrainTimer({ stationId, nowSec }: { stationId: string; nowSec: number }) {
+  const dayType = dayTypeOf(new Date());
+  const entries = useMemo(() => getStationDayTimetable(stationId, dayType), [stationId, dayType]);
+
+  if (entries.length === 0) return null;
+
+  return (
+    <div className="flex shrink-0 items-center">
+      {entries.map((entry, idx) => {
+        const nextIdx = entry.times.findIndex((t) => timeStrToSec(t) >= nowSec);
+        const hasNext = nextIdx !== -1;
+        const etaSec = hasNext ? timeStrToSec(entry.times[nextIdx]) : 0;
+        const arrow = idx === 0 ? '→' : '←';
+
+        return (
+          <div key={`${entry.lineId}-${entry.direction}-${idx}`} className="flex items-center">
+            {/* Розділювач між напрямками — друга колія поруч з першою */}
+            {idx > 0 && <span className="mx-2 h-7 w-[3px] shrink-0 rounded-full bg-border/70" aria-hidden />}
+            <div className="flex min-w-[2.6rem] flex-col items-center leading-tight">
+              <span className="text-[9px] font-bold text-ink-muted/70">{arrow}</span>
+              {hasNext ? (
+                <span className="text-[11px] font-extrabold tabular-nums text-ink-text">
+                  {formatEtaCountdown(etaSec, nowSec)}
+                </span>
+              ) : (
+                <span className="text-[10px] font-semibold text-ink-muted/60">—</span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 /** Плоский список усіх станцій з усіх ліній — для пошуку станції пересадки за id. */
@@ -199,6 +251,7 @@ function StationTimetableSheet({
 export function MetroLinesExplorer() {
   const [activeLineId, setActiveLineId] = useState(BUILT_LINES[0].line.id);
   const [selectedStation, setSelectedStation] = useState<{ id: string; name: string } | null>(null);
+  const nowSec = useNowSec();
 
   const activeLine = BUILT_LINES.find((l) => l.line.id === activeLineId)?.line ?? BUILT_LINES[0].line;
   const color = LINE_COLORS[activeLine.id];
@@ -246,8 +299,14 @@ export function MetroLinesExplorer() {
       {/* Station list for the active line */}
       <div className="rounded-3xl border border-border/60 bg-surface/50 p-3 backdrop-blur-xl shadow-sm">
         <ol className="relative flex flex-col">
+          {/* Основна колія */}
           <div
             className="absolute left-[1.15rem] top-4 bottom-4 w-0.5 rounded-full opacity-60"
+            style={{ backgroundColor: color }}
+          />
+          {/* Друга колія — тонка паралельна лінія поруч, підкреслює, що потяги йдуть в обидва боки */}
+          <div
+            className="absolute left-[1.45rem] top-4 bottom-4 w-0.5 rounded-full opacity-25"
             style={{ backgroundColor: color }}
           />
           {activeLine.stations.map((station, idx) => (
@@ -268,7 +327,8 @@ export function MetroLinesExplorer() {
                   <span className="truncate text-body-sm font-semibold text-ink-text">{station.name}</span>
                   <InterchangeBadge stationId={station.id} />
                 </div>
-                <MapPin className="h-4 w-4 shrink-0 text-ink-muted/50" />
+                {/* Таймер відправлення наступного потяга в обидва боки замість статичної іконки */}
+                <StationNextTrainTimer stationId={station.id} nowSec={nowSec} />
               </button>
             </li>
           ))}

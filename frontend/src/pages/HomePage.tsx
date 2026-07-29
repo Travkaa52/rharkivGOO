@@ -21,6 +21,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { ReportDelayModal } from '@/components/ReportDelayModal';
+import { RouteDetailModal } from '@/components/RouteDetailModal';
 import { TrainWishSprite } from '@/components/TrainWishSprite';
 import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
@@ -35,7 +36,7 @@ import {
   getUpcomingArrivalsForStation,
   formatEtaCountdown
 } from '@/liveMetro/liveMetroEngine';
-import type { TransportKind } from '@/types/transport';
+import type { TransportKind, TransportRoute } from '@/types/transport';
 
 const metroIcon = assetUrl('/icons/metroicono.png');
 
@@ -77,6 +78,7 @@ export function HomePage() {
 
   // Модалка "Повідомити про затримку"
   const [isReportDelayOpen, setIsReportDelayOpen] = useState(false);
+  const [activeRoute, setActiveRoute] = useState<TransportRoute | null>(null);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -308,21 +310,22 @@ export function HomePage() {
                         <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted px-2 mb-1.5">Маршрути</div>
                         <div className="space-y-1">
                           {searchResults.routes.map((r) => (
-                            <Link
+                            <button
                               key={r.id}
-                              to={`/routes/${r.id}`}
+                              type="button"
                               onClick={() => {
                                 setIsSearchFocused(false);
                                 addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
+                                setActiveRoute(r);
                               }}
-                              className="flex items-center justify-between p-2 rounded-xl hover:bg-primary/10 transition-colors group"
+                              className="flex w-full items-center justify-between p-2 rounded-xl hover:bg-primary/10 transition-colors group"
                             >
                               <div className="flex items-center gap-2.5">
                                 <span className="text-sm">{KIND_ICON[r.kind]}</span>
                                 <span className="font-bold text-xs text-ink-text group-hover:text-primary">{r.number} — {r.name}</span>
                               </div>
                               <ChevronRight size={14} className="text-ink-muted" />
-                            </Link>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -392,8 +395,8 @@ export function HomePage() {
         {/* 2.5. TRAIN WISH SPRITE — проїжджає раз на 2–3 години після заходу, тягне банер з побажанням */}
         <TrainWishSprite />
 
-        {/* 3. QUICK ACTIONS GRID (2x2) */}
-        <section className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        {/* 3. QUICK ACTIONS GRID (2x2) — кнопки зменшені (менше padding/gap), іконки того самого розміру */}
+        <section className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
             { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-blue-50 text-blue-600 border-blue-100', isImage: false },
             { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-primary/10 text-primary border-primary/15', isImage: false },
@@ -405,7 +408,7 @@ export function HomePage() {
               <Link
                 key={index}
                 to={item.to}
-                className="bg-surface-raised rounded-[22px] p-4 flex items-center gap-3.5 border border-border/40 shadow-sm hover:shadow-md hover:border-border/60 active:scale-[0.98] transition-all duration-200 group"
+                className="bg-surface-raised rounded-2xl p-2.5 flex items-center gap-2.5 border border-border/40 shadow-sm hover:shadow-md hover:border-border/60 active:scale-[0.98] transition-all duration-200 group"
               >
                 <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
                   {item.isImage ? (
@@ -584,11 +587,14 @@ export function HomePage() {
           ) : (
             <div className="space-y-2">
               {favoriteRouteDetails.slice(0, 3).map((r) => (
-                <Link
+                <button
                   key={r.id}
-                  to={`/routes/${r.id}`}
-                  onClick={() => addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' })}
-                  className="flex items-center justify-between p-3 rounded-[18px] bg-surface-soft hover:bg-surface transition-colors border border-border/40"
+                  type="button"
+                  onClick={() => {
+                    addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
+                    setActiveRoute(r);
+                  }}
+                  className="flex w-full items-center justify-between p-3 rounded-[18px] bg-surface-soft hover:bg-surface transition-colors border border-border/40"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {r.kind === 'metro' ? (
@@ -601,7 +607,7 @@ export function HomePage() {
                     </div>
                   </div>
                   <ChevronRight size={14} className="text-ink-muted shrink-0" />
-                </Link>
+                </button>
               ))}
 
               {favoriteStopDetails.slice(0, 2).map((s) => (
@@ -700,6 +706,7 @@ export function HomePage() {
       </div>
 
       <ReportDelayModal open={isReportDelayOpen} onClose={() => setIsReportDelayOpen(false)} />
+      <RouteDetailModal route={activeRoute} open={!!activeRoute} onClose={() => setActiveRoute(null)} />
     </div>
   );
 }

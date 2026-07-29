@@ -63,14 +63,14 @@ interface SimpleModalProps {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Про програму                                                            */
+/* Про програму                                                           */
 /* ---------------------------------------------------------------------- */
 export function AboutAppModal({ open, onClose }: SimpleModalProps) {
   return (
     <Modal open={open} onClose={onClose} title="Про програму" icon={<Info className="h-4 w-4" />}>
       <div className="space-y-3 text-xs leading-relaxed text-ink-text">
         <p>
-          <strong>Kharkiv GO</strong> — Kharkiv GO — незалежний проєкт, створений командою ентузіастів, які прагнуть зробити громадський транспорт Харкова сучаснішим, доступнішим і зручнішим для кожного.
+          <strong>Kharkiv GO</strong> — незалежний проєкт, створений командою ентузіастів, які прагнуть зробити громадський транспорт Харкова сучаснішим, доступнішим і зручнішим для кожного.
 
 Наша мета — створити швидкий, надійний та інтуїтивно зрозумілий сервіс, який допомагає мешканцям і гостям міста легко орієнтуватися в транспортній мережі.
 
@@ -84,7 +84,7 @@ export function AboutAppModal({ open, onClose }: SimpleModalProps) {
         </p>
         <div className="grid grid-cols-2 gap-y-2 border-t border-border/40 pt-3 text-[11px]">
           <span className="font-medium text-ink-muted">Версія</span>
-          <span className="text-right font-bold text-ink-text">v1.2.0 (Build 420)</span>
+          <span className="text-right font-bold text-ink-text">v1.4.8.8 (Build 4.5.0.)</span>
           <span className="font-medium text-ink-muted">Карта</span>
           <span className="text-right font-bold text-ink-text">Leaflet / OpenStreetMap</span>
         </div>
@@ -94,7 +94,7 @@ export function AboutAppModal({ open, onClose }: SimpleModalProps) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Оцінити застосунок                                                       */
+/* Оцінити застосунок                                                     */
 /* ---------------------------------------------------------------------- */
 export function RateAppModal({ open, onClose }: SimpleModalProps) {
   return (
@@ -120,52 +120,123 @@ export function RateAppModal({ open, onClose }: SimpleModalProps) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Політика конфіденційності                                               */
+/* Політика конфіденційності (Оновлена та жива версія)                    */
 /* ---------------------------------------------------------------------- */
 export function PrivacyPolicyModal({ open, onClose }: SimpleModalProps) {
   return (
     <Modal open={open} onClose={onClose} title="Політика конфіденційності" icon={<FileText className="h-4 w-4" />}>
-      <div className="max-h-[55dvh] space-y-3 overflow-y-auto pr-1 text-xs leading-relaxed text-ink-text">
-        <p>
-          <strong>1. Призначення застосунку.</strong> 1. 
-Kharkiv GO є інформаційним сервісом, створеним для зручної навігації громадським транспортом міста Харкова.
-        </p>
-        <p>
-          <strong>2. Достовірність інформації</strong> Ми прагнемо підтримувати інформацію актуальною, однак не гарантуємо її абсолютну точність.
+      <div className="max-h-[55dvh] space-y-3 overflow-y-auto pr-2 text-xs leading-relaxed text-ink-text">
+        <div className="rounded-2xl bg-primary/5 p-3 text-primary font-medium text-center">
+          ✨ Ми дбаємо про вашу довіру та прагнемо бути максимально прозорими.
+        </div>
 
-Маршрути, схеми руху, зупинки та інші дані можуть змінюватися без попереднього повідомлення.
-        </p>
-        <p>
-          <strong>3. Відповідальність користувача.</strong> Користувач самостійно приймає рішення щодо використання отриманої інформації.
+        <div className="space-y-2.5">
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>🎯</span> 1. Призначення застосунку
+            </h4>
+            <p className="text-ink-muted">
+              <strong>Kharkiv GO</strong> є незалежним інформаційним сервісом для зручної навігації громадським транспортом Харкова.
+            </p>
+          </div>
 
-Розробник не несе відповідальності за:
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>🔍</span> 2. Достовірність інформації
+            </h4>
+            <p className="text-ink-muted">
+              Ми оновлюємо дані за можливості, проте маршрути, схеми руху та зупинки можуть змінюватися у реальному часі без попереднього сповіщення.
+            </p>
+          </div>
 
-зміну маршрутів;
-затримки громадського транспорту;
-скасування рейсів;
-помилки у відкритих джерелах даних;
-тимчасову недоступність сервісу;
-будь-які збитки, що виникли внаслідок використання застосунку..
-        </p>
-        <p>
-          <strong>4. Доступність сервісу.</strong> Робота застосунку залежить від:
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>🛡️</span> 3. Відповідальність користувача
+            </h4>
+            <p className="text-ink-muted mb-1">Ви самостійно приймаєте рішення щодо використання даних. Розробник не несе відповідальності за:</p>
+            <ul className="list-disc pl-4 space-y-1 text-ink-muted">
+              <li>Зміни маршрутів або затримки транспорту 🚍</li>
+              <li>Скасування рейсів чи збої у відкритих джерелах ⏱️</li>
+              <li>Тимчасову недоступність платформи 🔌</li>
+            </ul>
+          </div>
 
-доступності мережі Інтернет;
-роботи сторонніх сервісів;
-технічного стану пристрою користувача.
-Можливі тимчасові перебої або профілактичні роботи.
-        </p>
-        <p className="text-ink-muted">
-          Це загальний опис для ознайомлення. З конкретними питаннями звертайтесь через кнопку
-          «Зв'язок з підтримкою».
-        </p>
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>🌐</span> 4. Доступність сервісу
+            </h4>
+            <p className="text-ink-muted">
+              Робота застосунку залежить від стабільності інтернет-мережі та зовнішніх сервісів. Можливі технічні перерви для оновлень.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>📍</span> 5. Геолокація
+            </h4>
+            <p className="text-ink-muted">
+              За вашою згодою застосунок використовує геолокацію для пошуку найближчих зупинок 🗺️ та відображення вас на мапі. Доступ можна вимкнути в налаштуваннях пристрою.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>🔒</span> 6. Конфіденційність та дані
+            </h4>
+            <p className="text-ink-muted mb-1">Ми не збираємо приватних даних. На вашому пристрої локально зберігаються лише:</p>
+            <ul className="list-disc pl-4 space-y-1 text-ink-muted">
+              <li>Обрані маршрути та зупинки ⭐</li>
+              <li>Налаштування інтерфейсу та теми оформлення ⚙️</li>
+            </ul>
+          </div>
+
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>🎨</span> 7. Інтелектуальна власність
+            </h4>
+            <p className="text-ink-muted">
+              Програмний код, дизайн, логотипи та елементи інтерфейсу Kharkiv GO захищені авторським правом. Будь-яке копіювання чи модифікація без дозволу заборонені.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>🔄</span> 8. Оновлення умов
+            </h4>
+            <p className="text-ink-muted">
+              Ми залишаємо за собою право оновлювати функціонал, інтерфейс та правила користування для покращення сервісу.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>⚠️</span> 9. Відмова від офіційного статусу
+            </h4>
+            <p className="text-ink-muted">
+              Kharkiv GO — незалежний проєкт і не є офіційним додатком міського метрополітену чи комунальних підприємств. Інформація надається «як є».
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border/40 bg-surface-muted/30 p-3 space-y-1">
+            <h4 className="font-extrabold text-ink-text flex items-center gap-1.5">
+              <span>📬</span> 10. Контакти
+            </h4>
+            <p className="text-ink-muted">
+              Маєте пропозиції чи знайшли помилку? Звертайтеся до нас через кнопку «Зв'язок з підтримкою».
+            </p>
+          </div>
+        </div>
+
+        <div className="pt-2 text-center text-[10px] text-ink-muted/70">
+          © Kharkiv GO. Усі права захищені 💚💛
+        </div>
       </div>
     </Modal>
   );
 }
 
 /* ---------------------------------------------------------------------- */
-/* Зв'язок з підтримкою — надсилає повідомлення адміну через бота          */
+/* Зв'язок з підтримкою — надсилає повідомлення адміну через бота         */
 /* ---------------------------------------------------------------------- */
 export function SupportModal({ open, onClose }: SimpleModalProps) {
   const [message, setMessage] = useState('');
@@ -251,7 +322,7 @@ export function SupportModal({ open, onClose }: SimpleModalProps) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Підтримати проект — донати                                              */
+/* Підтримати проект — донати                                             */
 /* ---------------------------------------------------------------------- */
 export function SupportProjectModal({ open, onClose }: SimpleModalProps) {
   const [copied, setCopied] = useState(false);

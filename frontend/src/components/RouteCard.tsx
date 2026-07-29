@@ -1,29 +1,28 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
-import { TransportKindIcon } from '@/components/TransportKindIcon';
 import { FavoriteButton } from '@/components/FavoriteButton';
+import { RouteDetailModal } from '@/components/RouteDetailModal';
 import type { TransportRoute } from '@/types/transport';
 
 export function RouteCard({ route }: { route: TransportRoute }) {
-  const navigate = useNavigate();
+  const [detailOpen, setDetailOpen] = useState(false);
   const isFavorite = useFavoritesStore((s) => s.isRouteFavorite(route.id));
   const addRoute = useFavoritesStore((s) => s.addRoute);
   const removeRoute = useFavoritesStore((s) => s.removeRoute);
 
-  // Раніше картка була <Link> (тег <a>), а зірочка обраного — <button> всередині
-  // неї: HTML забороняє вкладати інтерактивні елементи в посилання, і це ламало
-  // клавіатурну навігацію та читалки екрана. Тепер картка — це div з роллю
-  // "link" і навігацією через useNavigate, а кнопка обраного лежить поруч,
-  // а не всередині клікабельної області.
+  // Раніше картка була <Link> і вела на окрему сторінку /routes/:id на весь
+  // застосунок. Тепер один тап по картці одразу відкриває повну інформацію
+  // про маршрут (включно з розкладом руху) у модальному вікні — швидше і
+  // без втрати контексту списку/фільтрів позаду.
   return (
     <div
-      role="link"
+      role="button"
       tabIndex={0}
-      onClick={() => navigate(`/routes/${route.id}`)}
+      onClick={() => setDetailOpen(true)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          navigate(`/routes/${route.id}`);
+          setDetailOpen(true);
         }
       }}
       className="flex cursor-pointer items-center gap-2.5 rounded-2xl border border-border/40 bg-surface-raised px-2.5 py-2 shadow-sm transition hover:shadow-md hover:border-border/60 active:scale-[0.98]"
@@ -34,11 +33,6 @@ export function RouteCard({ route }: { route: TransportRoute }) {
           style={{ backgroundColor: route.color }}
         >
           {route.number}
-        </div>
-        {/* Іконка виду транспорту поверх бейджа з номером — збільшена, щоб
-            залишатись головним візуальним акцентом навіть у компактній картці. */}
-        <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-surface-raised bg-surface-raised shadow-sm">
-          <TransportKindIcon kind={route.kind} size={34} />
         </div>
       </div>
       <div className="min-w-0 flex-1">
@@ -52,6 +46,10 @@ export function RouteCard({ route }: { route: TransportRoute }) {
         onToggle={() => (isFavorite ? removeRoute(route.id) : addRoute(route.id))}
         label={isFavorite ? 'Прибрати з обраного' : 'Додати в обране'}
       />
+
+      <div onClick={(e) => e.stopPropagation()}>
+        <RouteDetailModal route={route} open={detailOpen} onClose={() => setDetailOpen(false)} />
+      </div>
     </div>
   );
 }
