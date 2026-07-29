@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { create } from 'zustand';
 import type { GeoPoint } from '@/types/transport';
 
 interface GeolocationState {
@@ -33,119 +33,140 @@ function haversineMeters(a: GeoPoint, b: GeoPoint): number {
 }
 
 /**
- * Постійне відстеження геолокації користувача (watchPosition), а не разовий запит.
- * Стартує сам при монтуванні (якщо дозвіл вже надано раніше — браузер віддасть позицію
- * без додаткового промпта; інакше `locate()` явно запитує дозвіл, наприклад по кліку на
- * кнопку GPS). Стеження триває, поки хук змонтований — позиція на карті лишається
- * "живою" весь час, а не застигає після першого визначення.
+ * -----------------------------------------------------------------------
+ * ГЛОБАЛЬНИЙ, ЄДИНИЙ НА ВЕСЬ ЗАСТОСУНОК запит геолокації.
+ * -----------------------------------------------------------------------
+ * Раніше кожна сторінка (HomePage, MapPage, HomePageANG...) викликала
+ * власний React-хук `useGeolocation()`, який сам стартував
+ * `navigator.geolocation.watchPosition(...)` при монтуванні компонента.
+ * Через це системний запит дозволу на геолокацію показувався (або
+ * намагався показатись) щоразу при переході на сторінку з картою/головну —
+ * тобто по суті на кожен ремаунт компонента, а не один раз за весь час
+ * користування застосунком.
+ *
+ * Тепер `watchPosition` стартує ОДИН РАЗ на рівні модуля (singleton) і живе
+ * стільки, скільки живе вкладка браузера — незалежно від того, скільки
+ * компонентів підписані на позицію і скільки разів вони перемонтовуються.
+ * Дозвіл в браузері один раз запитується (або підхоплюється, якщо вже був
+ * наданий раніше) і назавжди лишається активним до закриття/перезавантаження
+ * сторінки.
  */
-export function useGeolocation() {
-  const [state, setState] = useState<GeolocationState>({
-    position: null,
-    accuracy: null,
-    heading: null,
-    speedMps: null,
-    isMoving: false,
-    error: null,
-    isLocating: false,
-    hasFix: false
-  });
 
-  const watchIdRef = useRef<number | null>(null);
-  const lastFixRef = useRef<{ point: GeoPoint; atMs: number } | null>(null);
-  const movingClearTimerRef = useRef<number | null>(null);
+let watchId: number | null = null;
+let lastFix: { point: GeoPoint; atMs: number } | null = null;
+let movingClearTimer: number | null = null;
 
-  const handlePosition = useCallback((pos: GeolocationPosition) => {
-    const point: GeoPoint = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-    const nowMs = pos.timestamp || Date.now();
+interface GeolocationStore extends GeolocationState {
+  /** Стартує глобальне стеження, якщо воно ще не запущене. Безпечно викликати повторно. */
+  ensureWatching: () => void;
+  /** Явний повторний запит позиції (напр. по кліку на кнопку GPS) — корисно як
+   *  тригер системного дозволу, якщо автостарт мовчки впав у стан "ще не питали". */
+  locate: () => void;
+}
 
-    let moving = false;
-    if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed)) {
-      moving = pos.coords.speed > MOVING_SPEED_THRESHOLD_MPS;
-    } else if (lastFixRef.current) {
-      const dtSec = (nowMs - lastFixRef.current.atMs) / 1000;
-      const distM = haversineMeters(lastFixRef.current.point, point);
-      if (dtSec > 0.2) moving = distM > MOVING_DISTANCE_FALLBACK_M && distM / dtSec > MOVING_SPEED_THRESHOLD_MPS;
-    }
+export const useGeolocationStore = create<GeolocationStore>()((set, get) => ({
+  position: null,
+  accuracy: null,
+  heading: null,
+  speedMps: null,
+  isMoving: false,
+  error: null,
+  isLocating: false,
+  hasFix: false,
 
-    lastFixRef.current = { point, atMs: nowMs };
-
-    // Невеликий "hold" перед тим, як погасити відео ходьби — інакше воно блимає
-    // на кожному GPS-семплі, де швидкість на мить впала до нуля (нормальний шум GPS).
-    if (movingClearTimerRef.current !== null) {
-      window.clearTimeout(movingClearTimerRef.current);
-      movingClearTimerRef.current = null;
-    }
-    if (!moving) {
-      movingClearTimerRef.current = window.setTimeout(() => {
-        setState((s) => ({ ...s, isMoving: false }));
-      }, 1500);
-    }
-
-    setState((s) => ({
-      position: point,
-      accuracy: pos.coords.accuracy,
-      heading: typeof pos.coords.heading === 'number' && !Number.isNaN(pos.coords.heading) ? pos.coords.heading : s.heading,
-      speedMps: typeof pos.coords.speed === 'number' ? pos.coords.speed : null,
-      isMoving: moving || s.isMoving,
-      error: null,
-      isLocating: false,
-      hasFix: true
-    }));
-  }, []);
-
-  const handleError = useCallback((err: GeolocationPositionError) => {
-    setState((s) => ({ ...s, isLocating: false, error: err.message }));
-  }, []);
-
-  const startWatch = useCallback(() => {
+  ensureWatching: () => {
+    if (watchId !== null) return; // вже стежимо — запит дозволу вже було зроблено
     if (!navigator.geolocation) {
-      setState((s) => ({ ...s, error: 'Геолокація не підтримується цим браузером' }));
+      set({ error: 'Геолокація не підтримується цим браузером' });
       return;
     }
-    if (watchIdRef.current !== null) return; // вже стежимо
 
-    setState((s) => ({ ...s, isLocating: true, error: null }));
-    watchIdRef.current = navigator.geolocation.watchPosition(handlePosition, handleError, {
+    set({ isLocating: true, error: null });
+
+    const handlePosition = (pos: GeolocationPosition) => {
+      const point: GeoPoint = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      const nowMs = pos.timestamp || Date.now();
+
+      let moving = false;
+      if (typeof pos.coords.speed === 'number' && !Number.isNaN(pos.coords.speed)) {
+        moving = pos.coords.speed > MOVING_SPEED_THRESHOLD_MPS;
+      } else if (lastFix) {
+        const dtSec = (nowMs - lastFix.atMs) / 1000;
+        const distM = haversineMeters(lastFix.point, point);
+        if (dtSec > 0.2) moving = distM > MOVING_DISTANCE_FALLBACK_M && distM / dtSec > MOVING_SPEED_THRESHOLD_MPS;
+      }
+
+      lastFix = { point, atMs: nowMs };
+
+      // Невеликий "hold" перед тим, як погасити відео ходьби — інакше воно блимає
+      // на кожному GPS-семплі, де швидкість на мить впала до нуля (нормальний шум GPS).
+      if (movingClearTimer !== null) {
+        window.clearTimeout(movingClearTimer);
+        movingClearTimer = null;
+      }
+      if (!moving) {
+        movingClearTimer = window.setTimeout(() => {
+          set((s) => ({ ...s, isMoving: false }));
+        }, 1500);
+      }
+
+      set((s) => ({
+        position: point,
+        accuracy: pos.coords.accuracy,
+        heading: typeof pos.coords.heading === 'number' && !Number.isNaN(pos.coords.heading) ? pos.coords.heading : s.heading,
+        speedMps: typeof pos.coords.speed === 'number' ? pos.coords.speed : null,
+        isMoving: moving || s.isMoving,
+        error: null,
+        isLocating: false,
+        hasFix: true
+      }));
+    };
+
+    const handleError = (err: GeolocationPositionError) => {
+      set({ isLocating: false, error: err.message });
+    };
+
+    watchId = navigator.geolocation.watchPosition(handlePosition, handleError, {
       enableHighAccuracy: true,
       maximumAge: 1000,
       timeout: 15000
     });
-  }, [handlePosition, handleError]);
+  },
 
-  // Стартуємо стеження одразу при монтуванні застосунку — "постійна" геолокація,
-  // а не тільки за кліком на кнопку. Якщо дозвіл ще не надавався, браузер сам
-  // покаже системний промпт один раз.
-  useEffect(() => {
-    startWatch();
-    return () => {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
-      if (movingClearTimerRef.current !== null) {
-        window.clearTimeout(movingClearTimerRef.current);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /** Явний запит (напр. по кліку на кнопку GPS) — корисно як тригер системного
-   *  дозволу, якщо автостарт мовчки впав у стан "denied"/ще не питали. */
-  const locate = useCallback(() => {
-    if (watchIdRef.current === null) {
-      startWatch();
+  locate: () => {
+    if (watchId === null) {
+      get().ensureWatching();
       return;
     }
-    setState((s) => ({ ...s, isLocating: true }));
+    if (!navigator.geolocation) return;
+    set({ isLocating: true });
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        handlePosition(pos);
+        const point: GeoPoint = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        lastFix = { point, atMs: pos.timestamp || Date.now() };
+        set({
+          position: point,
+          accuracy: pos.coords.accuracy,
+          heading:
+            typeof pos.coords.heading === 'number' && !Number.isNaN(pos.coords.heading)
+              ? pos.coords.heading
+              : get().heading,
+          speedMps: typeof pos.coords.speed === 'number' ? pos.coords.speed : null,
+          error: null,
+          isLocating: false,
+          hasFix: true
+        });
       },
-      handleError,
+      (err) => set({ isLocating: false, error: err.message }),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 1000 }
     );
-  }, [handleError, handlePosition, startWatch]);
+  }
+}));
 
-  return { ...state, locate };
+// Стартуємо стеження одразу при завантаженні модуля (один раз за весь час
+// життя вкладки) — "постійна" геолокація, а не тільки за кліком на кнопку.
+// Якщо дозвіл ще не надавався, браузер сам покаже системний промпт ОДИН РАЗ;
+// якщо дозвіл вже надано раніше — позиція підхоплюється без жодного промпта.
+if (typeof window !== 'undefined') {
+  useGeolocationStore.getState().ensureWatching();
 }
