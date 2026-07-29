@@ -1,7 +1,7 @@
 import { TransportKind } from '@/types/transport';
 import routesRealJson from './routesReal.json';
 import stopsRealJson from './stopsReal.json';
-import { metroStopsData } from './metroStationsReal';
+import { metroStopsData, metroRoutesData, METRO_INTERCHANGES } from './metroStationsReal';
 
 /**
  * Реальні дані маршрутів і зупинок Харкова, розшифровані з офіційних
@@ -83,6 +83,11 @@ const routesData: RouteItem[] = REAL_ROUTES.map((r) => ({
 }));
 
 const stopsData: StopItem[] = Array.from(stopsMap.values());
+
+// Лінії метро як звичайні "маршрути" для роутера поїздок — жодної окремої
+// гілки логіки для метро не потрібно: buildTripOptions/buildTripPlans
+// сприймають лінію метро так само, як маршрут автобуса/трамвая/тролейбуса.
+routesData.push(...(metroRoutesData as unknown as RouteItem[]));
 
 export interface TripOption {
   route: RouteItem;
@@ -175,10 +180,44 @@ function nearestStopOnRoute(route: RouteItem, lat: number, lng: number): { stop:
   return best;
 }
 
+/**
+ * Пересадочні вузли (наразі — три реальні пересадки харківського метро,
+ * `METRO_INTERCHANGES` з metroStationsReal.ts) як карта "звідси можна
+ * пішки перейти сюди", в обидва боки.
+ */
+const interchangeMap = new Map<string, string[]>();
+for (const [a, b] of METRO_INTERCHANGES) {
+  interchangeMap.set(a, [...(interchangeMap.get(a) ?? []), b]);
+  interchangeMap.set(b, [...(interchangeMap.get(b) ?? []), a]);
+}
+
+/**
+ * Повертає зупинку-кандидата на пересадку разом із самою зупинкою:
+ * саму зупинку (пересадка без ходьби між платформами) та, якщо є,
+ * пов'язані пересадочні станції поруч (підземний перехід метро) —
+ * з відстанню пішки між ними.
+ */
+function getTransferCandidates(stop: StopItem): { stop: StopItem; walkM: number }[] {
+  const result: { stop: StopItem; walkM: number }[] = [{ stop, walkM: 0 }];
+  const linkedIds = interchangeMap.get(stop.id) ?? [];
+  for (const id of linkedIds) {
+    const linked = stopsMap.get(id);
+    if (!linked) continue;
+    result.push({
+      stop: linked,
+      walkM: distanceMetersLatLng(stop.position.lat, stop.position.lng, linked.position.lat, linked.position.lng)
+    });
+  }
+  return result;
+}
+
 export interface TripLeg {
   route: RouteItem;
   boardStop: StopItem;
   alightStop: StopItem;
+  /** Пішки від виходу з попередньої ділянки до посадки на цю (перехід між
+   *  двома різними, але пов'язаними пересадочними станціями, напр. метро). */
+  transferWalkFromM?: number;
 }
 
 export interface TripPlan {
@@ -231,28 +270,33 @@ export function buildTripPlans(
         const transferStop = stopsMap.get(stopId);
         if (!transferStop) continue;
 
-        for (const routeId2 of transferStop.routeIds) {
-          if (routeId2 === route1.id) continue;
-          const route2 = routesData.find((r) => r.id === routeId2);
-          if (!route2) continue;
+        // Пересадка можлива або на цій самій зупинці (routeId2 в її
+        // routeIds), або на пов'язаній пересадочній станції поруч
+        // (напр. метро: Майдан Конституції ↔ Історичний музей).
+        for (const candidate of getTransferCandidates(transferStop)) {
+          for (const routeId2 of candidate.stop.routeIds) {
+            if (routeId2 === route1.id) continue;
+            const route2 = routesData.find((r) => r.id === routeId2);
+            if (!route2) continue;
 
-          const alight = nearestStopOnRoute(route2, toLat, toLng);
-          if (!alight || alight.dist > radius) continue;
-          if (alight.stop.id === transferStop.id) continue;
+            const alight = nearestStopOnRoute(route2, toLat, toLng);
+            if (!alight || alight.dist > radius) continue;
+            if (alight.stop.id === candidate.stop.id) continue;
 
-          const pairKey = `${route1.id}|${transferStop.id}|${route2.id}`;
-          if (seenPairs.has(pairKey)) continue;
-          seenPairs.add(pairKey);
+            const pairKey = `${route1.id}|${transferStop.id}|${candidate.stop.id}|${route2.id}`;
+            if (seenPairs.has(pairKey)) continue;
+            seenPairs.add(pairKey);
 
-          candidates.push({
-            legs: [
-              { route: route1, boardStop: board.stop, alightStop: transferStop },
-              { route: route2, boardStop: transferStop, alightStop: alight.stop }
-            ],
-            boardWalkM: board.dist,
-            alightWalkM: alight.dist,
-            transfersCount: 1
-          });
+            candidates.push({
+              legs: [
+                { route: route1, boardStop: board.stop, alightStop: transferStop },
+                { route: route2, boardStop: candidate.stop, alightStop: alight.stop, transferWalkFromM: candidate.walkM }
+              ],
+              boardWalkM: board.dist,
+              alightWalkM: alight.dist,
+              transfersCount: 1
+            });
+          }
         }
       }
     }

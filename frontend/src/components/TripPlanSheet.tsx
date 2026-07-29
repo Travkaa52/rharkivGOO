@@ -66,7 +66,14 @@ export function TripPlanSheet({ plans, selectedIndex, onSelect }: TripPlanSheetP
               </div>
               {plan.transfersCount > 0 ? (
                 <div className="truncate text-[11px] text-ink-muted">
-                  Пересадка на «{plan.legs[0].alightStop.name}»
+                  {plan.legs[1]?.boardStop.id === plan.legs[0].alightStop.id ? (
+                    <>Пересадка на «{plan.legs[0].alightStop.name}»</>
+                  ) : (
+                    <>
+                      Пересадка: «{plan.legs[0].alightStop.name}» → пішки{' '}
+                      {Math.round(plan.legs[1]?.transferWalkFromM ?? 0)} м → «{plan.legs[1]?.boardStop.name}»
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="truncate text-[11px] text-ink-muted">

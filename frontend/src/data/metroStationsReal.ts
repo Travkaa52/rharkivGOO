@@ -24,6 +24,18 @@ export const METRO_LINE_COLORS: Record<MetroStationItem['line'], string> = {
   oleksiivska: '#3949AB'
 };
 
+export const METRO_LINE_ROUTE_IDS: Record<MetroStationItem['line'], string> = {
+  'kholodnohirsko-zavodska': 'metro-line-1',
+  saltivska: 'metro-line-2',
+  oleksiivska: 'metro-line-3'
+};
+
+const METRO_LINE_LABELS: Record<MetroStationItem['line'], string> = {
+  'kholodnohirsko-zavodska': 'Холодногірсько-заводська лінія',
+  saltivska: 'Салтівська лінія',
+  oleksiivska: 'Олексіївська лінія'
+};
+
 export const metroStations: MetroStationItem[] = [
   // Холодногірсько-заводська лінія
   { id: 'metro-holodna-hora', name: 'Холодна гора', line: 'kholodnohirsko-zavodska', lineColor: METRO_LINE_COLORS['kholodnohirsko-zavodska'], position: { lat: 49.9828767, lng: 36.1825322 } },
@@ -63,15 +75,55 @@ export const metroStations: MetroStationItem[] = [
 ];
 
 /**
+ * Реальні пересадочні вузли метрополітену (визначені за геометрією KML —
+ * станції різних ліній, платформи яких з'єднані підземним переходом на
+ * відстані до ~200м одна від одної):
+ *  - Майдан Конституції (Л1) ↔ Історичний музей (Л2)
+ *  - Спортивна (Л1) ↔ Метробудівників (Л3)
+ *  - Університет (Л2) ↔ Держпром (Л3)
+ */
+export const METRO_INTERCHANGES: Array<[string, string]> = [
+  ['metro-maidan-konstytutsii', 'metro-istorychnyi-muzei'],
+  ['metro-sportyvna', 'metro-metrobudivnykiv'],
+  ['metro-universytet', 'metro-derzhprom']
+];
+
+/**
+ * Маршрути-лінії метро у форматі, сумісному з `RouteItem` — по одному на
+ * кожну лінію, зупинки у порядку проходження лінії. Дозволяє переюзати
+ * існуючий алгоритм побудови поїздки (buildTripOptions/buildTripPlans)
+ * без окремої гілки логіки для метро: лінія метро для роутера — це просто
+ * ще один "маршрут" зі своїми зупинками.
+ */
+export const metroRoutesData = (Object.keys(METRO_LINE_ROUTE_IDS) as MetroStationItem['line'][]).map((line) => {
+  const lineStations = metroStations.filter((s) => s.line === line);
+  return {
+    id: METRO_LINE_ROUTE_IDS[line],
+    kind: 'metro' as const,
+    number: 'M',
+    name: METRO_LINE_LABELS[line],
+    color: METRO_LINE_COLORS[line],
+    stopIds: lineStations.map((s) => s.id),
+    headsignForward: lineStations[lineStations.length - 1].name,
+    headsignBackward: lineStations[0].name,
+    schedule: [] as unknown[],
+    firstDeparture: '05:30',
+    lastDeparture: '23:40',
+    intervalMinutes: 4
+  };
+});
+
+/**
  * Станції метро у форматі `StopItem`, щоб їх можна було підключити до
- * спільного масиву зупинок (пошук, "Звідси"/"Куди", модалка зупинки) —
- * без прив'язки до маршрутів наземного транспорту (routeIds порожній,
- * бо для метро в застосунку немає окремої сутності "маршрут").
+ * спільного масиву зупинок (пошук, "Звідси"/"Куди", модалка зупинки,
+ * побудова поїздки з пересадками). `routeIds` містить id лінії метро,
+ * на якій стоїть станція — так само, як у наземних зупинок, це дозволяє
+ * роутеру знаходити метро як пряму ділянку поїздки чи пересадку.
  */
 export const metroStopsData: StopItem[] = metroStations.map((station) => ({
   id: station.id,
   name: station.name,
   kinds: ['metro'],
   position: station.position,
-  routeIds: []
+  routeIds: [METRO_LINE_ROUTE_IDS[station.line]]
 }));

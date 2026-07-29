@@ -261,15 +261,21 @@ function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
     return;
   }
 
-  map.loadImage(assetUrl('icons/kharkiv-metro-logo.png'), (error, image) => {
-    if (!error && image && !map.hasImage(METRO_ICON_IMAGE_ID)) {
-      map.addImage(METRO_ICON_IMAGE_ID, image);
-    }
-    // Навіть якщо картинку не вдалось завантажити, шар все одно додаємо —
-    // тоді станції метро лишаться підписаними назвою (без іконки), а не
-    // зникнуть з карти повністю.
-    buildLayer();
-  });
+  map
+    .loadImage(assetUrl('icons/kharkiv-metro-logo.png'))
+    .then((result) => {
+      if (result?.data && !map.hasImage(METRO_ICON_IMAGE_ID)) {
+        map.addImage(METRO_ICON_IMAGE_ID, result.data);
+      }
+    })
+    .catch(() => {
+      // Якщо картинку не вдалось завантажити, шар все одно додаємо —
+      // тоді станції метро лишаться підписаними назвою (без іконки), а не
+      // зникнуть з карти повністю.
+    })
+    .finally(() => {
+      buildLayer();
+    });
 }
 
 function updateRouteStopHighlight(map: MapLibreMap, selectedRouteId?: string | null) {
