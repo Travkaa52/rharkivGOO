@@ -35,28 +35,28 @@ const TRANSPORT_META: Record<TransportKind, TransportMeta> = {
     title: 'Метро', 
     subtitle: '3 лінії · 30 станцій · Швидкісний підземний транспорт', 
     icon: TrainTrack,
-    badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
-    themeColor: 'from-purple-600 to-purple-800'
+    badgeColor: 'text-ink-text bg-surface-raised border-border/40',
+    themeColor: 'from-primary to-forest-dark'
   },
   tram: { 
     title: 'Трамваї', 
     subtitle: 'Наземні рейкові маршрути міста', 
     icon: TrainTrack,
-    badgeColor: 'text-red-400 bg-red-500/10 border-red-500/20',
-    themeColor: 'from-red-600 to-red-800'
+    badgeColor: 'text-ink-text bg-surface-raised border-border/40',
+    themeColor: 'from-primary to-forest-dark'
   },
   trolleybus: { 
     title: 'Тролейбуси', 
     subtitle: 'Екологічний міський електротранспорт', 
     icon: Zap,
-    badgeColor: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
-    themeColor: 'from-blue-600 to-blue-800'
+    badgeColor: 'text-ink-text bg-surface-raised border-border/40',
+    themeColor: 'from-primary to-forest-dark'
   },
   bus: { 
     title: 'Автобуси', 
     subtitle: 'Міські та приміські маршрутні автобуси', 
     icon: Bus,
-    badgeColor: 'text-primary bg-primary/10 border-primary/20',
+    badgeColor: 'text-ink-text bg-surface-raised border-border/40',
     themeColor: 'from-primary to-forest-dark'
   }
 };
@@ -281,7 +281,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
               onClick={() => setSelectedFilter('favorites')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1 shadow-2xs ${
                 selectedFilter === 'favorites'
-                  ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
+                  ? 'bg-primary text-white shadow-md shadow-primary/20'
                   : 'bg-surface-raised text-ink-muted border border-border/40 hover:bg-surface'
               }`}
             >
@@ -302,8 +302,8 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
           )}
 
           {errorMsg && !loading && (
-            <div className="flex flex-col items-center justify-center rounded-[22px] border border-red-500/20 bg-surface-raised p-8 text-center shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-500 mb-3">
+            <div className="flex flex-col items-center justify-center rounded-[22px] border border-border/40 bg-surface-raised p-8 text-center shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-soft text-ink-muted mb-3">
                 <AlertCircle className="h-6 w-6" />
               </div>
               <h3 className="text-sm font-bold text-ink-text mb-1">Помилка завантаження</h3>
@@ -330,7 +330,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
 
           {!loading && !errorMsg && routes.length > 0 && filteredRoutes.length === 0 && (
             <div className="flex flex-col items-center justify-center rounded-[22px] border border-border/40 bg-surface-raised p-8 text-center shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400 mb-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-soft text-ink-muted mb-3">
                 <SearchX className="h-6 w-6" />
               </div>
               <p className="text-sm font-bold text-ink-text mb-1">Маршрутів не знайдено</p>

@@ -398,10 +398,10 @@ export function HomePage() {
         {/* 3. QUICK ACTIONS GRID (2x2) — кнопки зменшені (менше padding/gap), іконки того самого розміру */}
         <section className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
-            { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-blue-500/10 text-blue-500 border-blue-500/15', isImage: false },
-            { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-primary/10 text-primary border-primary/15', isImage: false },
-            { label: 'Метро', icon: null, to: '/metro/live', color: 'bg-gold/10 text-gold border-gold/15', isImage: true },
-            { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-purple-500/10 text-purple-400 border-purple-500/15', isImage: false },
+            { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-surface-soft text-ink-text border-border/40', isImage: false },
+            { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-surface-soft text-ink-text border-border/40', isImage: false },
+            { label: 'Метро', icon: null, to: '/metro/live', color: 'bg-surface-soft text-ink-text border-border/40', isImage: true },
+            { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-surface-soft text-ink-text border-border/40', isImage: false },
           ].map((item, index) => {
             const Icon = item.icon;
             return (
@@ -412,7 +412,7 @@ export function HomePage() {
               >
                 <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
                   {item.isImage ? (
-                    <img src={metroIcon} alt="Метро" className="w-12 h-12 object-contain" />
+                    <img src={metroIcon} alt="Метро" className="w-[4.5rem] h-[4.5rem] object-contain scale-125" />
                   ) : (
                     Icon && <Icon size={30} />
                   )}
@@ -497,7 +497,7 @@ export function HomePage() {
               <div className="p-1.5 bg-primary/10 text-primary rounded-xl">
                 <Navigation size={16} />
               </div>
-              <h2 className="font-extrabold text-ink-text text-xs">Найближчі зупинки</h2>
+              <h2 className="font-extrabold text-ink-text text-xs">Ближайшие остановки</h2>
             </div>
             <Link 
               to="/map"
@@ -657,15 +657,15 @@ export function HomePage() {
         {/* 8. TRANSPORT NEWS & ANNOUNCEMENTS */}
         <section className="bg-surface-raised rounded-[22px] p-4 border border-border/40 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 bg-blue-500/10 text-blue-500 rounded-xl">
+            <div className="p-1.5 bg-surface-soft text-ink-muted rounded-xl">
               <AlertCircle size={16} />
             </div>
             <h2 className="font-extrabold text-ink-text text-xs">Новини транспорту</h2>
           </div>
 
-          <div className="p-3.5 bg-blue-500/[0.06] rounded-[18px] border border-blue-500/15 space-y-2">
+          <div className="p-3.5 bg-surface-soft rounded-[18px] border border-border/40 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/15 text-blue-500">Офіційно</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-surface-raised text-ink-text">Офіційно</span>
               <span className="text-[10px] font-semibold text-ink-muted">Сьогодні, 08:00</span>
             </div>
             <h3 className="font-extrabold text-ink-text text-xs">Зміни в розкладі рухів тролейбусів у місті</h3>

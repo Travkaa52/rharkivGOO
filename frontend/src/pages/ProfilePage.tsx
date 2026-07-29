@@ -194,8 +194,8 @@ export function ProfilePage() {
               className="flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px]"
             >
               <div className="flex items-center gap-3.5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <Star className="h-5 w-5 fill-amber-500/20" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-soft text-ink-text border border-border/40">
+                  <Star className="h-5 w-5 fill-ink-muted/20" />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-ink-text">Обране</h4>
@@ -203,7 +203,7 @@ export function ProfilePage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-extrabold text-amber-400">
+                <span className="rounded-full bg-surface-soft px-2.5 py-0.5 text-xs font-extrabold text-ink-text">
                   {favoritesCount}
                 </span>
                 <ChevronRight className="h-4 w-4 text-ink-muted" />
@@ -353,7 +353,7 @@ export function ProfilePage() {
               className="w-full flex items-center justify-between p-4 transition-colors hover:bg-surface/90 active:bg-muted/50 min-h-[48px] text-left"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-soft text-ink-text border border-border/40">
                   <LifeBuoy className="h-4 w-4" />
                 </div>
                 <div>

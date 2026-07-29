@@ -39,7 +39,7 @@ export function RouteDetailModal({ route, open, onClose }: RouteDetailModalProps
         >
           <Star
             className={`h-4 w-4 transition-all ${
-              isFavorite ? 'fill-amber-400 text-amber-400 scale-110' : 'text-ink-muted'
+              isFavorite ? 'fill-ink-text text-ink-text scale-110' : 'text-ink-muted'
             }`}
           />
           <span>{isFavorite ? 'В обраному' : 'В обране'}</span>

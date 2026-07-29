@@ -31,7 +31,7 @@ export function HistoryPage() {
         ) : (
           <>
             <div className="mb-2 flex justify-end">
-              <button onClick={clear} className="rounded-lg px-2 py-1 text-xs text-white/40 transition hover:text-red-400">
+              <button onClick={clear} className="rounded-lg px-2 py-1 text-xs text-white/40 transition hover:text-white/80">
                 Очистити все
               </button>
             </div>
@@ -53,7 +53,7 @@ export function HistoryPage() {
                   <button
                     onClick={() => removeEntry(entry.id)}
                     aria-label="Видалити запис"
-                    className="shrink-0 rounded-full p-1.5 text-white/30 transition hover:bg-white/10 hover:text-red-400"
+                    className="shrink-0 rounded-full p-1.5 text-white/30 transition hover:bg-white/10 hover:text-white/80"
                   >
                     ✕
                   </button>

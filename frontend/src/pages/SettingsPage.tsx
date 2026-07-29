@@ -298,7 +298,7 @@ export function SettingsPage() {
               onClick={handleClearCache} 
               disabled={clearingState !== 'idle'}
               className={`relative overflow-hidden transition-all duration-300 font-medium ${
-                clearingState === 'done' ? 'border-emerald-500/50 text-emerald-500 bg-emerald-500/10' : ''
+                clearingState === 'done' ? 'border-border text-ink-text bg-surface-soft' : ''
               }`}
             >
               <div className="flex items-center justify-center gap-2">
@@ -307,7 +307,7 @@ export function SettingsPage() {
                 )}
                 {clearingState === 'done' ? (
                   <>
-                    <Check className="h-4 w-4 text-emerald-500 animate-bounce" />
+                    <Check className="h-4 w-4 text-ink-text animate-bounce" />
                     <span>Кеш успішно очищено</span>
                   </>
                 ) : clearingState === 'loading' ? (

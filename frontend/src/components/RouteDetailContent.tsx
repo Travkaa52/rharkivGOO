@@ -91,7 +91,7 @@ export function RouteDetailContent({ route, onNavigate }: { route: TransportRout
           )}
 
           <div className="inline-flex items-center gap-1.5 rounded-xl border border-border/40 bg-surface/50 px-3 py-1.5 font-semibold text-ink-text backdrop-blur-md">
-            <MapPin className="h-3.5 w-3.5 text-emerald-500" />
+            <MapPin className="h-3.5 w-3.5 text-ink-muted" />
             <span>{route.stopIds.length} зупинок</span>
           </div>
         </div>
@@ -174,8 +174,8 @@ export function RouteDetailContent({ route, onNavigate }: { route: TransportRout
                       <span
                         className={`inline-block mt-0.5 text-[10px] font-bold tracking-wider uppercase px-1.5 py-0.2 rounded-md border ${
                           isFirst
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                            : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                            ? 'bg-surface-soft text-ink-text border-border/40'
+                            : 'bg-surface-soft text-ink-muted border-border/40'
                         }`}
                       >
                         {isFirst ? 'Початкова' : 'Кінцева'}

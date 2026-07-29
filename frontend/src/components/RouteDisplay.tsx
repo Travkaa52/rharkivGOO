@@ -56,7 +56,7 @@ function RouteDisplayComponent({
       {/* Електронне LED-табло напрямку */}
       <div className="w-full overflow-hidden">
         {needsMarquee ? (
-          <div className="flex w-max animate-marquee whitespace-nowrap text-[8.5px] font-bold leading-tight text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]">
+          <div className="flex w-max animate-marquee whitespace-nowrap text-[8.5px] font-bold leading-tight text-ink-text">
             <span className="pr-4">{headsign}</span>
             <span className="pr-4" aria-hidden="true">
               {headsign}
@@ -65,7 +65,7 @@ function RouteDisplayComponent({
         ) : (
           <span
             className={clsx(
-              'block w-full text-center text-[8.5px] font-bold leading-tight text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]',
+              'block w-full text-center text-[8.5px] font-bold leading-tight text-ink-text',
               'line-clamp-2 break-words'
             )}
           >

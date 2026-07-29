@@ -173,7 +173,7 @@ export function RouteDetailPage() {
         >
           <Star 
             className={`h-5 w-5 transition-all duration-200 ${
-              isFavorite ? 'fill-amber-400 text-amber-400 scale-110' : 'text-ink-muted hover:text-ink-text'
+              isFavorite ? 'fill-ink-text text-ink-text scale-110' : 'text-ink-muted hover:text-ink-text'
             }`} 
           />
         </button>
