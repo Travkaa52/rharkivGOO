@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { TransportKindPage } from '@/pages/TransportKindPage';
-import { assetUrl } from '@/lib/assetUrl';
+import { TransportKindIcon } from '@/components/TransportKindIcon';
 import type { TransportKind } from '@/types/transport';
 
 interface TabItem {
   kind: TransportKind;
   label: string;
-  iconSrc: string;
   activeColor: string;
 }
 
@@ -15,25 +14,21 @@ const TABS: TabItem[] = [
   {
     kind: 'bus',
     label: 'Автобуси',
-    iconSrc: assetUrl('/icons/avtobusicono.png'),
     activeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
   },
   {
     kind: 'trolleybus',
     label: 'Тролейбуси',
-    iconSrc: assetUrl('/icons/troleyicono.png'),
     activeColor: 'bg-blue-500/15 text-blue-400 border-blue-500/30'
   },
   {
     kind: 'tram',
     label: 'Трамваї',
-    iconSrc: assetUrl('/icons/tramwaiicono.png'),
     activeColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30'
   },
   {
     kind: 'metro',
     label: 'Метро',
-    iconSrc: assetUrl('/icons/metroicono.png'),
     activeColor: 'bg-red-500/15 text-red-400 border-red-500/30'
   },
 ];
@@ -45,7 +40,10 @@ export function RoutesPage() {
     <div className="min-h-dvh bg-bg text-ink-text selection:bg-primary/20">
       {/* Sticky Glassmorphic Navigation Bar */}
       <div className="sticky top-0 z-30 border-b border-border/40 bg-bg/80 backdrop-blur-xl">
-        {/* Кнопки зменшені (менше padding/gap/висота), іконки лишились того самого розміру (h-14 w-14) */}
+        {/* Кнопки зменшені (менше padding/gap/висота). Іконки — векторні (TransportKindIcon),
+            а не PNG з /public/icons: раніше файл /icons/troleyicono.png був відсутній у збірці,
+            тож іконка тролейбуса просто не показувалась (404). Векторна іконка не залежить
+            від зовнішніх файлів і показується для всіх видів транспорту однаково надійно. */}
         <div className="mx-auto flex max-w-md items-center gap-1.5 overflow-x-auto px-4 py-1.5 no-scrollbar">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.kind;
@@ -61,11 +59,7 @@ export function RoutesPage() {
                     : 'border-border/40 bg-surface/50 text-ink-muted hover:bg-surface/80 hover:text-ink-text backdrop-blur-sm'
                 )}
               >
-                <img
-                  src={tab.iconSrc}
-                  alt=""
-                  className={clsx('h-14 w-14 object-contain', isActive ? 'opacity-100' : 'opacity-70')}
-                />
+                <TransportKindIcon kind={tab.kind} size={34} className={isActive ? 'opacity-100' : 'opacity-70'} />
                 <span>{tab.label}</span>
               </button>
             );

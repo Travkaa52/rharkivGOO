@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
-import { TransportKindIcon } from '@/components/TransportKindIcon';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { RouteDetailModal } from '@/components/RouteDetailModal';
 import type { TransportRoute } from '@/types/transport';
@@ -34,11 +33,6 @@ export function RouteCard({ route }: { route: TransportRoute }) {
           style={{ backgroundColor: route.color }}
         >
           {route.number}
-        </div>
-        {/* Іконка виду транспорту поверх бейджа з номером — збільшена, щоб
-            залишатись головним візуальним акцентом навіть у компактній картці. */}
-        <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-surface-raised bg-surface-raised shadow-sm">
-          <TransportKindIcon kind={route.kind} size={34} />
         </div>
       </div>
       <div className="min-w-0 flex-1">
