@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Харьковское метро на карте Google</name>
+    <description>Подробно https://info.kharkov.com/-tr/tr_city/tr_city_m/</description>
+    <Style id="icon-1899-DB4436-nodesc-normal">
+      <IconStyle>
+        <color>ff3644db</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-DB4436-nodesc-highlight">
+      <IconStyle>
+        <color>ff3644db</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-DB4436-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-DB4436-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-DB4436-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-0F9D58-6425-nodesc-normal">
+      <LineStyle>
+        <color>ff589d0f</color>
+        <width>6.425</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-0F9D58-6425-nodesc-highlight">
+      <LineStyle>
+        <color>ff589d0f</color>
+        <width>9.6375</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-0F9D58-6425-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-0F9D58-6425-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-0F9D58-6425-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-3949AB-6038-nodesc-normal">
+      <LineStyle>
+        <color>ffab4939</color>
+        <width>6.038</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-3949AB-6038-nodesc-highlight">
+      <LineStyle>
+        <color>ffab4939</color>
+        <width>9.057</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-3949AB-6038-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-3949AB-6038-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-3949AB-6038-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-FF5252-6425-nodesc-normal">
+      <LineStyle>
+        <color>ff5252ff</color>
+        <width>6.425</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="line-FF5252-6425-nodesc-highlight">
+      <LineStyle>
+        <color>ff5252ff</color>
+        <width>9.6375</width>
+      </LineStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="line-FF5252-6425-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-FF5252-6425-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-FF5252-6425-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Folder>
+      <name>Холодногорско-заводская линия</name>
+      <Placemark>
+        <name>Линия метро</name>
+        <styleUrl>#line-FF5252-6425-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.1825322,49.9828767,0
+            36.1920682,49.9863562,0
+            36.193699,49.9869633,0
+            36.1959306,49.9875703,0
+            36.1996213,49.9886188,0
+            36.2041704,49.9895018,0
+            36.2066842,49.9896959,0
+            36.209406,49.9903847,0
+            36.2131826,49.9912676,0
+            36.21653,49.9920953,0
+            36.2199632,49.9927574,0
+            36.221594,49.9929782,0
+            36.2246839,49.9927023,0
+            36.2272588,49.9923712,0
+            36.2317259,49.9918717,0
+            36.2326661,49.9906606,0
+            36.2339536,49.9887844,0
+            36.2359277,49.9869633,0
+            36.238846,49.9840383,0
+            36.2421934,49.9812236,0
+            36.2435666,49.9807821,0
+            36.2467424,49.9802301,0
+            36.249489,49.9799542,0
+            36.2536088,49.9797334,0
+            36.2611107,49.9792942,0
+            36.2724916,49.9771392,0
+            36.2772123,49.976256,0
+            36.2811092,49.9757064,0
+            36.3019661,49.9721184,0
+            36.3061372,49.9709015,0
+            36.3211403,49.9661158,0
+            36.3428555,49.9618092,0
+            36.3591806,49.9583133,0
+            36.3787017,49.9526753,0
+            36.3980136,49.9465449,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Станция Холодная гора</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.1825322,49.9828767,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Южный вокзал </name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2066842,49.9896959,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Центральный рынок
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2205001,49.9927954,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Майдан Конституции
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2317259,49.9918717,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Левада</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2428692,49.9807886,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Спортивная</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2611107,49.9792942,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Заводская
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2811092,49.9757064,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Турбоатом
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3019661,49.9721184,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Дворец Спорта
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3211403,49.9661158,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Армейская
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3428555,49.9618092,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Масельского
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3599048,49.9582527,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Тракторный завод
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3787017,49.9526753,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Индустриальная
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3980136,49.9465449,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Салтовская линия</name>
+      <Placemark>
+        <name>Линия метро</name>
+        <styleUrl>#line-3949AB-6038-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.2318923,49.992822,0
+            36.2343384,50.0042702,0
+            36.2484136,50.0035733,0
+            36.2683279,50.0010897,0
+            36.3025895,50.002287,0
+            36.319042,50.0095186,0
+            36.3292322,50.017867,0
+            36.3357554,50.0250723,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Станция Исторический музей
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2318923,49.992822,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Университет
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2343384,50.0042702,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Ярослава Мудрого 
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2484136,50.0035733,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Киевская
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.268997,50.0011576,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Академика Барабашова
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3025895,50.002287,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Академика Павлова
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.319042,50.0095186,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Студенческая
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3292322,50.017867,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Салтовская
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.3357554,50.0250723,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Алексевская линия</name>
+      <Placemark>
+        <name>Линия метро</name>
+        <styleUrl>#line-0F9D58-6425-nodesc</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            36.2625342,49.9782028,0
+            36.2649375,49.9886889,0
+            36.2406166,49.9982701,0
+            36.2323769,50.0054421,0
+            36.2265404,50.0127232,0
+            36.2234505,50.0254075,0
+            36.2196739,50.0354144,0
+            36.2065045,50.0502937,0
+            36.2018227,50.0595656,0
+          </coordinates>
+        </LineString>
+      </Placemark>
+      <Placemark>
+        <name>Станция Метростроителей
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2625342,49.9782028,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Защитников Украины
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2649375,49.9886889,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Архитектора Бекетова
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2406166,49.9982701,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Госпром
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2328061,50.0052766,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Научная
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2265404,50.0127232,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Ботанический сад
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2234505,50.0254075,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция 23 Августа
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2196739,50.0354144,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Алексеевская
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2065045,50.0502937,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Станция Победа
+</name>
+        <styleUrl>#icon-1899-DB4436-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            36.2018227,50.0595656,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>
