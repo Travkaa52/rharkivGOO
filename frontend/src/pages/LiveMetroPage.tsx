@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
+import { PageHeader } from '@/components/PageHeader';
 import { getStationPhoto } from '@/data/stationPhotos';
 import { TIMETABLES } from '@/liveMetro/timetableData';
 
@@ -826,6 +827,7 @@ export function assetUrl(path: string): string {
   return `${normalizedBase}${path}`;
 }
 
+
 // =============================================================================
 // КОМПОНЕНТИ
 // =============================================================================
@@ -1035,30 +1037,25 @@ export function LiveMetroPage() {
   }, [nowSec]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-ink">
-      {/* Компактна верхня панель — оптимізована під мобільні екрани, з кнопкою "назад" замість повного PageHeader */}
-      <div
-        className="flex items-center justify-between gap-2 border-b border-white/10 bg-ink/95 px-3 backdrop-blur-xl"
-        style={{ paddingTop: 'max(0.6rem, env(safe-area-inset-top))', paddingBottom: '0.6rem' }}
-      >
-        <div className="flex min-w-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            aria-label="Назад"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white active:scale-95"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6" />
+    <div className="flex min-h-dvh flex-col bg-ink pb-20">
+      <PageHeader title="Живе метро" subtitle="Позиції поїздів на схемі в реальному часі" />
+
+      {/* Верхня панель */}
+      <div className="mx-4 mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white/10">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-mint">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M3 9h18M9 21V9" />
             </svg>
-          </button>
-          <div className="flex min-w-0 flex-col">
-            <span className="truncate text-[13px] font-semibold text-white/90">Живе метро</span>
-            <span className="truncate text-[10px] text-white/40">30 станцій · 38.1 км · 3 лінії</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[13px] font-semibold text-white/90">Харківський метрополітен</span>
+            <span className="text-[10px] text-white/40">30 станцій · 38.1 км · 3 лінії</span>
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex items-center gap-3">
           <div className="hidden rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-[12px] font-mono text-mint sm:block">
             {currentTime}
           </div>
@@ -1067,7 +1064,7 @@ export function LiveMetroPage() {
               type="button"
               onClick={() => setDayType('weekday')}
               className={[
-                'px-2.5 py-1.5 text-[11px] font-medium transition-all',
+                'px-3 py-1.5 text-[12px] font-medium transition-all',
                 dayType === 'weekday' ? 'bg-mint text-ink font-bold' : 'bg-transparent text-white/60 hover:text-white/90',
               ].join(' ')}
             >
@@ -1077,7 +1074,7 @@ export function LiveMetroPage() {
               type="button"
               onClick={() => setDayType('weekend')}
               className={[
-                'px-2.5 py-1.5 text-[11px] font-medium transition-all',
+                'px-3 py-1.5 text-[12px] font-medium transition-all',
                 dayType === 'weekend' ? 'bg-mint text-ink font-bold' : 'bg-transparent text-white/60 hover:text-white/90',
               ].join(' ')}
             >
@@ -1087,10 +1084,10 @@ export function LiveMetroPage() {
         </div>
       </div>
 
-      {/* Контейнер карти — розтягнутий на весь доступний екран, без відступів і заокруглень */}
+      {/* Контейнер карти */}
       <div
         ref={containerRef}
-        className="relative flex-1 overflow-hidden bg-[#0B120F] touch-none"
+        className="relative mx-4 mb-4 flex-1 overflow-hidden rounded-2xl border border-white/10 bg-[#0B120F] shadow-2xl touch-none"
         // Інлайн-стиль дублює touch-none навмисно: на деяких Android WebView
         // (особливо в Telegram Mini App) сама CSS-властивість touch-action не
         // застосовується, якщо контейнер отримав її лише через клас Tailwind
@@ -1164,6 +1161,39 @@ export function LiveMetroPage() {
             <text x={64} y={18} className="font-sans font-medium" fontSize={16} fill="#9FB3A9">Kharkiv subway system · 30 stations · 38.1 km</text>
           </g>
 
+          {/* Легенда */}
+          {showLegend && (
+            <g transform="translate(60, 820)">
+              <rect x={-12} y={-12} width={300} height={270} rx={14} fill="#0F1A14" stroke="#1E2A24" strokeWidth={1} opacity={0.95} />
+              <g transform="translate(10, 20)">
+                <rect x={0} y={0} width={32} height={22} rx={5} fill="#D92B27" />
+                <text x={16} y={15} textAnchor="middle" fill="#FFF" fontSize={13} fontWeight="bold">1</text>
+                <text x={42} y={12} className="font-bold" fontSize={13} fill="#F5F7F6">Холодногірсько-Заводська</text>
+                <text x={42} y={27} className="font-normal" fontSize={10} fill="#6E8377">Kholodnohirsko-Zavodska line · 13 станцій</text>
+              </g>
+              <g transform="translate(10, 80)">
+                <rect x={0} y={0} width={32} height={22} rx={5} fill="#0072BC" />
+                <text x={16} y={15} textAnchor="middle" fill="#FFF" fontSize={13} fontWeight="bold">2</text>
+                <text x={42} y={12} className="font-bold" fontSize={13} fill="#F5F7F6">Салтівська лінія</text>
+                <text x={42} y={27} className="font-normal" fontSize={10} fill="#6E8377">Saltivska line · 8 станцій</text>
+              </g>
+              <g transform="translate(10, 130)">
+                <rect x={0} y={0} width={32} height={22} rx={5} fill="#009640" />
+                <text x={16} y={15} textAnchor="middle" fill="#FFF" fontSize={13} fontWeight="bold">3</text>
+                <text x={42} y={12} className="font-bold" fontSize={13} fill="#F5F7F6">Олексіївська лінія</text>
+                <text x={42} y={27} className="font-normal" fontSize={10} fill="#6E8377">Oleksiivska line · 9 станцій</text>
+              </g>
+              <line x1={10} y1={175} x2={270} y2={175} stroke="#1E2A24" strokeWidth={1} />
+              <g transform="translate(10, 195)">
+                <text x={0} y={0} className="font-bold" fontSize={14} fill="#F5F7F6">Працюємо з 5:30 до 24:00</text>
+                <text x={0} y={16} className="font-normal" fontSize={11} fill="#6E8377">Works from 5:30 to 24:00</text>
+                <text x={0} y={38} className="font-medium" fontSize={11} fill="#9FB3A9">metro.kharkiv.ua</text>
+                <text x={0} y={55} className="font-normal" fontSize={10} fill="#6E8377">eTicket: 0-800-505-685</text>
+                <text x={0} y={75} className="font-normal" fontSize={9} fill="#4A5C52">Версія 5.2.0 · Оновлено 2026</text>
+              </g>
+            </g>
+          )}
+
           {/* Лінії метро */}
           {BUILT_LINES.map(({ line }) => (
             <LineTracks key={line.id} line={line} />
@@ -1199,44 +1229,12 @@ export function LiveMetroPage() {
         </svg>
 
         {/* Кнопки зума */}
-        <div className="absolute right-3 top-3 flex flex-col gap-2" style={{ marginTop: 'env(safe-area-inset-top)' }}>
+        <div className="absolute right-4 top-4 flex flex-col gap-2">
           <ZoomButton label="+" onClick={() => setTransform((t) => ({ ...t, scale: clampScale(t.scale * 1.25) }))} />
           <ZoomButton label="−" onClick={() => setTransform((t) => ({ ...t, scale: clampScale(t.scale / 1.25) }))} />
           <ZoomButton label="⟲" onClick={resetView} small />
           <ZoomButton label="ⓘ" onClick={() => setShowLegend((v) => !v)} small />
         </div>
-
-        {/* Умовні позначення — фіксований HTML-оверлей у лівому нижньому куті.
-            На відміну від старої версії (яка малювалась усередині <svg> і тому
-            "їхала" разом зі схемою під час пану/зуму й губилась за межами екрана),
-            цей блок завжди лишається на місці незалежно від transform карти. */}
-        {showLegend && !selectedTrain && !selectedStation && (
-          <div
-            className="pointer-events-none absolute bottom-3 left-3 z-20 w-[min(78vw,260px)] rounded-2xl border border-white/10 bg-[#0F1A14]/95 p-3 shadow-2xl backdrop-blur-sm"
-            style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
-          >
-            <div className="flex flex-col gap-2">
-              {BUILT_LINES.map(({ line }) => (
-                <div key={line.id} className="flex items-center gap-2.5">
-                  <span
-                    className="flex h-6 w-7 shrink-0 items-center justify-center rounded-md text-[12px] font-bold text-white"
-                    style={{ backgroundColor: line.color }}
-                  >
-                    {line.number}
-                  </span>
-                  <div className="min-w-0 leading-tight">
-                    <div className="truncate text-[11px] font-bold text-white/90">{line.name}</div>
-                    <div className="truncate text-[9.5px] text-white/45">{line.nameEn} · {line.stations.length} ст.</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-2.5 border-t border-white/10 pt-2">
-              <div className="text-[11px] font-bold text-white/90">Працює з 5:30 до 24:00</div>
-              <div className="text-[9.5px] text-white/45">metro.kharkiv.ua · 0-800-505-685</div>
-            </div>
-          </div>
-        )}
 
         {/* Картки інформації */}
         {selectedTrain && <TrainInfoCard train={selectedTrain} onClose={() => setSelectedTrainId(null)} />}
