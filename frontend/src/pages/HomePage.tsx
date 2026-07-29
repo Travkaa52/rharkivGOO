@@ -39,6 +39,9 @@ import {
 import type { TransportKind, TransportRoute } from '@/types/transport';
 
 const metroIcon = assetUrl('/icons/metroicono.png');
+const routesIcon = assetUrl('/icons/marshryticono.png');
+const mapIcon = assetUrl('/icons/kartaicono.png');
+const favoritesIcon = assetUrl('/icons/obraneicono.png');
 
 const KIND_ICON: Record<TransportKind, string> = {
   metro: '🚇',
@@ -398,10 +401,10 @@ export function HomePage() {
         {/* 3. QUICK ACTIONS GRID (2x2) — кнопки зменшені (менше padding/gap), іконки того самого розміру */}
         <section className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
-            { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-surface-soft text-ink-text border-border/40', isImage: false },
-            { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-surface-soft text-ink-text border-border/40', isImage: false },
-            { label: 'Метро', icon: null, to: '/metro/live', color: 'bg-surface-soft text-ink-text border-border/40', isImage: true },
-            { label: 'Обране', icon: Star, to: '/favorites', color: 'bg-surface-soft text-ink-text border-border/40', isImage: false },
+            { label: 'Маршрути', icon: Navigation, image: routesIcon, to: '/routes', color: 'bg-surface-soft text-ink-text border-border/40' },
+            { label: 'Карта', icon: MapIcon, image: mapIcon, to: '/map', color: 'bg-surface-soft text-ink-text border-border/40' },
+            { label: 'Метро', icon: null, image: metroIcon, to: '/metro/live', color: 'bg-surface-soft text-ink-text border-border/40' },
+            { label: 'Обране', icon: Star, image: favoritesIcon, to: '/favorites', color: 'bg-surface-soft text-ink-text border-border/40' },
           ].map((item, index) => {
             const Icon = item.icon;
             return (
@@ -410,11 +413,26 @@ export function HomePage() {
                 to={item.to}
                 className="bg-surface-raised rounded-2xl p-2.5 flex items-center gap-2.5 border border-border/40 shadow-sm hover:shadow-md hover:border-border/60 active:scale-[0.98] transition-all duration-200 group"
               >
-                <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
-                  {item.isImage ? (
-                    <img src={metroIcon} alt="Метро" className="w-[4.5rem] h-[4.5rem] object-contain scale-125" />
-                  ) : (
-                    Icon && <Icon size={30} />
+                <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs overflow-hidden`}>
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.label}
+                      className="w-[4.5rem] h-[4.5rem] object-contain scale-125"
+                      onError={(e) => {
+                        // Якщо PNG-іконку ще не поклали в public/icons — тихо ховаємо
+                        // зображення і показуємо запасну lucide-іконку замість неї.
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  {Icon && (
+                    <Icon
+                      size={30}
+                      style={item.image ? { display: 'none' } : undefined}
+                    />
                   )}
                 </div>
                 <span className="font-extrabold text-ink-text text-xs tracking-tight">{item.label}</span>

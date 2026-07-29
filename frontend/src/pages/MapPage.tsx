@@ -356,8 +356,9 @@ export function MapPage() {
   // Запобіжник: якщо подія 'load' від MapLibre з якоїсь причини не настає
   // (повільна мережа, застряглий запит спрайту/шрифтів тощо), не тримаємо
   // користувача вічно за блокуючим екраном завантаження — знімаємо його через
-  // 8 секунд і даємо картою користуватись; шари та зупинки доопрацюються самі,
-  // коли/якщо стиль усе ж довантажиться.
+  // 3 секунди (максимально допустимий час очікування) і даємо картою
+  // користуватись; шари та зупинки доопрацюються самі, коли/якщо стиль усе ж
+  // довантажиться.
   useEffect(() => {
     if (isMapLoaded || mapError) {
       if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
@@ -365,7 +366,7 @@ export function MapPage() {
     }
     loadTimeoutRef.current = setTimeout(() => {
       setIsMapLoaded(true);
-    }, 8000);
+    }, 3000);
     return () => {
       if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
     };

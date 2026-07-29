@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState, memo, startTransition } from 'react';
+import { Suspense, lazy, useState, useEffect, memo, startTransition } from 'react';
 import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
 import { TelegramGate } from '@/components/TelegramGate';
@@ -74,12 +74,25 @@ export default function App() {
   const [splashMounted, setSplashMounted] = useState<boolean>(true);
   const location = useLocation();
 
+  // Карта — важкий компонент (ініціалізація MapLibre, завантаження стилю,
+  // тайлів, шрифтів). Щоб вона відкривалась миттєво щоразу після першого
+  // разу, а не перезавантажувалась заново на кожен вхід у "/map", ми не
+  // розмонтовуємо <MapPage /> при виході зі сторінки — лишаємо її живою
+  // в DOM (просто ховаємо через CSS) одразу після першого відвідування.
+  const isMapRoute = location.pathname === '/map';
+  const [mapMounted, setMapMounted] = useState(isMapRoute);
+  useEffect(() => {
+    if (isMapRoute) setMapMounted(true);
+  }, [isMapRoute]);
+
   return (
     <div className="relative min-h-dvh w-full overflow-x-hidden bg-bg text-ink-text antialiased selection:bg-primary/20">
       <Suspense fallback={<RouteFallback />}>
         <Routes location={location}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/map" element={<MapPage />} />
+          {/* MapPage рендериться окремо нижче — постійно змонтована, щоб не
+              перезавантажуватись при кожному переході на цю сторінку. */}
+          <Route path="/map" element={null} />
           <Route path="/routes" element={<RoutesPage />} />
           <Route path="/routes/:routeId" element={<RouteDetailPage />} />
           <Route path="/metro" element={<TransportKindPage kind="metro" />} />
@@ -96,6 +109,14 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+
+      {mapMounted && (
+        <div className={isMapRoute ? 'contents' : 'hidden'}>
+          <Suspense fallback={<RouteFallback />}>
+            <MapPage />
+          </Suspense>
+        </div>
+      )}
 
       {telegramStatus === 'outside' && <MemoizedTelegramGate />}
 
