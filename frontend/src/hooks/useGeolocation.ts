@@ -9,15 +9,13 @@ export function useGeolocation() {
   }, [store]);
 
   return {
+    ...store,
     loading: store.isLocating && !store.hasFix,
-    accuracy: store.accuracy,
-    altitude: null,
-    altitudeAccuracy: null,
-    heading: store.heading,
     latitude: store.position?.lat ?? null,
     longitude: store.position?.lng ?? null,
     speed: store.speedMps,
+    altitude: null,
+    altitudeAccuracy: null,
     timestamp: null,
-    error: store.error,
   };
 }
