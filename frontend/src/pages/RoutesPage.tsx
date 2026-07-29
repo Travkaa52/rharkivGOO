@@ -25,7 +25,7 @@ export function RoutesPage() {
     <div className="min-h-dvh bg-bg text-ink-text selection:bg-primary/20">
       {/* Sticky Glassmorphic Navigation Bar — єдиний нейтральний стиль для всіх вкладок */}
       <div className="sticky top-0 z-30 border-b border-border/40 bg-bg/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-md items-center gap-1.5 overflow-x-auto px-4 py-2 no-scrollbar">
+        <div className="mx-auto flex max-w-md items-center gap-2 overflow-x-auto px-4 pt-3.5 pb-2 no-scrollbar">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.kind;
 
@@ -34,7 +34,9 @@ export function RoutesPage() {
                 key={tab.kind}
                 onClick={() => setActiveTab(tab.kind)}
                 className={clsx(
-                  'flex shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all duration-200 active:scale-95',
+                  // h-10 фіксує ВИСОТУ КНОПКИ — вона не росте.
+                  // overflow-visible дозволяє картинці вилазити за межі кнопки замість обрізання.
+                  'relative flex h-10 shrink-0 items-center gap-1 overflow-visible rounded-lg border pl-1 pr-2.5 text-[11px] font-semibold transition-all duration-200 active:scale-95',
                   isActive
                     ? 'border-border bg-surface-raised text-ink-text shadow-sm backdrop-blur-md'
                     : 'border-border/40 bg-surface/50 text-ink-muted hover:bg-surface/80 hover:text-ink-text backdrop-blur-sm'
@@ -44,7 +46,9 @@ export function RoutesPage() {
                   src={assetUrl(`/icons/${tab.icon}`)}
                   alt={tab.label}
                   className={clsx(
-                    'h-11 w-11 object-contain shrink-0 transition-opacity duration-200',
+                    // Картинка БІЛЬША за кнопку (h-16 проти h-10) — вилазить зверху й знизу,
+                    // сама кнопка (фон/рамка) лишається того самого розміру.
+                    'h-16 w-16 shrink-0 object-contain transition-opacity duration-200',
                     isActive ? 'opacity-100' : 'opacity-60'
                   )}
                 />
