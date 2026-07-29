@@ -5,10 +5,16 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { DEFAULT_ZOOM, KHARKIV_CENTER, MAP_STYLES, MAX_ZOOM, MIN_ZOOM, TRANSPORT_COLORS } from '@/config/map';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import { buildRouteLinesGeoJson, buildStopsGeoJson } from '@/lib/mapLayers';
+import { buildRouteLinesGeoJson, buildStopsGeoJson, buildTripPathGeoJson } from '@/lib/mapLayers';
 import { assetUrl } from '@/lib/assetUrl';
 import { localRoutes } from '@/data/localData';
+import type { TripPlan } from '@/data/localData';
 import type { TransportKind } from '@/types/transport';
+
+const TRIP_PATH_SOURCE_ID = 'khgo-trip-path';
+const TRIP_PATH_CASING_LAYER_ID = 'khgo-trip-path-casing';
+const TRIP_PATH_LAYER_ID = 'khgo-trip-path-line';
+const TRIP_PATH_WALK_LAYER_ID = 'khgo-trip-path-walk';
 
 const ROUTES_SOURCE_ID = 'khgo-routes';
 const ROUTES_LAYER_ID = 'khgo-routes-lines';
@@ -93,6 +99,55 @@ function addStaticTransitLayers(
         'line-opacity': 0
       }
     }, ROUTES_LAYER_ID);
+  }
+
+  // Шар намальованого шляху обраного варіанту поїздки (Звідки -> Куди):
+  // пунктирна пішохідна ділянка + суцільна лінія кольору виду транспорту
+  // для кожного legу (з пересадкою — кілька кольорових відрізків підряд).
+  if (!map.getSource(TRIP_PATH_SOURCE_ID)) {
+    map.addSource(TRIP_PATH_SOURCE_ID, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+
+    map.addLayer({
+      id: TRIP_PATH_WALK_LAYER_ID,
+      type: 'line',
+      source: TRIP_PATH_SOURCE_ID,
+      filter: ['==', ['get', 'kind'], 'walk'],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#9AA3AE',
+        'line-width': 3,
+        'line-dasharray': [0.001, 1.6]
+      }
+    });
+
+    map.addLayer({
+      id: TRIP_PATH_CASING_LAYER_ID,
+      type: 'line',
+      source: TRIP_PATH_SOURCE_ID,
+      filter: ['==', ['get', 'kind'], 'transit'],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#0A0F0D',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 11, 7, 17, 12],
+        'line-opacity': 0.5
+      }
+    });
+
+    map.addLayer({
+      id: TRIP_PATH_LAYER_ID,
+      type: 'line',
+      source: TRIP_PATH_SOURCE_ID,
+      filter: ['==', ['get', 'kind'], 'transit'],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': ['coalesce', ['get', 'color'], '#05522E'],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 11, 4.5, 17, 9],
+        'line-opacity': 1
+      }
+    });
   }
 
   if (!map.getSource(STOPS_SOURCE_ID)) {
@@ -246,6 +301,8 @@ interface MapViewProps {
   fromPoint?: { lat: number; lng: number } | null;
   /** Точка "Куди" для побудови маршруту — позначається червоним піном. */
   toPoint?: { lat: number; lng: number } | null;
+  /** Обраний варіант поїздки — малюється кольоровим шляхом по видах транспорту. */
+  tripPlan?: TripPlan | null;
 }
 
 export function MapView({
@@ -260,7 +317,8 @@ export function MapView({
   onMapReady,
   onMapError,
   fromPoint = null,
-  toPoint = null
+  toPoint = null,
+  tripPlan = null
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -360,6 +418,10 @@ export function MapView({
     map.once('styledata', () => {
       ensureBuildingsLayer(map, show3DBuildings);
       addStaticTransitLayers(map, visibleKinds, showStops, selectedRouteId);
+      const tripSource = map.getSource(TRIP_PATH_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+      tripSource?.setData(
+        tripPlan ? buildTripPathGeoJson(tripPlan, fromPoint, toPoint) : { type: 'FeatureCollection', features: [] }
+      );
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapStyle]);
@@ -437,6 +499,17 @@ export function MapView({
       rotor.style.transform = typeof userHeading === 'number' ? `rotate(${userHeading}deg)` : 'rotate(0deg)';
     }
   }, [userIsMoving, userHeading]);
+
+  // Малювання шляху обраного варіанту поїздки кольором транспорту
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    const source = map.getSource(TRIP_PATH_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+    if (!source) return;
+    source.setData(
+      tripPlan ? buildTripPathGeoJson(tripPlan, fromPoint, toPoint) : { type: 'FeatureCollection', features: [] }
+    );
+  }, [tripPlan, fromPoint, toPoint, mapReady]);
 
   // Маркери "Звідки" / "Куди" для побудови маршруту
   useEffect(() => {
