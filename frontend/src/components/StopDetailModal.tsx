@@ -1,5 +1,5 @@
 import { Clock, MapPin, ChevronRight, Navigation } from 'lucide-react';
-import { Modal } from '@/components/Modal';
+import { Sheet } from '@/components/ui/Sheet';
 import { TransportKindIcon, KIND_LABELS_UK } from '@/components/TransportKindIcon';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
@@ -37,8 +37,8 @@ export function StopDetailModal({ stop, arrivals, onClose, onRouteSelect, onUseA
     .sort((a, b) => (arrivalByRouteId.get(a.id) ?? 999) - (arrivalByRouteId.get(b.id) ?? 999));
 
   return (
-    <Modal open={!!stop} onClose={onClose} title={stop.name} icon={<MapPin className="h-4 w-4" />}>
-      <div className="space-y-4">
+    <Sheet open={!!stop} onClose={onClose} title={stop.name}>
+      <div className="max-h-[65vh] space-y-4 overflow-y-auto">
         {/* Види транспорту + обране */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-1.5">
@@ -125,6 +125,6 @@ export function StopDetailModal({ stop, arrivals, onClose, onRouteSelect, onUseA
           </ul>
         </div>
       </div>
-    </Modal>
+    </Sheet>
   );
 }

@@ -1,6 +1,7 @@
 import { TransportKind } from '@/types/transport';
 import routesRealJson from './routesReal.json';
 import stopsRealJson from './stopsReal.json';
+import { metroStopsData } from './metroStationsReal';
 
 /**
  * Реальні дані маршрутів і зупинок Харкова, розшифровані з офіційних
@@ -59,6 +60,10 @@ const REAL_STOPS = stopsRealJson as unknown as StopItem[];
 
 const stopsMap = new Map<string, StopItem>();
 REAL_STOPS.forEach((s) => stopsMap.set(s.id, s));
+// Станції метро (з KML, координати + українські назви) — окреме джерело,
+// без прив'язки до наземних маршрутів, але доступне для пошуку, вибору
+// на карті та як точка "Звідси"/"Куди" при побудові поїздки.
+metroStopsData.forEach((s) => stopsMap.set(s.id, s));
 
 // stopIds — зупинки в напрямку "туди" (headsignForward), як основний
 // список для карти, сторінки маршруту та підрахунку кількості зупинок.

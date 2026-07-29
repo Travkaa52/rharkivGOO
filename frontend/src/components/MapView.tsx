@@ -24,11 +24,13 @@ const STOPS_SOURCE_ID = 'khgo-stops';
 const STOPS_LAYER_ID = 'khgo-stops-circles';
 const STOPS_HALO_LAYER_ID = 'khgo-stops-halo';
 const STOP_HIGHLIGHT_LAYER_ID = 'khgo-stops-highlight';
-// Метро — окремі шари без minzoom-обмеження: станції метро мають лишатись
+// Метро — окремий шар без minzoom-обмеження: станції метро мають лишатись
 // видимими на будь-якому масштабі карти, на відміну від трамвайних/тролейбусних/
 // автобусних зупинок, яких на віддаленому зумі забагато й вони заховані навмисно.
-const METRO_STOPS_HALO_LAYER_ID = 'khgo-stops-metro-halo';
-const METRO_STOPS_LAYER_ID = 'khgo-stops-metro-circles';
+// Рендериться значком метрополітену (public/icons/kharkiv-metro-logo.png) з
+// назвою станції збоку, а не звичайним кольоровим кружечком.
+const METRO_STOPS_LAYER_ID = 'khgo-stops-metro-icons';
+const METRO_ICON_IMAGE_ID = 'khgo-metro-station-icon';
 
 const STOP_COLOR_MATCH: maplibregl.ExpressionSpecification = [
   'match',
@@ -211,33 +213,63 @@ function addStaticTransitLayers(
     });
 
     // Метро — без minzoom, завжди видимі, поки showStops увімкнено.
-    map.addLayer({
-      id: METRO_STOPS_HALO_LAYER_ID,
-      type: 'circle',
-      source: STOPS_SOURCE_ID,
-      filter: ['==', ['get', 'dominantKind'], 'metro'],
-      layout: { visibility: showStops ? 'visible' : 'none' },
-      paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 4.5, 17, 11],
-        'circle-color': '#FFFFFF',
-        'circle-opacity': 0.95
-      }
-    });
+    // Значок станції (лого метрополітену) + назва станції збоку.
+    addMetroIconLayer(map, showStops);
+  }
+}
 
+/**
+ * Додає значок станції метро (public/icons/kharkiv-metro-logo.png) як
+ * MapLibre-зображення та символьний шар поверх нього з назвою станції
+ * збоку. Зображення потрібно вантажити асинхронно й наново після кожної
+ * зміни стилю карти (map.setStyle скидає всі раніше додані зображення),
+ * тому виклик безпечний для повторного виконання.
+ */
+function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
+  const buildLayer = () => {
+    if (map.getLayer(METRO_STOPS_LAYER_ID) || !map.getSource(STOPS_SOURCE_ID)) return;
     map.addLayer({
       id: METRO_STOPS_LAYER_ID,
-      type: 'circle',
+      type: 'symbol',
       source: STOPS_SOURCE_ID,
       filter: ['==', ['get', 'dominantKind'], 'metro'],
-      layout: { visibility: showStops ? 'visible' : 'none' },
+      layout: {
+        visibility: showStops ? 'visible' : 'none',
+        'icon-image': map.hasImage(METRO_ICON_IMAGE_ID) ? METRO_ICON_IMAGE_ID : '',
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 10, 0.32, 17, 0.6],
+        'icon-anchor': 'center',
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
+        'text-field': ['get', 'name'],
+        'text-size': 11,
+        'text-anchor': 'left',
+        'text-offset': [1.15, 0],
+        'text-allow-overlap': false,
+        'text-ignore-placement': false,
+        'text-optional': true
+      },
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 3.5, 17, 8],
-        'circle-color': TRANSPORT_COLORS.metro,
-        'circle-stroke-color': '#FFFFFF',
-        'circle-stroke-width': 2
+        'text-color': TRANSPORT_COLORS.metro,
+        'text-halo-color': '#FFFFFF',
+        'text-halo-width': 1.4
       }
     });
+  };
+
+  if (map.hasImage(METRO_ICON_IMAGE_ID)) {
+    buildLayer();
+    return;
   }
+
+  map.loadImage(assetUrl('icons/kharkiv-metro-logo.png'), (error, image) => {
+    if (!error && image && !map.hasImage(METRO_ICON_IMAGE_ID)) {
+      map.addImage(METRO_ICON_IMAGE_ID, image);
+    }
+    // Навіть якщо картинку не вдалось завантажити, шар все одно додаємо —
+    // тоді станції метро лишаться підписаними назвою (без іконки), а не
+    // зникнуть з карти повністю.
+    buildLayer();
+  });
 }
 
 function updateRouteStopHighlight(map: MapLibreMap, selectedRouteId?: string | null) {
@@ -278,7 +310,7 @@ function updateStaticTransitLayers(
 
   updateRouteStopHighlight(map, selectedRouteId);
 
-  for (const layerId of [STOPS_LAYER_ID, STOPS_HALO_LAYER_ID, METRO_STOPS_LAYER_ID, METRO_STOPS_HALO_LAYER_ID]) {
+  for (const layerId of [STOPS_LAYER_ID, STOPS_HALO_LAYER_ID, METRO_STOPS_LAYER_ID]) {
     if (map.getLayer(layerId)) {
       map.setLayoutProperty(layerId, 'visibility', showStops ? 'visible' : 'none');
     }
