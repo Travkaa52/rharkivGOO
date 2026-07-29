@@ -21,7 +21,7 @@ const TABS: TabItem[] = [
   {
     kind: 'trolleybus',
     label: 'Тролейбуси',
-    iconSrc: assetUrl('/icons/trolleyicono.png'),
+    iconSrc: assetUrl('/icons/troleyicono.png'),
     activeColor: 'bg-blue-500/15 text-blue-400 border-blue-500/30'
   },
   {
@@ -45,7 +45,8 @@ export function RoutesPage() {
     <div className="min-h-dvh bg-bg text-ink-text selection:bg-primary/20">
       {/* Sticky Glassmorphic Navigation Bar */}
       <div className="sticky top-0 z-30 border-b border-border/40 bg-bg/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-md items-center gap-2 overflow-x-auto px-4 py-3 no-scrollbar">
+        {/* Кнопки зменшені (менше padding/gap/висота), іконки лишились того самого розміру (h-14 w-14) */}
+        <div className="mx-auto flex max-w-md items-center gap-1.5 overflow-x-auto px-4 py-1.5 no-scrollbar">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.kind;
 
@@ -54,7 +55,7 @@ export function RoutesPage() {
                 key={tab.kind}
                 onClick={() => setActiveTab(tab.kind)}
                 className={clsx(
-                  'flex shrink-0 items-center gap-2.5 rounded-xl border px-3.5 py-2 text-body-sm font-semibold transition-all duration-200 active:scale-95',
+                  'flex shrink-0 items-center gap-1 rounded-lg border px-1.5 py-0.5 text-[11px] font-semibold transition-all duration-200 active:scale-95',
                   isActive
                     ? clsx('shadow-sm backdrop-blur-md', tab.activeColor)
                     : 'border-border/40 bg-surface/50 text-ink-muted hover:bg-surface/80 hover:text-ink-text backdrop-blur-sm'

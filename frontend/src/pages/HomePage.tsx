@@ -395,8 +395,8 @@ export function HomePage() {
         {/* 2.5. TRAIN WISH SPRITE — проїжджає раз на 2–3 години після заходу, тягне банер з побажанням */}
         <TrainWishSprite />
 
-        {/* 3. QUICK ACTIONS GRID (2x2) */}
-        <section className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        {/* 3. QUICK ACTIONS GRID (2x2) — кнопки зменшені (менше padding/gap), іконки того самого розміру */}
+        <section className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
             { label: 'Маршрути', icon: Navigation, to: '/routes', color: 'bg-blue-50 text-blue-600 border-blue-100', isImage: false },
             { label: 'Карта', icon: MapIcon, to: '/map', color: 'bg-primary/10 text-primary border-primary/15', isImage: false },
@@ -408,7 +408,7 @@ export function HomePage() {
               <Link
                 key={index}
                 to={item.to}
-                className="bg-surface-raised rounded-[22px] p-4 flex items-center gap-3.5 border border-border/40 shadow-sm hover:shadow-md hover:border-border/60 active:scale-[0.98] transition-all duration-200 group"
+                className="bg-surface-raised rounded-2xl p-2.5 flex items-center gap-2.5 border border-border/40 shadow-sm hover:shadow-md hover:border-border/60 active:scale-[0.98] transition-all duration-200 group"
               >
                 <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs`}>
                   {item.isImage ? (
