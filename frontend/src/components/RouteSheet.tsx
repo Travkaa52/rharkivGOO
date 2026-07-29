@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { TransportKindIcon, KIND_LABELS_UK } from '@/components/TransportKindIcon';
 import { FavoriteButton } from '@/components/FavoriteButton';
+import { RouteDetailModal } from '@/components/RouteDetailModal';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { localStops } from '@/data/localData';
 import type { TransportRoute } from '@/types/transport';
@@ -18,7 +19,7 @@ interface RouteSheetProps {
  * тап по зупинці в списку виділяє її на карті так само, як тап по маркеру.
  */
 export function RouteSheet({ route, onClose, onStopSelect }: RouteSheetProps) {
-  const navigate = useNavigate();
+  const [detailOpen, setDetailOpen] = useState(false);
   const isFavorite = useFavoritesStore((s) => s.isRouteFavorite(route.id));
   const addRoute = useFavoritesStore((s) => s.addRoute);
   const removeRoute = useFavoritesStore((s) => s.removeRoute);
@@ -86,11 +87,13 @@ export function RouteSheet({ route, onClose, onStopSelect }: RouteSheetProps) {
 
       <button
         type="button"
-        onClick={() => navigate(`/routes/${route.id}`)}
+        onClick={() => setDetailOpen(true)}
         className="m-2 mt-0 rounded-xl2 bg-forest px-4 py-2.5 text-center font-body text-sm font-semibold text-white transition hover:bg-forest-dark active:scale-[0.99]"
       >
         Детальніше про маршрут
       </button>
+
+      <RouteDetailModal route={route} open={detailOpen} onClose={() => setDetailOpen(false)} />
     </div>
   );
 }
