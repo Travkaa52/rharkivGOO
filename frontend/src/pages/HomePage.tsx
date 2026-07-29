@@ -21,6 +21,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { ReportDelayModal } from '@/components/ReportDelayModal';
+import { RouteDetailModal } from '@/components/RouteDetailModal';
 import { TrainWishSprite } from '@/components/TrainWishSprite';
 import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
@@ -35,7 +36,7 @@ import {
   getUpcomingArrivalsForStation,
   formatEtaCountdown
 } from '@/liveMetro/liveMetroEngine';
-import type { TransportKind } from '@/types/transport';
+import type { TransportKind, TransportRoute } from '@/types/transport';
 
 const metroIcon = assetUrl('/icons/metroicono.png');
 
@@ -77,6 +78,7 @@ export function HomePage() {
 
   // Модалка "Повідомити про затримку"
   const [isReportDelayOpen, setIsReportDelayOpen] = useState(false);
+  const [activeRoute, setActiveRoute] = useState<TransportRoute | null>(null);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -308,21 +310,22 @@ export function HomePage() {
                         <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted px-2 mb-1.5">Маршрути</div>
                         <div className="space-y-1">
                           {searchResults.routes.map((r) => (
-                            <Link
+                            <button
                               key={r.id}
-                              to={`/routes/${r.id}`}
+                              type="button"
                               onClick={() => {
                                 setIsSearchFocused(false);
                                 addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
+                                setActiveRoute(r);
                               }}
-                              className="flex items-center justify-between p-2 rounded-xl hover:bg-primary/10 transition-colors group"
+                              className="flex w-full items-center justify-between p-2 rounded-xl hover:bg-primary/10 transition-colors group"
                             >
                               <div className="flex items-center gap-2.5">
                                 <span className="text-sm">{KIND_ICON[r.kind]}</span>
                                 <span className="font-bold text-xs text-ink-text group-hover:text-primary">{r.number} — {r.name}</span>
                               </div>
                               <ChevronRight size={14} className="text-ink-muted" />
-                            </Link>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -584,11 +587,14 @@ export function HomePage() {
           ) : (
             <div className="space-y-2">
               {favoriteRouteDetails.slice(0, 3).map((r) => (
-                <Link
+                <button
                   key={r.id}
-                  to={`/routes/${r.id}`}
-                  onClick={() => addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' })}
-                  className="flex items-center justify-between p-3 rounded-[18px] bg-surface-soft hover:bg-surface transition-colors border border-border/40"
+                  type="button"
+                  onClick={() => {
+                    addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
+                    setActiveRoute(r);
+                  }}
+                  className="flex w-full items-center justify-between p-3 rounded-[18px] bg-surface-soft hover:bg-surface transition-colors border border-border/40"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {r.kind === 'metro' ? (
@@ -601,7 +607,7 @@ export function HomePage() {
                     </div>
                   </div>
                   <ChevronRight size={14} className="text-ink-muted shrink-0" />
-                </Link>
+                </button>
               ))}
 
               {favoriteStopDetails.slice(0, 2).map((s) => (
@@ -700,6 +706,7 @@ export function HomePage() {
       </div>
 
       <ReportDelayModal open={isReportDelayOpen} onClose={() => setIsReportDelayOpen(false)} />
+      <RouteDetailModal route={activeRoute} open={!!activeRoute} onClose={() => setActiveRoute(null)} />
     </div>
   );
 }
