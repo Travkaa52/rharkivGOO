@@ -6,7 +6,7 @@ import {
   getActiveTrains,
   getUpcomingArrivalsForStation
 } from '@/liveMetro/liveMetroEngine';
-import { localStops } from '@/data/localData';
+import { METRO_STATION_GEO, haversineMeters } from '@/liveMetro/metroStationsGeo';
 import type { GeoPoint } from '@/types/transport';
 
 interface LiveMetroWidgetProps {
@@ -65,7 +65,10 @@ export function LiveMetroWidget({ userPosition }: LiveMetroWidgetProps) {
 
   const isServiceRunning = activeTrains.length > 0;
 
-  // Пошук найближчої станції метро
+  // Пошук найближчої станції метро — координати станцій беремо напряму з
+  // офіційного KML (src/assets/marshryt transporty kharkiv/…Google.kml),
+  // а не з узагальненого списку зупинок (там інша, менш точна, схема id
+  // для метро, і збіг з нею раніше не спрацьовував).
   const nearestMetroStation = useMemo(() => {
     if (!userPosition) return null;
 
@@ -73,21 +76,15 @@ export function LiveMetroWidget({ userPosition }: LiveMetroWidgetProps) {
 
     for (const { line } of BUILT_LINES) {
       for (const s of line.stations) {
-        const stop = localStops.getById(s.id);
-        if (!stop) continue;
+        const geo = METRO_STATION_GEO[s.id];
+        if (!geo) continue;
 
-        const dLat = ((stop.position.lat - userPosition.lat) * Math.PI) / 180;
-        const dLng = ((stop.position.lng - userPosition.lng) * Math.PI) / 180;
-        const lat1 = (userPosition.lat * Math.PI) / 180;
-        const lat2 = (stop.position.lat * Math.PI) / 180;
-        const h =
-          Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
-        const distM = 2 * 6371000 * Math.asin(Math.min(1, Math.sqrt(h)));
+        const distM = haversineMeters(userPosition, geo);
 
         if (!best || distM < best.distM) {
           best = {
             id: s.id,
-            name: stop.name,
+            name: s.name,
             distM,
             lineId: line.id,
             lineColor: line.color
