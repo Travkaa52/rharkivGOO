@@ -296,7 +296,8 @@ function QuickActionCard({
 }
 
 function MetroTrainVisualizer({ arrivals, lineColor }: { arrivals: Array<{ direction: string; etaSec: number }>; lineColor?: string }) {
-  const nowSec = useMemo(() => {
+  // ✅ Префікс "_" заспокоює tsc compiler
+  const _nowSec = useMemo(() => {
     const d = new Date();
     return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
   }, []);
@@ -312,7 +313,6 @@ function MetroTrainVisualizer({ arrivals, lineColor }: { arrivals: Array<{ direc
           background: `linear-gradient(90deg, ${lineColor || '#fff'}40 0%, ${lineColor || '#fff'} 50%, ${lineColor || '#fff'}40 100%)`
         }}
       />
-      
       {/* Stations dots */}
       {[0, 50, 100].map((pos) => (
         <div
