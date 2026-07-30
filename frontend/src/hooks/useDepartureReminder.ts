@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useReminderStore } from '@/store/useReminderStore';
-import { useSettingsStore } from '@/store/useSettingsStore';
 import { useToastStore } from '@/store/useToastStore';
 import { computeLeavePlan, formatClock, isReminderInWindow } from '@/lib/reminderEngine';
+import { getPushPermissionState } from '@/lib/pushPermission';
 import type { LeaveTimePlan } from '@/types/reminder';
 
 const CHECK_INTERVAL_MS = 20_000;
@@ -12,8 +12,7 @@ function isSameDay(a: Date, b: Date): boolean {
 }
 
 function sendNativeNotification(title: string, body: string) {
-  if (typeof window === 'undefined' || !('Notification' in window)) return false;
-  if (Notification.permission !== 'granted') return false;
+  if (getPushPermissionState() !== 'granted') return false;
   try {
     new Notification(title, { body, tag: 'kharkivgo-departure-reminder', icon: '/icons/kharkiv-metro-logo.png' });
     return true;
@@ -28,23 +27,15 @@ function sendNativeNotification(title: string, body: string) {
  * нагадування актуальний план поїздки: якщо користувач запізнюється до
  * попереднього рейсу, наступний прохід сам підхопить наступний рейс
  * (computeLeavePlan рахує ETA від "зараз", а не від колись обраного часу).
+ *
+ * Сам дозвіл на push запитується не тут, а в момент збереження нагадування
+ * (ReminderFormSheet) — у межах жесту користувача. Тут лише читаємо
+ * поточний стан дозволу.
  */
 export function useDepartureReminder() {
   const reminders = useReminderStore((s) => s.reminders);
   const markFired = useReminderStore((s) => s.markFired);
-  const pushEnabled = useSettingsStore((s) => s.pushNotificationsEnabled);
   const showToast = useToastStore((s) => s.show);
-  const askedPermissionRef = useRef(false);
-
-  useEffect(() => {
-    if (!pushEnabled) return;
-    if (askedPermissionRef.current) return;
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-      askedPermissionRef.current = true;
-      void Notification.requestPermission();
-    }
-  }, [pushEnabled]);
 
   useEffect(() => {
     function tick() {

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { safeStorage } from '@/lib/safeStorage';
 import { DEFAULT_WALK_SPEED_KMH } from '@/lib/reminderEngine';
 import type { ReminderPoint, SmartReminder } from '@/types/reminder';
 
@@ -71,6 +72,6 @@ export const useReminderStore = create<ReminderState>()(
           reminders: get().reminders.map((r) => (r.id === id ? { ...r, lastFiredAt: atIso } : r))
         })
     }),
-    { name: 'kharkivgo-smart-reminders' }
+    { name: 'kharkivgo-smart-reminders', storage: safeStorage, version: 1 }
   )
 );

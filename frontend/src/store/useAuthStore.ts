@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { safeStorage } from '@/lib/safeStorage';
 import { getTelegramUser, isInsideTelegram } from '@/lib/telegram';
 import type { UserProfile } from '@/types/user';
 
@@ -83,6 +84,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'kharkivgo-auth',
+      storage: safeStorage,
       partialize: (state) => ({
         profile: state.profile,
         hasCompletedOnboarding: state.hasCompletedOnboarding

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { safeStorage } from '@/lib/safeStorage';
 import type { SearchHistoryEntry } from '@/types/transport';
 
 const MAX_HISTORY_ITEMS = 30;
@@ -28,6 +29,6 @@ export const useHistoryStore = create<HistoryState>()(
       removeEntry: (id) => set((state) => ({ entries: state.entries.filter((e) => e.id !== id) })),
       clear: () => set({ entries: [] })
     }),
-    { name: 'kharkivgo-history' }
+    { name: 'kharkivgo-history', storage: safeStorage }
   )
 );

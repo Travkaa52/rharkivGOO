@@ -260,6 +260,7 @@ export function HomePage() {
 
         {/* 2. ADVANCED REAL-TIME SEARCH BAR */}
         <div className="relative z-30">
+          <TrainWishSprite />
           <div className={`relative flex items-center bg-surface-raised rounded-[22px] border transition-all duration-200 shadow-sm ${
             isSearchFocused ? 'border-primary/40 ring-4 ring-primary/10 shadow-md' : 'border-border/40 hover:border-border/60'
           }`}>
@@ -389,9 +390,6 @@ export function HomePage() {
             </>
           )}
         </div>
-
-        {/* 2.5. TRAIN WISH SPRITE — проїжджає раз на 2–3 години після заходу, тягне банер з побажанням */}
-        <TrainWishSprite />
 
         {/* 3. QUICK ACTIONS GRID (2x2) — кнопки зменшені (менше padding/gap), іконки того самого розміру */}
         <section className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">

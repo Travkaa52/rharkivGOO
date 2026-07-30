@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { safeStorage } from '@/lib/safeStorage';
 import { apiClient, isBackendAvailable } from '@/api/client';
 import type { FavoriteRoute, FavoriteStop } from '@/types/transport';
 
@@ -71,6 +72,10 @@ export const useFavoritesStore = create<FavoritesState>()(
         });
       }
     }),
-    { name: 'kharkivgo-favorites', partialize: (state) => ({ stops: state.stops, routes: state.routes }) }
+    {
+      name: 'kharkivgo-favorites',
+      storage: safeStorage,
+      partialize: (state) => ({ stops: state.stops, routes: state.routes })
+    }
   )
 );

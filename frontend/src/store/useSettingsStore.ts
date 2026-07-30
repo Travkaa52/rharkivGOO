@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { safeStorage } from '@/lib/safeStorage';
 import type { AppSettings } from '@/types/user';
 import type { TransportKind } from '@/types/transport';
 
@@ -73,6 +74,6 @@ export const useSettingsStore = create<SettingsState>()(
       toggleStopsOnMap: () => set((state) => ({ showStopsOnMap: !state.showStopsOnMap })),
       toggle3DMode: () => set((state) => ({ is3DMode: !state.is3DMode }))
     }),
-    { name: 'kharkivgo-settings' }
+    { name: 'kharkivgo-settings', storage: safeStorage }
   )
 );

@@ -6,12 +6,27 @@ import { ReminderCard } from '@/components/reminder/ReminderCard';
 import { ReminderFormSheet } from '@/components/reminder/ReminderFormSheet';
 import { useReminderStore } from '@/store/useReminderStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { useToastStore } from '@/store/useToastStore';
+import { ensurePushPermission } from '@/lib/pushPermission';
 
 export function RemindersPage() {
   const reminders = useReminderStore((s) => s.reminders);
   const pushEnabled = useSettingsStore((s) => s.pushNotificationsEnabled);
   const togglePush = useSettingsStore((s) => s.togglePushNotifications);
+  const showToast = useToastStore((s) => s.show);
   const [formOpen, setFormOpen] = useState(false);
+
+  async function handleEnablePush() {
+    const permission = await ensurePushPermission();
+    if (permission === 'granted') {
+      if (!pushEnabled) togglePush();
+      showToast('Push-сповіщення увімкнено 🔔', 'success');
+    } else if (permission === 'denied') {
+      showToast('Дозвіл на push заблоковано в браузері/системі — перевірте налаштування пристрою', 'error');
+    } else {
+      showToast('Цей браузер не підтримує push-сповіщення', 'error');
+    }
+  }
 
   return (
     <div className="min-h-dvh bg-surface-soft pb-24">
@@ -29,7 +44,7 @@ export function RemindersPage() {
         {!pushEnabled && (
           <button
             type="button"
-            onClick={togglePush}
+            onClick={handleEnablePush}
             className="flex items-center gap-2.5 rounded-xl2 border border-primary/30 bg-primary/10 px-3.5 py-3 text-left"
           >
             <BellRing size={18} className="shrink-0 text-primary" />
