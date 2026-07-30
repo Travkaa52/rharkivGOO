@@ -128,6 +128,8 @@ export function TrainWishSprite() {
   const [visible, setVisible] = useState(false);
   const [wish, setWish] = useState('');
   const [train, setTrain] = useState<TrainDef | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const scheduleTimeoutRef = useRef<number | null>(null);
   const hideTimeoutRef = useRef<number | null>(null);
 
@@ -138,6 +140,10 @@ export function TrainWishSprite() {
   }, []);
 
   const runTrain = useCallback(() => {
+    // Ширина батьківського елемента (рядка пошуку) — потяг біжить рівно
+    // по його ширині, а не по всьому екрану.
+    const parentWidth = wrapperRef.current?.parentElement?.getBoundingClientRect().width ?? window.innerWidth;
+    setContainerWidth(parentWidth);
     setWish(pickWish());
     setTrain(pickTrain());
     setVisible(true);
@@ -168,16 +174,34 @@ export function TrainWishSprite() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!visible || !train) return null;
+  if (!visible || !train || containerWidth === 0) {
+    // Порожній якір потрібен завжди — від нього runTrain() вимірює ширину
+    // батьківського рядка пошуку (навіть коли потяг зараз не їде).
+    return <div ref={wrapperRef} className="absolute inset-0 pointer-events-none" aria-hidden="true" />;
+  }
 
   const aspectRatio = train.naturalWidth / train.naturalHeight;
+  const trainWidthPx = SPRITE_HEIGHT_PX * aspectRatio;
+
+  // Потяг рухається строго в межах ширини рядка пошуку: старт — повністю
+  // за правим краєм (containerWidth), фініш — повністю за лівим
+  // (-trainWidthPx). Плавна поява протягом перших ~10% шляху (щойно
+  // з'явився з правого краю) і плавне зникнення в останні ~15% (під'їжджає
+  // до лівого краю рядка).
+  const startX = containerWidth;
+  const endX = -trainWidthPx;
+  const distance = startX - endX;
+  const fadeInX = startX - distance * 0.1;
+  const fadeOutX = startX - distance * 0.85;
 
   return (
-    <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen pointer-events-none z-30" aria-hidden="true">
+    <div ref={wrapperRef} className="absolute inset-0 overflow-visible pointer-events-none z-30" aria-hidden="true">
       <style>{`
         @keyframes train-wish-move {
-          0% { transform: translateX(100vw); }
-          100% { transform: translateX(-100%); }
+          0% { transform: translateX(${startX}px); opacity: 0; }
+          10% { transform: translateX(${fadeInX}px); opacity: 1; }
+          85% { transform: translateX(${fadeOutX}px); opacity: 1; }
+          100% { transform: translateX(${endX}px); opacity: 0; }
         }
         .train-wish-track {
           animation: train-wish-move ${ANIMATION_DURATION_MS}ms linear forwards;
@@ -185,8 +209,13 @@ export function TrainWishSprite() {
       `}</style>
 
       <div
-        className="absolute top-0 left-0 train-wish-track"
-        style={{ height: SPRITE_HEIGHT_PX, width: SPRITE_HEIGHT_PX * aspectRatio }}
+        className="absolute train-wish-track"
+        style={{
+          top: '50%',
+          marginTop: -SPRITE_HEIGHT_PX / 2,
+          height: SPRITE_HEIGHT_PX,
+          width: trainWidthPx
+        }}
       >
         <div className="relative h-full w-full">
           <img src={train.src} alt="" draggable={false} className="block h-full w-full select-none" />

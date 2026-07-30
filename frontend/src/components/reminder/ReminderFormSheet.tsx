@@ -6,8 +6,10 @@ import { TransportKindIcon, KIND_LABELS_UK } from '@/components/TransportKindIco
 import { buildTripOptions } from '@/data/localData';
 import type { StopItem, TripOption } from '@/data/localData';
 import { useReminderStore } from '@/store/useReminderStore';
+import { useSettingsStore } from '@/store/useSettingsStore';
 import { useToastStore } from '@/store/useToastStore';
 import { DEFAULT_WALK_SPEED_KMH } from '@/lib/reminderEngine';
+import { ensurePushPermission } from '@/lib/pushPermission';
 
 interface ReminderFormSheetProps {
   open: boolean;
@@ -26,6 +28,8 @@ const WALK_SPEED_PRESETS: { label: string; value: number }[] = [
 
 export function ReminderFormSheet({ open, onClose }: ReminderFormSheetProps) {
   const addReminder = useReminderStore((s) => s.addReminder);
+  const pushEnabled = useSettingsStore((s) => s.pushNotificationsEnabled);
+  const togglePush = useSettingsStore((s) => s.togglePushNotifications);
   const showToast = useToastStore((s) => s.show);
 
   const [title, setTitle] = useState('');
@@ -59,7 +63,7 @@ export function ReminderFormSheet({ open, onClose }: ReminderFormSheetProps) {
     setWindowEnd('22:00');
   }
 
-  function handleSave() {
+  async function handleSave() {
     const chosen = options[selectedOptionIndex];
     if (!home || !destination || !chosen) {
       showToast('Оберіть дім, пункт призначення та маршрут', 'error');
@@ -90,7 +94,18 @@ export function ReminderFormSheet({ open, onClose }: ReminderFormSheetProps) {
       windowEnd
     });
 
-    showToast('Нагадування збережено', 'success');
+    // Запит дозволу на push — рівно в момент збереження нагадування, у межах
+    // жесту користувача (клік по кнопці), інакше браузер діалог не покаже.
+    const permission = await ensurePushPermission();
+    if (permission === 'granted') {
+      if (!pushEnabled) togglePush();
+      showToast('Нагадування збережено. Push-сповіщення увімкнено 🔔', 'success');
+    } else if (permission === 'denied') {
+      showToast('Нагадування збережено. Push заблоковано — покажемо сповіщення в застосунку', 'info');
+    } else {
+      showToast('Нагадування збережено', 'success');
+    }
+
     reset();
     onClose();
   }
@@ -104,7 +119,7 @@ export function ReminderFormSheet({ open, onClose }: ReminderFormSheetProps) {
       }}
       title="Нове нагадування про вихід"
     >
-      <div className="max-h-[70vh] space-y-4 overflow-y-auto pb-2">
+      <div className="space-y-4 pb-2">
         <div className="space-y-1.5">
           <label className="px-0.5 text-[11px] font-bold uppercase tracking-wide text-ink-muted">Назва</label>
           <input
