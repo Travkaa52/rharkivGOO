@@ -168,7 +168,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
         if (!cancelled) setRoutes(data);
       })
       .catch(() => {
-        if (!cancelled) setErrorMsg('Не вдалося завантажити маршрути. Перевірте з'єднання.');
+        if (!cancelled) setErrorMsg('Не вдалося завантажити маршрути. Перевірте з\'єднання.');
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
