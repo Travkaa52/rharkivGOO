@@ -407,10 +407,10 @@ export function HomePage() {
         {/* 3. QUICK ACTIONS GRID (2x2) — кнопки зменшені (менше padding/gap), іконки того самого розміру */}
         <section className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {[
-            { label: 'Маршрути', icon: Navigation, image: routesIcon, imageFallback: undefined as string | undefined, to: '/routes', color: 'bg-surface-soft text-ink-text border-border/40' },
-            { label: 'Карта', icon: MapIcon, image: mapIcon, imageFallback: undefined as string | undefined, to: '/map', color: 'bg-surface-soft text-ink-text border-border/40' },
-            { label: 'Метро', icon: TrainTrack, image: metroIconPrimary, imageFallback: metroIconFallback as string | undefined, to: '/metro/live', color: 'bg-surface-soft text-ink-text border-border/40' },
-            { label: 'Обране', icon: Star, image: favoritesIcon, imageFallback: undefined as string | undefined, to: '/favorites', color: 'bg-surface-soft text-ink-text border-border/40' },
+            { label: 'Маршрути', icon: Navigation, image: routesIcon, imageFallback: undefined as string | undefined, to: '/routes', color: 'bg-surface-soft text-ink-text border-border/40', imageScale: 'scale-125', overflowVisible: false },
+            { label: 'Карта', icon: MapIcon, image: mapIcon, imageFallback: undefined as string | undefined, to: '/map', color: 'bg-surface-soft text-ink-text border-border/40', imageScale: 'scale-125', overflowVisible: false },
+            { label: 'Метро', icon: TrainTrack, image: metroIconPrimary, imageFallback: metroIconFallback as string | undefined, to: '/metro/live', color: 'bg-surface-soft text-ink-text border-border/40', imageScale: 'scale-150', overflowVisible: true },
+            { label: 'Обране', icon: Star, image: favoritesIcon, imageFallback: undefined as string | undefined, to: '/favorites', color: 'bg-surface-soft text-ink-text border-border/40', imageScale: 'scale-125', overflowVisible: false },
           ].map((item, index) => {
             const Icon = item.icon;
             const fallback = item.imageFallback;
@@ -420,12 +420,12 @@ export function HomePage() {
                 to={item.to}
                 className="bg-surface-raised rounded-2xl p-2.5 flex items-center gap-2.5 border border-border/40 shadow-sm hover:shadow-md hover:border-border/60 active:scale-[0.98] transition-all duration-200 group"
               >
-                <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs overflow-hidden`}>
+                <div className={`w-16 h-16 shrink-0 rounded-2xl ${item.color} border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs ${item.overflowVisible ? 'overflow-visible' : 'overflow-hidden'}`}>
                   {item.image ? (
                     <img
                       src={item.image}
                       alt={item.label}
-                      className="w-[4.5rem] h-[4.5rem] object-contain scale-125"
+                      className={`w-[4.5rem] h-[4.5rem] object-contain ${item.imageScale} ${item.overflowVisible ? 'relative z-10' : ''}`}
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement & { dataset: { triedFallback?: string } };
                         // Спочатку, якщо є запасний PNG (напр. лого метро замість
@@ -457,8 +457,8 @@ export function HomePage() {
         </section>
 
         {/* 4. LIVE METRO CARD */}
-        <section className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-primary via-forest-dark to-forest-dark text-white p-5 shadow-xl shadow-primary/10 transition-transform duration-300">
-          <div className="absolute -right-6 -bottom-6 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        <section className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-5 shadow-lg shadow-emerald-900/10 transition-transform duration-300 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
 
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 bg-white/15 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
