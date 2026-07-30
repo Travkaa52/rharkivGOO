@@ -8,6 +8,7 @@ import { SplashScreen } from '@/components/SplashScreen';
 import { useTelegramEnvironment } from '@/hooks/useTelegramEnvironment';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { useAppReady } from '@/hooks/useAppReady';
+import { useDepartureReminder } from '@/hooks/useDepartureReminder';
 import { useAuthStore } from '@/store/useAuthStore';
 import { HomePage } from '@/pages/HomePage';
 
@@ -26,6 +27,7 @@ const FavoritesPage = lazy(() => import('@/pages/FavoritesPage').then((m) => ({ 
 const HistoryPage = lazy(() => import('@/pages/HistoryPage').then((m) => ({ default: m.HistoryPage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const RemindersPage = lazy(() => import('@/pages/RemindersPage').then((m) => ({ default: m.RemindersPage })));
 
 /**
  * Преміальний Route Fallback із використанням Glassmorphism, Skeleton та Shimmer-ефекту.
@@ -71,6 +73,7 @@ const MemoizedTelegramGate = memo(TelegramGate);
 export default function App() {
   const telegramStatus = useTelegramEnvironment();
   useThemeSync();
+  useDepartureReminder();
 
   const appReady = useAppReady();
   const [splashMounted, setSplashMounted] = useState<boolean>(true);
@@ -109,6 +112,7 @@ export default function App() {
           <Route path="/trams" element={<TransportKindPage kind="tram" />} />
           <Route path="/trolleybuses" element={<TransportKindPage kind="trolleybus" />} />
           <Route path="/buses" element={<TransportKindPage kind="bus" />} />
+          <Route path="/reminders" element={<RemindersPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/settings" element={<SettingsPage />} />

@@ -18,7 +18,8 @@ import {
   CheckCircle2,
   ExternalLink,
   AlertTriangle,
-  TrainTrack
+  TrainTrack,
+  AlarmClock
 } from 'lucide-react';
 import { ReportDelayModal } from '@/components/ReportDelayModal';
 import { RouteDetailModal } from '@/components/RouteDetailModal';
@@ -443,6 +444,21 @@ export function HomePage() {
             );
           })}
         </section>
+
+        {/* 3.5. SMART DEPARTURE REMINDER ENTRY POINT */}
+        <Link
+          to="/reminders"
+          className="flex items-center gap-3 rounded-2xl border border-border/40 bg-surface-raised p-3.5 shadow-sm active:scale-[0.98] transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 duration-300"
+        >
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <AlarmClock size={22} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-black text-ink-text">Час виходити</p>
+            <p className="truncate text-[11px] text-ink-muted">Розумне нагадування про вихід із дому</p>
+          </div>
+          <ChevronRight size={16} className="shrink-0 text-ink-muted" />
+        </Link>
 
         {/* 4. LIVE METRO CARD */}
         <section className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-emerald-600 to-emerald-800 text-white p-5 shadow-lg shadow-emerald-900/10 transition-transform duration-300 animate-in fade-in slide-in-from-bottom-2 duration-300">
