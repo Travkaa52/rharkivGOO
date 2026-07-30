@@ -59,7 +59,9 @@ export function ReportDelayModal({ open, onClose }: ReportDelayModalProps) {
       return;
     }
 
-    if (result.reason === 'not-configured') {
+    const reason: string = result.reason;
+
+    if (reason === 'not-configured') {
       showToast('Функція ще не налаштована адміністратором. Спробуйте пізніше.', 'error');
       return;
     }
