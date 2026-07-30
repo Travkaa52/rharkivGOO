@@ -205,9 +205,6 @@ function addStaticTransitLayers(
 /**
  * Додає значок станції метро як MapLibre-зображення.
  */
-/**
- * Додає значок станції метро як MapLibre-зображення.
- */
 async function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
   const buildLayer = () => {
     if (map.getLayer(METRO_STOPS_LAYER_ID) || !map.getSource(STOPS_SOURCE_ID)) return;
