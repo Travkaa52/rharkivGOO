@@ -1,6 +1,63 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
+import {
+  X,
+  Clock,
+  CalendarDays,
+  Info,
+  TrainFront,
+  ArrowLeftRight,
+  MapPin,
+  Navigation,
+  DoorOpen,
+} from 'lucide-react';
 import { getStationPhoto } from '@/data/stationPhotos';
 import { TIMETABLES } from '@/liveMetro/timetableData';
+import stopsData from '@/data/stops.json';
+
+// =============================================================================
+// РЕАЛЬНА ФІЗИКА РУХУ ПОЇЗДА (ЕЖ3)
+// =============================================================================
+// Харківський метрополітен експлуатує вагони типу Еж3, конструктивна
+// максимальна швидкість яких — 83 км/год. Швидкість на кожному перегоні
+// рахується з реальної геовідстані між станціями (data/stops.json) та
+// реального часу перегону з розкладу, після чого обмежується (clamp) цією
+// фізичною межею — і використовується як для індикатора км/год, так і для
+// плавного (не лінійного) профілю розгін→крейсер→гальмування на схемі.
+const MAX_TRAIN_SPEED_KMH = 83;
+
+const REAL_STATION_POS: Record<string, { lat: number; lng: number }> = {};
+for (const stop of stopsData as Array<{ id: string; position: { lat: number; lng: number } }>) {
+  if (stop.id.startsWith('stop-metro-')) REAL_STATION_POS[stop.id] = stop.position;
+}
+
+function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const R = 6371000;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const la1 = toRad(a.lat);
+  const la2 = toRad(b.lat);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/** Симетричний easing розгін/гальмування (кубічний) — плавний профіль швидкості замість стрибка. */
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+/** Похідна easeInOutCubic по t — використовується для миттєвої швидкості. */
+function easeInOutCubicDerivative(t: number): number {
+  return t < 0.5 ? 12 * t * t : 6 * Math.pow(-2 * t + 2, 2);
+}
+
+/** Реальна дистанція (метри) перегону між двома станціями схеми, за їхніми справжніми геокоординатами. */
+function segmentDistanceMeters(fromId: string, toId: string): number {
+  const a = REAL_STATION_POS[realStationId(fromId)];
+  const b = REAL_STATION_POS[realStationId(toId)];
+  if (!a || !b) return 1500; // запасне значення — типова довжина перегону в Харкові, якщо станцію не знайдено
+  return haversineMeters(a, b);
+}
 
 export { getStationPhoto };
 
@@ -98,6 +155,7 @@ export interface LiveMetroTrain {
   point: SchematicPoint;
   headingDeg: number;
   speedRatio: number;
+  speedKmh: number;
   phase: 'moving' | 'dwell';
   previousStation: SchematicStation;
   nextStation: SchematicStation;
@@ -461,7 +519,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     name: 'Архітектора Бекетова',
     nameEn: 'Arkhitektora Beketova',
     point: { x: 752, y: 406 },
-    labelOffset: { x: -16, y: 14 },
+    labelOffset: { x: 16, y: 14 },
     lineId: 'route-metro-3',
     opened: '1995-05-06',
     type: 'shallow',
@@ -472,7 +530,7 @@ const LINE3_STATIONS: SchematicStation[] = [
     name: 'Захисників України',
     nameEn: 'Zakhysnykiv Ukrainy',
     point: { x: 738, y: 478 },
-    labelOffset: { x: -16, y: 14 },
+    labelOffset: { x: 16, y: 14 },
     lineId: 'route-metro-3',
     opened: '1995-05-06',
     type: 'shallow',
@@ -732,6 +790,11 @@ function computeActiveTrains(nowSec: number, dayType: LiveMetroDayType): LiveMet
       { dir: 'backward', stations: [...line.stations].reverse() },
     ];
 
+    // Показуємо КОЖЕН рейс, який зараз активний за реальним розкладом
+    // станцій (TIMETABLES) — їхню кількість визначає сам розклад: якщо в
+    // цю хвилину за графіком в дорозі кілька составів на лінії (обидва
+    // напрямки, чи навіть кілька услід один одному в години пік), усі вони
+    // відображаються одночасно, кожен зі своєю позицією.
     for (const { dir, stations } of directions) {
       const { times } = getRunProfile(line.id, stations, dir, dayType);
       const headsign = dir === 'forward' ? stations[stations.length - 1].name : stations[0].name;
@@ -742,22 +805,31 @@ function computeActiveTrains(nowSec: number, dayType: LiveMetroDayType): LiveMet
         const last = row[row.length - 1];
         if (nowSec < first || nowSec > last + DWELL_HOLD_SEC) continue;
 
-        // Знаходимо сегмент [i, i+1], у якому зараз перебуває потяг.
         let i = 0;
         while (i < row.length - 2 && nowSec >= row[i + 1]) i++;
         const tFrom = row[i];
         const tTo = row[i + 1];
         const segDur = Math.max(1, tTo - tFrom);
-        const rawProgress = (nowSec - tFrom) / segDur;
-        const progress = Math.min(1, Math.max(0, rawProgress));
+        const rawProgress = Math.min(1, Math.max(0, (nowSec - tFrom) / segDur));
 
         const from = stations[i];
         const to = stations[i + 1];
-        const point = lerpPoint(from.point, to.point, progress);
+
+        // Плавний фізичний профіль розгін → крейсер → гальмування (замість
+        // лінійної інтерполяції), швидкість — з реальної геодистанції
+        // перегону та реального часу за розкладом, обмежена максимальною
+        // конструктивною швидкістю вагона Еж3 (83 км/год).
+        const easedT = easeInOutCubic(rawProgress);
+        const point = lerpPoint(from.point, to.point, easedT);
         const heading = angleBetween(from.point, to.point);
+
+        const distanceMeters = segmentDistanceMeters(from.id, to.id);
+        const instSpeedMps = (distanceMeters * easeInOutCubicDerivative(rawProgress)) / segDur;
+        const speedKmh = Math.min(MAX_TRAIN_SPEED_KMH, instSpeedMps * 3.6);
+
         const isLastLeg = i === row.length - 2;
-        const phase: 'moving' | 'dwell' =
-          progress >= 1 || (isLastLeg && nowSec > row[row.length - 1]) ? 'dwell' : progress < 0.06 ? 'dwell' : 'moving';
+        const isDwell = rawProgress >= 1 || (isLastLeg && nowSec > row[row.length - 1]) || rawProgress <= 0;
+        const phase: 'moving' | 'dwell' = isDwell ? 'dwell' : 'moving';
 
         trains.push({
           id: `${line.id}-${dir}-${k}`,
@@ -768,11 +840,12 @@ function computeActiveTrains(nowSec: number, dayType: LiveMetroDayType): LiveMet
           point,
           headingDeg: heading,
           speedRatio: 0.55,
+          speedKmh: isDwell ? 0 : Math.round(speedKmh),
           phase,
           previousStation: from,
           nextStation: to,
           etaNextStationSec: tTo,
-          progress,
+          progress: rawProgress,
         });
       }
     }
@@ -1090,7 +1163,7 @@ export function LiveMetroPage() {
       {/* Контейнер карти — розтягнутий на весь доступний екран, без відступів і заокруглень */}
       <div
         ref={containerRef}
-        className="relative flex-1 overflow-hidden bg-[#0B120F] touch-none"
+        className="relative flex-1 overflow-hidden bg-bg touch-none"
         // Інлайн-стиль дублює touch-none навмисно: на деяких Android WebView
         // (особливо в Telegram Mini App) сама CSS-властивість touch-action не
         // застосовується, якщо контейнер отримав її лише через клас Tailwind
@@ -1112,10 +1185,10 @@ export function LiveMetroPage() {
         }}
       >
         {isLoading && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#0B120F]">
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-bg">
             <div className="flex flex-col items-center gap-3">
               <div className="h-10 w-10 animate-spin rounded-full border-2 border-mint/20 border-t-mint" />
-              <span className="text-sm text-white/60">Завантаження схеми...</span>
+              <span className="text-sm text-ink-muted">Завантаження схеми...</span>
             </div>
           </div>
         )}
@@ -1130,8 +1203,8 @@ export function LiveMetroPage() {
         >
           <defs>
             <linearGradient id="riverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#0D1F17" />
-              <stop offset="100%" stopColor="#0A1812" />
+              <stop offset="0%" stopColor="rgb(var(--color-surface))" />
+              <stop offset="100%" stopColor="rgb(var(--color-bg))" />
             </linearGradient>
             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="3" result="coloredBlur" />
@@ -1145,23 +1218,23 @@ export function LiveMetroPage() {
 
           {/* Фонова сітка */}
           <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#1A2A22" strokeWidth="0.5" />
+            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgb(var(--color-border))" strokeWidth="0.5" strokeOpacity={0.35} />
           </pattern>
           <rect width={VIEW_W} height={VIEW_H} fill="url(#grid)" opacity={0.3} />
 
           {/* Річки */}
           <g opacity={0.5}>
-            <path d="M 200 50 C 250 200, 300 350, 400 450 C 480 520, 580 550, 700 530 C 820 510, 880 520, 950 600 C 1020 680, 950 800, 850 880" fill="none" stroke="#12211B" strokeWidth={28} strokeLinecap="round" />
-            <path d="M 200 50 C 250 200, 300 350, 400 450 C 480 520, 580 550, 700 530 C 820 510, 880 520, 950 600 C 1020 680, 950 800, 850 880" fill="none" stroke="#1A3328" strokeWidth={18} strokeLinecap="round" />
-            <path d="M 80 380 Q 260 390 400 450" fill="none" stroke="#12211B" strokeWidth={20} strokeLinecap="round" />
-            <path d="M 80 380 Q 260 390 400 450" fill="none" stroke="#1A3328" strokeWidth={12} strokeLinecap="round" />
+            <path d="M 200 50 C 250 200, 300 350, 400 450 C 480 520, 580 550, 700 530 C 820 510, 880 520, 950 600 C 1020 680, 950 800, 850 880" fill="none" stroke="rgb(var(--color-surface-soft))" strokeWidth={28} strokeLinecap="round" />
+            <path d="M 200 50 C 250 200, 300 350, 400 450 C 480 520, 580 550, 700 530 C 820 510, 880 520, 950 600 C 1020 680, 950 800, 850 880" fill="none" stroke="rgb(var(--color-border))" strokeOpacity={0.3} strokeWidth={18} strokeLinecap="round" />
+            <path d="M 80 380 Q 260 390 400 450" fill="none" stroke="rgb(var(--color-surface-soft))" strokeWidth={20} strokeLinecap="round" />
+            <path d="M 80 380 Q 260 390 400 450" fill="none" stroke="rgb(var(--color-border))" strokeOpacity={0.3} strokeWidth={12} strokeLinecap="round" />
           </g>
 
           {/* Заголовок */}
           <g transform="translate(60, 70)">
             <image href={assetUrl('/icons/kharkiv-metro-logo.png')} x={-6} y={-40} width={48} height={40} preserveAspectRatio="xMidYMid meet" />
-            <text x={64} y={-5} className="font-display font-extrabold" fontSize={32} fill="#F5F7F6">Харківський метрополітен</text>
-            <text x={64} y={18} className="font-sans font-medium" fontSize={16} fill="#9FB3A9">Kharkiv subway system · 30 stations · 38.1 km</text>
+            <text x={64} y={-5} className="font-display font-extrabold" fontSize={32} fill="rgb(var(--color-text))">Харківський метрополітен</text>
+            <text x={64} y={18} className="font-sans font-medium" fontSize={16} fill="rgb(var(--color-text-muted))" fillOpacity={0.65}>Kharkiv subway system · 30 stations · 38.1 km</text>
           </g>
 
           {/* Лінії метро */}
@@ -1212,7 +1285,7 @@ export function LiveMetroPage() {
             цей блок завжди лишається на місці незалежно від transform карти. */}
         {showLegend && !selectedTrain && !selectedStation && (
           <div
-            className="pointer-events-none absolute bottom-3 left-3 z-20 w-[min(78vw,260px)] rounded-2xl border border-white/10 bg-[#0F1A14]/95 p-3 shadow-2xl backdrop-blur-sm"
+            className="pointer-events-none absolute bottom-3 left-3 z-20 w-[min(78vw,260px)] rounded-2xl border border-border/10 bg-surface-raised/95 p-3 shadow-2xl backdrop-blur-sm"
             style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
           >
             <div className="flex flex-col gap-2">
@@ -1225,8 +1298,8 @@ export function LiveMetroPage() {
                     {line.number}
                   </span>
                   <div className="min-w-0 leading-tight">
-                    <div className="truncate text-[11px] font-bold text-white/90">{line.name}</div>
-                    <div className="truncate text-[9.5px] text-white/45">{line.nameEn} · {line.stations.length} ст.</div>
+                    <div className="truncate text-[11px] font-bold text-ink-text">{line.name}</div>
+                    <div className="truncate text-[9.5px] text-ink-muted opacity-70">{line.nameEn} · {line.stations.length} ст.</div>
                   </div>
                 </div>
               ))}
@@ -1348,7 +1421,7 @@ function StationMarker({
 
       {/* Світіння при виборі */}
       {selected && (
-        <circle r={isInterchange ? 20 : 16} fill="none" stroke="#C6A552" strokeWidth={3} opacity={0.8}>
+        <circle r={isInterchange ? 20 : 16} fill="none" stroke="rgb(var(--color-gold))" strokeWidth={3} opacity={0.8}>
           <animate attributeName="r" values={`${isInterchange ? 18 : 14};${isInterchange ? 24 : 19};${isInterchange ? 18 : 14}`} dur="2s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite" />
         </circle>
@@ -1374,8 +1447,8 @@ function StationMarker({
           textAnchor={textAnchor}
           className="font-display font-extrabold"
           fontSize={13}
-          fill="#F5F7F6"
-          style={{ paintOrder: 'stroke', stroke: '#0B120F', strokeWidth: 4, strokeLinejoin: 'round' }}
+          fill="rgb(var(--color-text))"
+          style={{ paintOrder: 'stroke', stroke: 'rgb(var(--color-bg))', strokeWidth: 4, strokeLinejoin: 'round' }}
         >
           {station.name}
         </text>
@@ -1384,8 +1457,8 @@ function StationMarker({
           textAnchor={textAnchor}
           className="font-sans font-medium"
           fontSize={9.5}
-          fill="#9FB3A9"
-          style={{ paintOrder: 'stroke', stroke: '#0B120F', strokeWidth: 3, strokeLinejoin: 'round' }}
+          fill="rgb(var(--color-text-muted))"
+          style={{ paintOrder: 'stroke', stroke: 'rgb(var(--color-bg))', strokeWidth: 3, strokeLinejoin: 'round' }}
         >
           {station.nameEn}
         </text>
@@ -1423,7 +1496,7 @@ function TrainMarker({
 
       {/* Світіння при виборі */}
       {selected && (
-        <circle r={size / 2 + 8} fill="none" stroke="#C6A552" strokeWidth={2.5} opacity={0.6}>
+        <circle r={size / 2 + 8} fill="none" stroke="rgb(var(--color-gold))" strokeWidth={2.5} opacity={0.6}>
           <animate attributeName="r" values={`${size / 2 + 4};${size / 2 + 10};${size / 2 + 4}`} dur="1.5s" repeatCount="indefinite" />
         </circle>
       )}
@@ -1449,7 +1522,7 @@ function TrainMarker({
 
       {/* Індикатор зупинки */}
       {isDwell && (
-        <circle r={size / 2 + 5} fill="none" stroke="#C6A552" strokeWidth={2} opacity={0.5}>
+        <circle r={size / 2 + 5} fill="none" stroke="rgb(var(--color-gold))" strokeWidth={2} opacity={0.5}>
           <animate attributeName="r" values={`${size / 2 + 3};${size / 2 + 8};${size / 2 + 3}`} dur="1.2s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.6;0;0.6" dur="1.2s" repeatCount="indefinite" />
         </circle>
@@ -1487,37 +1560,52 @@ function ZoomButton({ label, onClick, small }: { label: string; onClick: () => v
 
 function TrainInfoCard({ train, onClose }: { train: LiveMetroTrain; onClose: () => void }) {
   const nowSec = secOfDay(new Date());
-  const speedKmh = Math.round(train.speedRatio * 40);
+  const speedKmh = train.speedKmh;
 
   return (
     <InfoCardShell onClose={onClose}>
-      <div className="flex items-center gap-2">
-        <span className="h-3.5 w-3.5 rounded-full ring-2 ring-white/20" style={{ backgroundColor: train.lineColor }} />
-        <span className="font-display text-base font-bold text-white">{train.lineNumber} лінія</span>
-        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-white/70">{train.headsign}</span>
+      <div className="flex items-center gap-2.5">
+        <span
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white shadow-sm"
+          style={{ backgroundColor: train.lineColor }}
+        >
+          {train.lineNumber}
+        </span>
+        <div className="min-w-0">
+          <span className="block font-display text-base font-extrabold leading-tight text-ink-text">
+            Поїзд лінії {train.lineNumber}
+          </span>
+          <span className="text-[11.5px] text-ink-muted opacity-70">→ {train.headsign}</span>
+        </div>
       </div>
-      <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-[12px]">
-        <dt className="text-white/50">Поточна станція</dt>
-        <dd className="text-right font-medium text-white/90">
+
+      <div className="mt-3.5 flex flex-col gap-2">
+        <InfoRow label={<><Navigation className="h-3.5 w-3.5 opacity-60" />Поточна станція</>}>
           {train.phase === 'dwell' ? train.nextStation.name : train.previousStation.name}
-        </dd>
-        <dt className="text-white/50">Наступна станція</dt>
-        <dd className="text-right font-medium text-white/90">{train.nextStation.name}</dd>
-        <dt className="text-white/50">Статус руху</dt>
-        <dd className="text-right font-medium text-white/90">
+        </InfoRow>
+        <InfoRow label={<><MapPin className="h-3.5 w-3.5 opacity-60" />Наступна станція</>}>
+          {train.nextStation.name}
+        </InfoRow>
+        <InfoRow label={<><TrainFront className="h-3.5 w-3.5 opacity-60" />Статус руху</>}>
           {train.phase === 'dwell' ? (
-            <span className="text-gold-light">зупинка · двері відкриті</span>
+            <span className="flex items-center gap-1 text-gold-light">
+              <DoorOpen className="h-3.5 w-3.5" />
+              зупинка · двері відкриті
+            </span>
           ) : (
             <span>у дорозі · ≈ {speedKmh} км/год</span>
           )}
-        </dd>
-        <dt className="text-white/50">Прибуття на {train.nextStation.name}</dt>
-        <dd className="text-right font-bold text-mint">
-          {formatEtaClock(train.etaNextStationSec)} · {formatEtaCountdown(train.etaNextStationSec, nowSec)}
-        </dd>
-        <dt className="text-white/50">Напрямок</dt>
-        <dd className="text-right font-medium text-white/90">→ {train.headsign}</dd>
-      </dl>
+        </InfoRow>
+        <div className="flex items-center justify-between rounded-xl bg-mint/10 px-3.5 py-2.5">
+          <span className="flex items-center gap-1.5 text-ink-muted opacity-80">
+            <Clock className="h-3.5 w-3.5 opacity-70" />
+            Прибуття на {train.nextStation.name}
+          </span>
+          <span className="font-bold text-mint">
+            {formatEtaClock(train.etaNextStationSec)} · {formatEtaCountdown(train.etaNextStationSec, nowSec)}
+          </span>
+        </div>
+      </div>
     </InfoCardShell>
   );
 }
@@ -1545,83 +1633,128 @@ function StationInfoCard({
 
   return (
     <InfoCardShell onClose={onClose}>
-      {/* Шапка з фото */}
-      <div className="flex gap-3">
-        {photo ? (
-          <img
-            src={photo}
-            alt={station.name}
-            className="h-18 w-24 shrink-0 rounded-lg object-cover shadow-md ring-1 ring-white/15"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-          />
-        ) : (
-          <div className="flex h-18 w-24 shrink-0 items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/10">
-            <span className="text-2xl">🚇</span>
-          </div>
-        )}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: line?.color }} />
-            <span className="font-display text-base font-extrabold text-white">{station.name}</span>
-          </div>
-          <div className="text-[11px] text-white/60">{station.nameEn}</div>
-          {station.interchangeWith?.length ? (
-            <div className="mt-1 flex items-center gap-1.5">
-              <span className="rounded bg-gold/20 px-1.5 py-0.5 text-[10px] font-bold text-gold-light">Пересадка</span>
-              <span className="text-[10px] text-white/50">
-                {station.interchangeWith.map((id) => ALL_STATIONS_MAP.get(id)?.name).filter(Boolean).join(' · ')}
-              </span>
+      {/* Шапка з фото на всю ширину картки — фото "перетікає" з-під ручки картки,
+          назва станції лежить на плавному градієнті поверх фото. */}
+      <div className="-mx-4 -mt-1">
+        <div className="relative h-40 w-full overflow-hidden">
+          {photo ? (
+            <img
+              src={photo}
+              alt={station.name}
+              className="h-full w-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+          ) : (
+            <div
+              className="flex h-full w-full items-center justify-center"
+              style={{ background: `linear-gradient(135deg, ${line?.color ?? '#1b1f1d'}55, rgb(var(--color-surface-raised)))` }}
+            >
+              <TrainFront className="h-12 w-12 opacity-30" style={{ color: line?.color }} />
             </div>
-          ) : null}
-          {station.description && (
-            <p className="mt-1 text-[11px] leading-relaxed text-white/50">{station.description}</p>
           )}
+          {/* Градієнт для читабельності підпису поверх фото */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to top, rgb(var(--color-surface-raised)) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)' }}
+          />
+          <div
+            className="absolute inset-x-0 top-0 h-1"
+            style={{ background: line?.color }}
+          />
+
+          <div className="absolute inset-x-4 bottom-3">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span
+                className="flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold text-white shadow"
+                style={{ backgroundColor: line?.color }}
+              >
+                {line?.number}
+              </span>
+              {station.interchangeWith?.length ? (
+                <span className="flex items-center gap-1 rounded-full bg-gold/20 px-2 py-0.5 text-[10px] font-bold text-gold-light backdrop-blur">
+                  <ArrowLeftRight className="h-2.5 w-2.5" />
+                  Пересадка
+                </span>
+              ) : null}
+            </div>
+            <h2 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white drop-shadow-sm">
+              {station.name}
+            </h2>
+            <p className="text-[11.5px] font-medium text-white/75">{station.nameEn}</p>
+          </div>
         </div>
       </div>
 
-      {/* Таби */}
-      <div className="mt-3 flex gap-1 border-b border-white/10 pb-2">
+      {station.interchangeWith?.length ? (
+        <p className="mt-2.5 flex items-center gap-1.5 text-[11.5px] text-ink-muted">
+          <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
+          {station.interchangeWith.map((id) => ALL_STATIONS_MAP.get(id)?.name).filter(Boolean).join(' · ')}
+        </p>
+      ) : null}
+      {station.description && (
+        <p className="mt-1.5 text-[12px] leading-relaxed text-ink-muted opacity-80">{station.description}</p>
+      )}
+
+      {/* Таби — сегментований перемикач у стилі "pill" */}
+      <div className="sticky top-0 z-[1] mt-3.5 -mx-1 flex gap-1 rounded-2xl bg-surface-soft p-1">
         {(
           [
-            { key: 'arrivals', label: 'Прибуття' },
-            { key: 'timetable', label: 'Розклад' },
-            { key: 'info', label: 'Інфо' },
+            { key: 'arrivals', label: 'Прибуття', icon: Clock },
+            { key: 'timetable', label: 'Розклад', icon: CalendarDays },
+            { key: 'info', label: 'Інфо', icon: Info },
           ] as const
-        ).map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={[
-              'rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors',
-              activeTab === tab.key ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white/80',
-            ].join(' ')}
-          >
-            {tab.label}
-          </button>
-        ))}
+        ).map((tab) => {
+          const Icon = tab.icon;
+          const active = activeTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={[
+                'flex flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-[12px] font-semibold transition-all duration-200',
+                active
+                  ? 'bg-surface-raised text-ink-text shadow-sm'
+                  : 'text-ink-muted opacity-70 hover:opacity-100',
+              ].join(' ')}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Контент табів */}
-      <div className="mt-2">
+      <div className="mt-3 animate-fade-in">
         {activeTab === 'arrivals' && (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             {arrivals.length === 0 && (
-              <p className="py-2 text-center text-[12px] text-white/40">Найближчим часом потягів немає</p>
+              <div className="flex flex-col items-center gap-2 py-8 text-center">
+                <Clock className="h-7 w-7 text-ink-muted opacity-30" />
+                <p className="text-[12.5px] text-ink-muted opacity-60">Найближчим часом потягів немає</p>
+              </div>
             )}
             {arrivals.map((a, i) => (
               <div
                 key={`${a.lineId}-${a.headsign}-${i}`}
-                className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-[12px] transition-colors hover:bg-white/10"
+                className="flex items-center justify-between rounded-2xl border border-border/8 bg-surface-soft px-3.5 py-2.5 text-[12.5px] transition-colors hover:bg-surface"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="h-2.5 w-2.5 rounded-full shadow-sm" style={{ backgroundColor: a.lineColor }} />
-                  <span className="text-white/90">{a.lineNumber} → {a.headsign}</span>
+                  <span
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-sm"
+                    style={{ backgroundColor: a.lineColor }}
+                  >
+                    {a.lineNumber}
+                  </span>
+                  <div className="flex flex-col">
+                    <span className="font-medium text-ink-text">→ {a.headsign}</span>
+                    <span className="text-[10.5px] text-ink-muted opacity-60">{formatEtaClock(a.etaSec)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-white/40">{formatEtaClock(a.etaSec)}</span>
-                  <span className="min-w-[50px] text-right font-bold text-mint">{formatEtaCountdown(a.etaSec, nowSec)}</span>
-                </div>
+                <span className="min-w-[54px] rounded-full bg-mint/10 px-2.5 py-1 text-right text-[12px] font-bold text-mint">
+                  {formatEtaCountdown(a.etaSec, nowSec)}
+                </span>
               </div>
             ))}
           </div>
@@ -1629,17 +1762,20 @@ function StationInfoCard({
 
         {activeTab === 'timetable' && timetable.length > 0 && (
           <div>
-            <div className="mb-2 flex items-center justify-between text-[11px] text-white/50">
-              <span>{dayType === 'weekday' ? 'Будній день' : 'Вихідний день'}</span>
+            <div className="mb-2.5 flex items-center justify-between text-[11.5px]">
+              <span className="flex items-center gap-1.5 font-medium text-ink-muted opacity-80">
+                <CalendarDays className="h-3.5 w-3.5" />
+                {dayType === 'weekday' ? 'Будній день' : 'Вихідний день'}
+              </span>
               <button
                 type="button"
                 onClick={() => setShowFullTimetable((v) => !v)}
-                className="text-white/40 hover:text-white/80"
+                className="rounded-full bg-surface-soft px-2.5 py-1 text-[11px] font-medium text-ink-muted transition-colors hover:text-ink-text"
               >
-                {showFullTimetable ? '▲ Згорнути' : '▼ Розгорнути'}
+                {showFullTimetable ? '▲ Згорнути' : '▼ Розгорнути все'}
               </button>
             </div>
-            <div className={`flex flex-col gap-2 ${showFullTimetable ? '' : 'max-h-32 overflow-hidden'}`}>
+            <div className={`flex flex-col gap-3 transition-all ${showFullTimetable ? '' : 'max-h-36 overflow-hidden'}`}>
               {timetable.map((entry, i) => (
                 <TimetableBlock key={`${entry.lineId}-${entry.direction}-${i}`} entry={entry} />
               ))}
@@ -1648,29 +1784,22 @@ function StationInfoCard({
         )}
 
         {activeTab === 'info' && (
-          <div className="space-y-2 text-[12px]">
-            <div className="flex justify-between">
-              <span className="text-white/50">Тип станції</span>
-              <span className="text-white/80">
-                {station.type === 'deep' && 'Глибокого закладення'}
-                {station.type === 'shallow' && 'Мілкого закладення'}
-                {station.type === 'single-vault' && 'Односклепінна'}
-                {station.type === 'pylon' && 'Колонна'}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/50">Дата відкриття</span>
-              <span className="text-white/80">{station.opened}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/50">Лінія</span>
-              <span className="text-white/80" style={{ color: line?.color }}>
+          <div className="flex flex-col gap-2 text-[12.5px]">
+            <InfoRow label="Тип станції">
+              {station.type === 'deep' && 'Глибокого закладення'}
+              {station.type === 'shallow' && 'Мілкого закладення'}
+              {station.type === 'single-vault' && 'Односклепінна'}
+              {station.type === 'pylon' && 'Колонна'}
+            </InfoRow>
+            <InfoRow label="Дата відкриття">{station.opened}</InfoRow>
+            <InfoRow label="Лінія">
+              <span className="flex items-center gap-1.5" style={{ color: line?.color }}>
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: line?.color }} />
                 {line?.number} — {line?.name}
               </span>
-            </div>
+            </InfoRow>
             {station.interchangeWith && station.interchangeWith.length > 0 && (
-              <div className="flex justify-between">
-                <span className="text-white/50">Пересадка на</span>
+              <InfoRow label="Пересадка на">
                 <span className="text-gold-light">
                   {station.interchangeWith.map((id) => {
                     const s = ALL_STATIONS_MAP.get(id);
@@ -1678,7 +1807,7 @@ function StationInfoCard({
                     return l ? `${l.number} лінію` : '';
                   }).filter(Boolean).join(', ')}
                 </span>
-              </div>
+              </InfoRow>
             )}
           </div>
         )}
@@ -1687,18 +1816,27 @@ function StationInfoCard({
   );
 }
 
+function InfoRow({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between rounded-xl bg-surface-soft px-3.5 py-2.5">
+      <span className="flex items-center gap-1.5 text-ink-muted opacity-70">{label}</span>
+      <span className="font-medium text-ink-text">{children}</span>
+    </div>
+  );
+}
+
 function TimetableBlock({ entry }: { entry: StationDayTimetableEntry }) {
   return (
-    <div className="mb-2">
-      <div className="mb-1.5 flex items-center gap-2 text-[11px] font-semibold text-white/80">
+    <div className="rounded-2xl border border-border/8 bg-surface-soft p-3">
+      <div className="mb-2 flex items-center gap-2 text-[11.5px] font-semibold text-ink-text">
         <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.lineColor }} />
         <span>{entry.lineNumber}</span>
-        <span className="text-white/50">→</span>
+        <span className="text-ink-muted opacity-50">→</span>
         <span>{entry.headsign}</span>
       </div>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1.5">
         {entry.times.map((t, i) => (
-          <span key={i} className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] tabular-nums text-white/70">
+          <span key={i} className="rounded-lg bg-surface px-1.5 py-0.5 text-[10.5px] tabular-nums text-ink-muted opacity-80">
             {t}
           </span>
         ))}
@@ -1708,18 +1846,92 @@ function TimetableBlock({ entry }: { entry: StationDayTimetableEntry }) {
 }
 
 function InfoCardShell({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  const [closing, setClosing] = useState(false);
+  const dragRef = useRef<{ startY: number; currentY: number; dragging: boolean }>({
+    startY: 0,
+    currentY: 0,
+    dragging: false,
+  });
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  // Плавне закриття: спершу програємо анімацію "вниз", і лише потім
+  // розмонтовуємо картку — замість миттєвого зникнення.
+  const closeAnimated = useCallback(() => {
+    setClosing(true);
+    window.setTimeout(onClose, 220);
+  }, [onClose]);
+
+  const onHandlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    dragRef.current = { startY: e.clientY, currentY: e.clientY, dragging: true };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const onHandlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current.dragging || !sheetRef.current) return;
+    dragRef.current.currentY = e.clientY;
+    const dy = Math.max(0, dragRef.current.currentY - dragRef.current.startY);
+    sheetRef.current.style.transform = `translateY(${dy}px)`;
+    sheetRef.current.style.transition = 'none';
+  };
+
+  const onHandlePointerUp = () => {
+    if (!dragRef.current.dragging || !sheetRef.current) return;
+    const dy = Math.max(0, dragRef.current.currentY - dragRef.current.startY);
+    dragRef.current.dragging = false;
+    sheetRef.current.style.transition = '';
+    sheetRef.current.style.transform = '';
+    if (dy > 80) {
+      closeAnimated();
+    }
+  };
+
   return (
-    <div className="absolute inset-x-3 bottom-3 z-30 rounded-2xl border border-ink-border bg-black/90 p-4 shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-4 duration-300">
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/10 hover:text-white"
-        aria-label="Закрити"
+    <>
+      {/* Затемнення фону — плавно проявляється разом із карткою й закриває її по тапу */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/55 backdrop-blur-[2px] transition-opacity duration-200 ${
+          closing ? 'opacity-0' : 'animate-fade-in opacity-100'
+        }`}
+        onClick={closeAnimated}
+        aria-hidden="true"
+      />
+
+      {/* Сама картка — виїжджає знизу екрана плавним cubic-bezier переходом */}
+      <div
+        ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+        className={[
+          'fixed inset-x-0 bottom-0 z-50 flex max-h-[84vh] flex-col overflow-hidden',
+          'rounded-t-[28px] border-t border-border/10 bg-surface-raised shadow-glass-lg',
+          closing ? 'translate-y-full transition-transform duration-200 ease-in' : 'animate-sheet-up',
+        ].join(' ')}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        ✕
-      </button>
-      {children}
-    </div>
+        {/* Ручка для перетягування вниз — закриває картку жестом */}
+        <div
+          className="flex shrink-0 cursor-grab touch-none justify-center pb-1 pt-2.5 active:cursor-grabbing"
+          onPointerDown={onHandlePointerDown}
+          onPointerMove={onHandlePointerMove}
+          onPointerUp={onHandlePointerUp}
+          onPointerCancel={onHandlePointerUp}
+        >
+          <div className="h-1.5 w-10 rounded-full bg-ink-muted/25" />
+        </div>
+
+        <button
+          type="button"
+          onClick={closeAnimated}
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface/80 text-ink-muted shadow-sm backdrop-blur transition-colors hover:bg-surface hover:text-ink-text"
+          aria-label="Закрити"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <div className="overflow-y-auto overscroll-contain px-4 pb-5">{children}</div>
+      </div>
+    </>
   );
 }
 
