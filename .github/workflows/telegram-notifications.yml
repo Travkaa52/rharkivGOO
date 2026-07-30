@@ -11,7 +11,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/parse-telegram-channels.mjs'
+      - 'frontend/scripts/parse-telegram-channels.mjs'
       - '.github/workflows/telegram-notifications.yml'
 
 permissions:
@@ -32,6 +32,7 @@ jobs:
           node-version: '20'
 
       - name: Parse public Telegram channel previews
+        working-directory: frontend
         env:
           TELEGRAM_CHANNELS: ${{ secrets.TELEGRAM_CHANNELS || vars.TELEGRAM_CHANNELS }}
           NOTIFICATIONS_LIMIT: ${{ vars.NOTIFICATIONS_LIMIT || '15' }}
@@ -41,6 +42,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/data/notifications.json
+          git add frontend/public/data/notifications.json
           git diff --staged --quiet && echo "Нема змін" || git commit -m "chore: update telegram notifications feed [skip ci]"
           git push
+
