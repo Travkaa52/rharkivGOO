@@ -2,11 +2,13 @@ import { Suspense, lazy, useState, useEffect, memo, startTransition } from 'reac
 import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { BottomNav } from '@/components/BottomNav';
 import { TelegramGate } from '@/components/TelegramGate';
+import { RegistrationModal } from '@/components/RegistrationModal';
 import { Toast } from '@/components/ui';
 import { SplashScreen } from '@/components/SplashScreen';
 import { useTelegramEnvironment } from '@/hooks/useTelegramEnvironment';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { useAppReady } from '@/hooks/useAppReady';
+import { useAuthStore } from '@/store/useAuthStore';
 import { HomePage } from '@/pages/HomePage';
 
 /**
@@ -74,6 +76,13 @@ export default function App() {
   const [splashMounted, setSplashMounted] = useState<boolean>(true);
   const location = useLocation();
 
+  // Вікно реєстрації показуємо лише коли: застосунок точно НЕ в Telegram
+  // (там профіль підтягується автоматично), користувач ще не проходив
+  // "знайомство" на цьому пристрої, і сплеш-екран вже пішов — щоб форма
+  // не блимала поверх анімації запуску.
+  const hasCompletedOnboarding = useAuthStore((s) => s.hasCompletedOnboarding);
+  const showRegistration = telegramStatus === 'outside' && !hasCompletedOnboarding && !splashMounted;
+
   // Карта — важкий компонент (ініціалізація MapLibre, завантаження стилю,
   // тайлів, шрифтів). Щоб вона відкривалась миттєво щоразу після першого
   // разу, а не перезавантажувалась заново на кожен вхід у "/map", ми не
@@ -118,10 +127,12 @@ export default function App() {
         </div>
       )}
 
-      {telegramStatus === 'outside' && <MemoizedTelegramGate />}
+      {telegramStatus === 'outside' && !showRegistration && <MemoizedTelegramGate />}
 
       <MemoizedBottomNav />
       <Toast />
+
+      {showRegistration && <RegistrationModal />}
 
       {splashMounted && (
         <SplashScreen

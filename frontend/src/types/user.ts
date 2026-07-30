@@ -6,17 +6,22 @@
  * без серверної перевірки initData.
  */
 export interface UserProfile {
+  /**
+   * Для Telegram-профілів — справжній telegramId. Для користувачів, що
+   * зареєструвалися вручну (поза Telegram), генерується локальний
+   * псевдо-id (від'ємне число), аби решта коду, що очікує число, не ламалась.
+   */
   telegramId: number;
   displayName: string;
   username?: string;
   avatarUrl?: string;
-  /** Емодзі-аватар, використовується як запасний варіант, якщо немає avatarUrl. */
-  avatarEmoji?: string;
   languageCode?: string;
   createdAt: string;
-  /** true, якщо профіль створено локально (поза Telegram Mini App). */
+  /** true, якщо профіль створено вручну через форму реєстрації, а не підтягнуто з Telegram. */
   isLocal?: boolean;
-  /** Контактні дані для локального профілю (телефон/email тощо). */
+  /** Емодзі-аватар, обраний користувачем при локальній реєстрації (коли фото немає). */
+  avatarEmoji?: string;
+  /** Телефон/контакт, вказаний користувачем при реєстрації (необов'язково). */
   contact?: string;
 }
 

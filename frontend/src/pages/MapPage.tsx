@@ -14,8 +14,7 @@ import {
   MapPin,
   ArrowUpDown,
   Route as RouteIcon,
-  LocateFixed,
-  Loader2
+  LocateFixed
 } from 'lucide-react';
 import { MapView } from '@/components/MapView';
 import { LiveMetroWidget } from '@/components/LiveMetroWidget';
@@ -37,30 +36,19 @@ import type { TransportKind } from '@/types/transport';
 const SUGGESTIONS_LIMIT = 6;
 const STORAGE_PREFIX = 'kharkiv_go_map_state_';
 
-// ─── Design Tokens ─────────────────────────────────────────────────
-// Единая система визуальных констант. 15 лет опыта = никаких magic numbers.
-const CHIP_FILTERS: { 
-  id: TransportKind | 'stops'; 
-  label: string; 
-  icon: typeof Bus;
-  accentColor: string;
-}[] = [
-  { id: 'bus', label: 'Автобуси', icon: Bus, accentColor: 'bg-sky-500' },
-  { id: 'trolleybus', label: 'Тролейбуси', icon: Zap, accentColor: 'bg-amber-500' },
-  { id: 'tram', label: 'Трамваї', icon: TrainTrack, accentColor: 'bg-emerald-500' },
-  { id: 'metro', label: 'Метро', icon: TrainTrack, accentColor: 'bg-indigo-500' },
-  { id: 'stops', label: 'Зупинки', icon: Navigation, accentColor: 'bg-slate-500' },
+const CHIP_FILTERS: { id: TransportKind | 'stops'; label: string; icon: typeof Bus }[] = [
+  { id: 'bus', label: 'Автобуси', icon: Bus },
+  { id: 'trolleybus', label: 'Тролейбуси', icon: Zap },
+  { id: 'tram', label: 'Трамваї', icon: TrainTrack },
+  { id: 'metro', label: 'Метро', icon: TrainTrack },
+  { id: 'stops', label: 'Зупинки', icon: Navigation },
 ];
-
-// Spring-анимация для нативного ощущения (cubic-bezier(0.34, 1.56, 0.64, 1))
-const SPRING_TRANSITION = 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
-const SMOOTH_TRANSITION = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
 
 export function MapPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') ?? '';
   const { position, heading, isMoving, isLocating, error, locate } = useGeolocation();
-
+  
   const storeVisibleKinds = useSettingsStore((s) => s.visibleTransportKinds);
   const showStops = useSettingsStore((s) => s.showStopsOnMap);
   const toggleStopsOnMap = useSettingsStore((s) => s.toggleStopsOnMap);
@@ -74,7 +62,7 @@ export function MapPage() {
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
-  // ─── Route Builder State ────────────────────────────────────────────
+  // --- Побудова маршруту "Звідки -> Куди" -------------------------------
   const [fromQuery, setFromQuery] = useState('');
   const [toQuery, setToQuery] = useState(initialQuery);
   const [fromPoint, setFromPoint] = useState<{ lat: number; lng: number } | null>(null);
@@ -86,29 +74,35 @@ export function MapPage() {
   const [selectedPlanIndex, setSelectedPlanIndex] = useState<number | null>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // ─── Filter Chips State ─────────────────────────────────────────────
   const [activeFilterChips, setActiveFilterChips] = useState<Record<string, boolean>>(() => {
     try {
       const cached = localStorage.getItem(`${STORAGE_PREFIX}filters`);
       if (cached) return JSON.parse(cached);
-    } catch { /* silent fail */ }
-    return { bus: true, trolleybus: true, tram: true, metro: true, stops: true };
+    } catch {
+      // fallback
+    }
+    return {
+      bus: true,
+      trolleybus: true,
+      tram: true,
+      metro: true,
+      stops: true,
+    };
   });
 
   useEffect(() => {
     try {
       localStorage.setItem(`${STORAGE_PREFIX}filters`, JSON.stringify(activeFilterChips));
-    } catch { /* quota exceeded or private mode */ }
+    } catch {
+      // quota exceeded or private mode
+    }
   }, [activeFilterChips]);
 
   const visibleKinds = useMemo(() => {
     return storeVisibleKinds.filter((kind) => activeFilterChips[kind] ?? true);
   }, [storeVisibleKinds, activeFilterChips]);
 
-  // ─── Voice Search ───────────────────────────────────────────────────
-  const [voiceSupported] = useState(() => 
-    typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)
-  );
+  const [voiceSupported] = useState(() => typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window));
   const [isListening, setIsListening] = useState(false);
 
   const handleVoiceSearch = useCallback((field: 'from' | 'to') => {
@@ -132,29 +126,16 @@ export function MapPage() {
     recognition.start();
   }, []);
 
-  // ─── Derived Data ───────────────────────────────────────────────────
-  const selectedStop = useMemo(() => 
-    selectedStopId ? localStops.getById(selectedStopId) : undefined, 
-    [selectedStopId]
-  );
-  const arrivals = useMemo(() => 
-    selectedStopId ? localStops.getArrivals(selectedStopId) : [], 
-    [selectedStopId]
-  );
-  const selectedRoute = useMemo(() => 
-    selectedRouteId ? localRoutes.getById(selectedRouteId) : undefined, 
-    [selectedRouteId]
-  );
+  const selectedStop = useMemo(() => (selectedStopId ? localStops.getById(selectedStopId) : undefined), [selectedStopId]);
+  const arrivals = useMemo(() => (selectedStopId ? localStops.getArrivals(selectedStopId) : []), [selectedStopId]);
+  const selectedRoute = useMemo(() => (selectedRouteId ? localRoutes.getById(selectedRouteId) : undefined), [selectedRouteId]);
 
   const activeFieldQuery = activeField === 'from' ? fromQuery : activeField === 'to' ? toQuery : '';
   const fieldSuggestions = useMemo(
-    () => activeField && activeFieldQuery.trim() 
-      ? localStops.search(activeFieldQuery).slice(0, SUGGESTIONS_LIMIT) 
-      : [],
+    () => (activeField && activeFieldQuery.trim() ? localStops.search(activeFieldQuery).slice(0, SUGGESTIONS_LIMIT) : []),
     [activeField, activeFieldQuery]
   );
 
-  // ─── Handlers ───────────────────────────────────────────────────────
   const clearSelection = useCallback(() => {
     setSelectedStopId(null);
     setSelectedRouteId(null);
@@ -166,12 +147,7 @@ export function MapPage() {
     setActiveField(null);
     const stop = localStops.getById(stopId);
     if (map && stop) {
-      map.flyTo({ 
-        center: [stop.position.lng, stop.position.lat], 
-        zoom: Math.max(map.getZoom(), 15.5), 
-        essential: true,
-        duration: 800
-      });
+      map.flyTo({ center: [stop.position.lng, stop.position.lat], zoom: Math.max(map.getZoom(), 15.5), essential: true });
     }
   }, [map]);
 
@@ -218,7 +194,7 @@ export function MapPage() {
       setFromPoint({ lat: position.lat, lng: position.lng });
       setFromQuery('Моє місцезнаходження');
       setTripPlans(null);
-      setSelectedPlanIndex(null);
+    setSelectedPlanIndex(null);
     } else {
       setPendingUseLocation(true);
       locate();
@@ -259,11 +235,17 @@ export function MapPage() {
       );
     }
 
+    // Перший показ — миттєвий (побудований по прямій відстані). Одразу
+    // після цього запускаємо другий, уточнюючий прохід через OpenStreetMap
+    // (реальна пішохідна мережа вулиць), який тихо підправляє цифри ходьби
+    // і, за потреби, переставляє варіанти місцями — без блокування UI.
     if (plans.length > 0) {
       const requestId = ++refineRequestIdRef.current;
       setIsRefiningTrip(true);
       refineTripPlansWithOSM(plans, fromPoint, toPoint)
         .then((refined) => {
+          // Ігноруємо застарілу відповідь, якщо користувач встиг побудувати
+          // ще один маршрут, поки цей запит ще виконувався.
           if (refineRequestIdRef.current !== requestId) return;
           setTripPlans(refined);
           setSelectedPlanIndex(refined.length > 0 ? 0 : null);
@@ -334,14 +316,16 @@ export function MapPage() {
   const toggleChip = useCallback((id: string) => {
     setActiveFilterChips((prev) => {
       const next = { ...prev, [id]: !prev[id] };
-      if (id === 'stops') toggleStopsOnMap();
+      if (id === 'stops') {
+        toggleStopsOnMap();
+      }
       return next;
     });
   }, [toggleStopsOnMap]);
 
-  // ─── Map Camera Persistence ─────────────────────────────────────────
   useEffect(() => {
     if (!map) return;
+
     try {
       const cachedState = localStorage.getItem(`${STORAGE_PREFIX}camera`);
       if (cachedState) {
@@ -350,18 +334,24 @@ export function MapPage() {
           map.jumpTo({ center, zoom });
         }
       }
-    } catch { /* ignore */ }
+    } catch {
+      // Ignore
+    }
 
     const handleMoveEnd = () => {
       try {
         const center = map.getCenter().toArray();
         const zoom = map.getZoom();
         localStorage.setItem(`${STORAGE_PREFIX}camera`, JSON.stringify({ center, zoom }));
-      } catch { /* ignore */ }
+      } catch {
+        // Ignore
+      }
     };
 
     map.on('moveend', handleMoveEnd);
-    return () => { map.off('moveend', handleMoveEnd); };
+    return () => {
+      map.off('moveend', handleMoveEnd);
+    };
   }, [map]);
 
   useEffect(() => {
@@ -380,6 +370,9 @@ export function MapPage() {
   }, []);
 
   const handleMapError = useCallback((message: string) => {
+    // Помилка стилю карти (мережа/CORS/недоступний тайл-сервер) — раніше в цьому
+    // випадку спінер "Завантаження карти..." лишався назавжди і поверх нього
+    // висів непрозорий блокуючий шар, який не давав користуватись картою.
     setMapError(message);
   }, []);
 
@@ -387,10 +380,17 @@ export function MapPage() {
     setMapError(null);
     setIsMapLoaded(false);
     setMap(null);
+    // Перемонтовуємо <MapView> заново — інакше застряглий екземпляр MapLibre
+    // (наприклад, після обірваного запиту стилю) не зробить повторну спробу сам.
     setMapKey((k) => k + 1);
   }, []);
 
-  // Safety timeout: не держим пользователя вечно на загрузке
+  // Запобіжник: якщо подія 'load' від MapLibre з якоїсь причини не настає
+  // (повільна мережа, застряглий запит спрайту/шрифтів тощо), не тримаємо
+  // користувача вічно за блокуючим екраном завантаження — знімаємо його через
+  // 3 секунди (максимально допустимий час очікування) і даємо картою
+  // користуватись; шари та зупинки доопрацюються самі, коли/якщо стиль усе ж
+  // довантажиться.
   useEffect(() => {
     if (isMapLoaded || mapError) {
       if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
@@ -404,60 +404,34 @@ export function MapPage() {
     };
   }, [isMapLoaded, mapError, mapKey]);
 
-  // ─── Render ─────────────────────────────────────────────────────────
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-[#f5f5f7] text-slate-900 font-sans antialiased selection:bg-indigo-500 selection:text-white">
-
-      {/* ═══════════════════════════════════════════════════════════════
-          1. MAP CANVAS + LOADING / ERROR OVERLAYS
-          ═══════════════════════════════════════════════════════════════ */}
+    <div className="relative h-dvh w-full overflow-hidden bg-bg text-ink-text font-sans antialiased selection:bg-primary selection:text-white">
+      
+      {/* 1. КАРТА ТА СКЕЛЕТОН */}
       <div className="absolute inset-0 z-0">
-        {/* Skeleton / Loading State */}
         {!isMapLoaded && !mapError && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#f5f5f7]/95 backdrop-blur-xl">
-            <div className="flex flex-col items-center gap-5">
-              <div className="relative">
-                <div className="h-16 w-16 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/30 flex items-center justify-center">
-                  <MapPin className="h-7 w-7 text-white" strokeWidth={2.5} />
-                </div>
-                <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-emerald-400 border-2 border-white shadow-sm" />
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center bg-bg/90 backdrop-blur-md animate-pulse">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-primary/20 border border-primary/40 flex items-center justify-center">
+                <span className="text-xl">🗺️</span>
               </div>
-              <div className="flex flex-col items-center gap-1.5">
-                <span className="text-sm font-semibold tracking-tight text-slate-800">Завантаження карти Харкова</span>
-                <span className="text-xs text-slate-400 font-medium">Підготовка маршрутів та зупинок...</span>
-              </div>
-              {/* Прогресс-индикатор в виде тонкой полоски */}
-              <div className="w-32 h-1 bg-slate-200 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full animate-[shimmer_1.5s_ease-in-out_infinite]" 
-                     style={{ width: '60%' }} />
-              </div>
+              <span className="text-xs font-bold tracking-wider uppercase text-ink-muted">Завантаження карти Харкова...</span>
             </div>
           </div>
         )}
 
-        {/* Error State */}
         {mapError && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-[#f5f5f7]/98 px-8 text-center backdrop-blur-xl">
-            <div className="relative">
-              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-rose-50 border border-rose-200 shadow-sm">
-                <span className="text-2xl">📡</span>
-              </div>
-              <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 border-2 border-white" />
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-bg/95 px-6 text-center backdrop-blur-md">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-500/40 bg-rose-500/20">
+              <span className="text-xl">⚠️</span>
             </div>
-            <div className="flex flex-col items-center gap-2 max-w-[280px]">
-              <h3 className="text-base font-bold text-slate-800 tracking-tight">Не вдалося завантажити карту</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">
-                Перевірте з'єднання з інтернетом або спробуйте ще раз через кілька секунд.
-              </p>
-            </div>
+            <p className="text-xs font-bold tracking-wide text-ink-muted">Не вдалося завантажити карту</p>
+            <p className="max-w-xs text-[11px] text-ink-muted">Перевірте з’єднання з інтернетом і спробуйте ще раз.</p>
             <button
               onClick={handleRetryMap}
-              className="mt-2 group relative overflow-hidden rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition-all hover:shadow-xl hover:shadow-slate-900/30 active:scale-[0.97]"
+              className="mt-1 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-primary active:scale-95"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                <Loader2 className="h-4 w-4 transition-transform group-hover:rotate-180" />
-                Спробувати знову
-              </span>
+              Спробувати знову
             </button>
           </div>
         )}
@@ -480,34 +454,20 @@ export function MapPage() {
         />
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          2. TOP PANEL: Route Builder
-          ═══════════════════════════════════════════════════════════════ */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-3 p-4 pt-[max(1rem,env(safe-area-inset-top))]">
+      {/* 2. ВЕРХНЯ ПАНЕЛЬ: побудова маршруту "Звідки -> Куди" */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2.5 p-4 pt-[max(1rem,env(safe-area-inset-top))] will-change-transform">
 
-        {/* Main Search Card */}
-        <div 
-          className="pointer-events-auto relative overflow-hidden rounded-[28px] border border-white/60 bg-white/90 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-2xl transition-shadow hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)]"
-          style={{ transition: SMOOTH_TRANSITION }}
-        >
-          {/* Gradient top accent line */}
-          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-500 opacity-80" />
-
+        <div className="pointer-events-auto relative rounded-[24px] border border-border/40 bg-surface/95 shadow-xl shadow-black/10 backdrop-blur-xl">
           <div className="flex items-stretch">
-            {/* Route indicators (dots + line) */}
-            <div className="flex flex-col items-center pl-5 pt-5 pb-5">
-              <div className="relative">
-                <div className="h-3 w-3 rounded-full bg-indigo-500 ring-[3px] ring-indigo-100" />
-                <div className="absolute inset-0 rounded-full bg-indigo-500 animate-ping opacity-20" />
-              </div>
-              <div className="my-2 flex-1 w-px bg-gradient-to-b from-indigo-200 via-slate-200 to-rose-200" />
-              <div className="h-3 w-3 rounded-full bg-rose-500 ring-[3px] ring-rose-100" />
+            <div className="flex flex-col items-center pl-4 pt-4 pb-4">
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-primary ring-4 ring-primary/20" />
+              <span className="my-1 h-6 w-px flex-1 border-l border-dashed border-ink-text/20" />
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-rose-500 ring-4 ring-rose-500/20" />
             </div>
 
-            {/* Inputs */}
-            <div className="flex-1 py-2">
-              {/* FROM field */}
-              <div className="group flex items-center gap-2 px-3 py-3 border-b border-slate-100 transition-colors hover:bg-slate-50/50">
+            <div className="flex-1 divide-y divide-border/40 py-1.5">
+              {/* Звідки */}
+              <div className="flex items-center gap-1 px-2 py-1.5">
                 <input
                   type="text"
                   value={fromQuery}
@@ -515,7 +475,7 @@ export function MapPage() {
                     setFromQuery(e.target.value);
                     setFromPoint(null);
                     setTripPlans(null);
-                    setSelectedPlanIndex(null);
+    setSelectedPlanIndex(null);
                   }}
                   onFocus={() => {
                     clearTimeout(blurTimeoutRef.current);
@@ -524,35 +484,32 @@ export function MapPage() {
                   onBlur={() => {
                     blurTimeoutRef.current = setTimeout(() => setActiveField((f) => (f === 'from' ? null : f)), 200);
                   }}
-                  placeholder="Звідки їдемо?"
-                  className="flex-1 bg-transparent text-[15px] font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                  placeholder="Звідки: адреса, зупинка..."
+                  className="w-full bg-transparent py-1.5 text-xs font-semibold text-ink-text placeholder:text-ink-text/40 focus:outline-none"
                 />
                 <button
                   onClick={handleUseMyLocationAsFrom}
                   aria-label="Моє місцезнаходження"
-                  className="shrink-0 rounded-xl p-2 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600 active:scale-90"
-                  style={{ transition: SPRING_TRANSITION }}
+                  title="Моє місцезнаходження"
+                  className="shrink-0 rounded-full p-1.5 text-ink-text/50 transition-colors hover:bg-primary/10 hover:text-primary"
                 >
-                  <LocateFixed size={18} />
+                  <LocateFixed size={15} />
                 </button>
                 {voiceSupported && (
                   <button
                     onClick={() => handleVoiceSearch('from')}
                     aria-label="Голосовий пошук"
-                    className={`shrink-0 rounded-xl p-2 transition-all active:scale-90 ${
-                      isListening && activeField === 'from' 
-                        ? 'bg-rose-50 text-rose-500 animate-pulse' 
-                        : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                    className={`shrink-0 rounded-full p-1.5 transition-colors ${
+                      isListening && activeField === 'from' ? 'bg-primary/20 text-primary animate-pulse' : 'text-ink-text/50 hover:bg-primary/10 hover:text-primary'
                     }`}
-                    style={{ transition: SPRING_TRANSITION }}
                   >
-                    <Mic size={18} />
+                    <Mic size={14} />
                   </button>
                 )}
               </div>
 
-              {/* TO field */}
-              <div className="group flex items-center gap-2 px-3 py-3 transition-colors hover:bg-slate-50/50">
+              {/* Куди */}
+              <div className="flex items-center gap-1 px-2 py-1.5">
                 <input
                   type="text"
                   value={toQuery}
@@ -560,7 +517,7 @@ export function MapPage() {
                     setToQuery(e.target.value);
                     setToPoint(null);
                     setTripPlans(null);
-                    setSelectedPlanIndex(null);
+    setSelectedPlanIndex(null);
                   }}
                   onFocus={() => {
                     clearTimeout(blurTimeoutRef.current);
@@ -569,8 +526,8 @@ export function MapPage() {
                   onBlur={() => {
                     blurTimeoutRef.current = setTimeout(() => setActiveField((f) => (f === 'to' ? null : f)), 200);
                   }}
-                  placeholder="Куди прямуємо?"
-                  className="flex-1 bg-transparent text-[15px] font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                  placeholder="Куди: адреса, зупинка, маршрут..."
+                  className="w-full bg-transparent py-1.5 text-xs font-semibold text-ink-text placeholder:text-ink-text/40 focus:outline-none"
                 />
                 {toQuery && (
                   <button
@@ -578,208 +535,149 @@ export function MapPage() {
                       setToQuery('');
                       setToPoint(null);
                       setTripPlans(null);
-                      setSelectedPlanIndex(null);
+    setSelectedPlanIndex(null);
                     }}
                     aria-label="Очистити"
-                    className="shrink-0 rounded-xl p-2 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-600 active:scale-90"
-                    style={{ transition: SPRING_TRANSITION }}
+                    className="shrink-0 rounded-full p-1.5 text-ink-text/40 transition-colors hover:bg-surface-raised hover:text-ink-text"
                   >
-                    <X size={18} />
+                    <X size={14} />
                   </button>
                 )}
                 {voiceSupported && (
                   <button
                     onClick={() => handleVoiceSearch('to')}
                     aria-label="Голосовий пошук"
-                    className={`shrink-0 rounded-xl p-2 transition-all active:scale-90 ${
-                      isListening && activeField === 'to' 
-                        ? 'bg-rose-50 text-rose-500 animate-pulse' 
-                        : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                    className={`shrink-0 rounded-full p-1.5 transition-colors ${
+                      isListening && activeField === 'to' ? 'bg-primary/20 text-primary animate-pulse' : 'text-ink-text/50 hover:bg-primary/10 hover:text-primary'
                     }`}
-                    style={{ transition: SPRING_TRANSITION }}
                   >
-                    <Mic size={18} />
+                    <Mic size={14} />
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Swap button */}
-            <div className="flex items-center pr-3">
-              <button
-                onClick={handleSwapPoints}
-                aria-label="Поміняти місцями"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 shadow-sm transition-all hover:bg-indigo-50 hover:text-indigo-600 hover:shadow-md active:scale-90 hover:-rotate-180"
-                style={{ transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-              >
-                <ArrowUpDown size={18} />
-              </button>
-            </div>
+            <button
+              onClick={handleSwapPoints}
+              aria-label="Поміняти місцями"
+              title="Поміняти місцями"
+              className="m-2 flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-full bg-surface-soft text-ink-text/60 transition-colors hover:bg-primary/10 hover:text-primary active:scale-95"
+            >
+              <ArrowUpDown size={16} />
+            </button>
           </div>
 
-          {/* Build Route CTA */}
           {fromPoint && toPoint && (
-            <div className="border-t border-slate-100 p-3 animate-in slide-in-from-top-2 fade-in duration-300">
+            <div className="border-t border-border/40 p-2.5">
               <button
                 onClick={handleBuildTrip}
-                className="group flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.98] hover:brightness-105"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-forest px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all active:scale-[0.98] hover:brightness-105"
               >
-                <RouteIcon size={18} className="transition-transform group-hover:scale-110" />
+                <RouteIcon size={15} />
                 <span>Побудувати маршрут</span>
-                <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold">
-                  {Math.round(
-                    Math.sqrt(
-                      Math.pow(toPoint.lat - fromPoint.lat, 2) + 
-                      Math.pow(toPoint.lng - fromPoint.lng, 2)
-                    ) * 111
-                  )} км
-                </span>
               </button>
             </div>
           )}
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
-            3. FILTER CHIPS
-            ═══════════════════════════════════════════════════════════════ */}
-        <div className="pointer-events-auto flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 px-0.5">
-          {CHIP_FILTERS.map((chip, index) => {
+        {/* Швидкі фільтри */}
+        <div className="pointer-events-auto flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+          {CHIP_FILTERS.map((chip) => {
             const isActive = activeFilterChips[chip.id];
             const Icon = chip.icon;
             return (
               <button
                 key={chip.id}
                 onClick={() => toggleChip(chip.id)}
-                className={`relative flex items-center gap-2 px-4 py-2.5 rounded-2xl text-[13px] font-semibold transition-all shrink-0 active:scale-95 ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all shrink-0 backdrop-blur-xl shadow-md ${
                   isActive
-                    ? `${chip.accentColor} text-white shadow-lg shadow-black/10`
-                    : 'bg-white/80 text-slate-600 shadow-sm shadow-black/5 border border-slate-200/60 hover:bg-white hover:shadow-md hover:text-slate-800'
+                    ? 'bg-primary text-white shadow-primary/30 border border-primary/40'
+                    : 'glass-surface text-ink-text hover:brightness-105'
                 }`}
-                style={{ 
-                  transition: SPRING_TRANSITION,
-                  animationDelay: `${index * 50}ms`
-                }}
               >
-                <Icon size={15} className={isActive ? 'text-white/90' : 'text-slate-400'} strokeWidth={2.5} />
+                <Icon size={14} className={isActive ? 'text-white' : 'text-ink-muted'} />
                 <span>{chip.label}</span>
-                {isActive && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/40 opacity-75" />
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white" />
-                  </span>
-                )}
               </button>
             );
           })}
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
-            4. LIVE METRO WIDGET
-            ═══════════════════════════════════════════════════════════════ */}
+        {/* Віджет "Найближча станція метро + розклад" — на живій карті,
+            коли ввімкнено шар метро і нічого іншого не перекриває екран
+            (немає активного поля пошуку/побудованого маршруту). */}
         {activeFilterChips.metro && !activeField && !tripPlans && (
-          <div className="pointer-events-auto animate-in fade-in slide-in-from-top-3 duration-500">
+          <div className="pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-200">
             <LiveMetroWidget userPosition={position} />
           </div>
         )}
 
-        {/* ═══════════════════════════════════════════════════════════════
-            5. SEARCH SUGGESTIONS DROPDOWN
-            ═══════════════════════════════════════════════════════════════ */}
         {activeField && fieldSuggestions.length > 0 && (
-          <div 
-            className="pointer-events-auto overflow-hidden rounded-[24px] border border-white/60 bg-white/95 shadow-2xl shadow-black/10 backdrop-blur-2xl animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200"
-          >
-            <div className="px-1 py-1">
-              <div className="px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Зупинки
-              </div>
-              <MapSearchSuggestions
-                stops={fieldSuggestions}
-                routes={[]}
-                onStopSelect={(stopId) => {
-                  const stop = localStops.getById(stopId);
-                  if (stop) handlePickPoint(activeField, stop);
-                }}
-                onRouteSelect={() => {}}
-              />
-            </div>
+          <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden glass-surface animate-in fade-in zoom-in-95 duration-150">
+            <MapSearchSuggestions
+              stops={fieldSuggestions}
+              routes={[]}
+              onStopSelect={(stopId) => {
+                const stop = localStops.getById(stopId);
+                if (stop) handlePickPoint(activeField, stop);
+              }}
+              onRouteSelect={() => {}}
+            />
           </div>
         )}
 
         {activeField && fieldSuggestions.length === 0 && (activeField === 'from' ? fromQuery : toQuery).trim() && (
-          <div className="pointer-events-auto flex flex-col items-center justify-center gap-3 rounded-[24px] border border-slate-200/60 bg-white/95 p-8 text-center shadow-2xl shadow-black/10 backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-              <MapPin className="h-6 w-6 text-slate-400" strokeWidth={2} />
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-semibold text-slate-700">Зупинок не знайдено</p>
-              <p className="text-xs text-slate-400">Спробуйте іншу назву або адресу</p>
-            </div>
+          <div className="pointer-events-auto flex flex-col items-center justify-center gap-2 rounded-2xl border border-border/80 bg-surface/95 p-6 text-center shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150">
+            <MapPin className="h-6 w-6 text-ink-muted/60" />
+            <p className="font-body text-sm font-medium text-ink-muted">Зупинок не знайдено</p>
           </div>
         )}
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          6. MAP CONTROLS (Floating Action Buttons)
-          ═══════════════════════════════════════════════════════════════ */}
-      <div className="absolute right-4 bottom-36 z-20 flex flex-col gap-3">
-        {/* Zoom Controls */}
-        <div className="flex flex-col rounded-[20px] bg-white/90 shadow-lg shadow-black/8 backdrop-blur-xl border border-white/60 overflow-hidden">
+      {/* 3. КНОПКИ КАРТИ */}
+      <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-2.5 will-change-transform">
+        <div className="flex flex-col rounded-[24px] glass-surface shadow-xl shadow-black/10 overflow-hidden">
           <button
             onClick={() => map?.zoomIn({ duration: 300 })}
-            className="flex h-12 w-12 items-center justify-center text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 border-b border-slate-100"
+            className="flex h-[52px] w-[52px] items-center justify-center text-ink-text hover:bg-surface/60 active:bg-surface transition-colors border-b border-border/40"
             aria-label="Збільшити"
           >
-            <Plus size={20} strokeWidth={2.5} />
+            <Plus size={21} />
           </button>
           <button
             onClick={() => map?.zoomOut({ duration: 300 })}
-            className="flex h-12 w-12 items-center justify-center text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100"
+            className="flex h-[52px] w-[52px] items-center justify-center text-ink-text hover:bg-surface/60 active:bg-surface transition-colors"
             aria-label="Зменшити"
           >
-            <Minus size={20} strokeWidth={2.5} />
+            <Minus size={21} />
           </button>
         </div>
 
-        {/* Compass */}
         <button
           onClick={() => map?.resetNorthPitch({ duration: 400 })}
-          className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-white/90 text-slate-600 shadow-lg shadow-black/8 backdrop-blur-xl border border-white/60 transition-all hover:bg-slate-50 hover:text-slate-900 hover:shadow-xl active:scale-95"
-          aria-label="Компас"
+          className="flex h-[52px] w-[52px] items-center justify-center rounded-[24px] glass-surface text-ink-text shadow-xl shadow-black/10 hover:brightness-105 active:scale-95 transition-all"
+          aria-label="Компас / Північ"
           title="Скинути нахил"
         >
-          <Compass size={20} strokeWidth={2} />
+          <Compass size={21} />
         </button>
 
-        {/* Map Mode */}
-        <div className="rounded-[20px] overflow-hidden shadow-lg shadow-black/8">
+        <div className="rounded-[24px] overflow-hidden shadow-xl shadow-black/10">
           <MapModeButton />
         </div>
 
-        {/* GPS */}
-        <div className="rounded-[20px] overflow-hidden shadow-lg shadow-black/8">
+        <div className="rounded-[24px] overflow-hidden shadow-xl shadow-black/10">
           <GpsButton onClick={locate} isLocating={isLocating} hasError={!!error} />
         </div>
       </div>
 
       <TransportLayersPanel />
 
-      {/* ═══════════════════════════════════════════════════════════════
-          7. BOTTOM SHEETS
-          ═══════════════════════════════════════════════════════════════ */}
-
-      {/* Route Details Sheet */}
+      {/* 4. НИЖНЯ ШТОРКА: Маршрут (обраний на карті/зупинці) — виїжджає знизу */}
       <Sheet open={!!selectedRoute} onClose={clearSelection}>
-        {selectedRoute && (
-          <RouteSheet 
-            route={selectedRoute} 
-            onClose={clearSelection} 
-            onStopSelect={handleStopSelect} 
-          />
-        )}
+        {selectedRoute && <RouteSheet route={selectedRoute} onClose={clearSelection} onStopSelect={handleStopSelect} />}
       </Sheet>
 
-      {/* Trip Plans Sheet */}
+      {/* 4б. НИЖНЯ ШТОРКА: варіанти побудованої поїздки — теж виїжджає знизу */}
       <Sheet
         open={tripPlans !== null}
         onClose={() => {
@@ -791,28 +689,20 @@ export function MapPage() {
         {tripPlans !== null && (
           <div className="-mx-5 -mt-2">
             {isRefiningTrip && (
-              <div className="mx-5 mb-3 flex items-center gap-3 rounded-2xl bg-indigo-50 border border-indigo-100 px-4 py-3">
-                <Loader2 className="h-4 w-4 shrink-0 animate-spin text-indigo-500" />
-                <div className="flex flex-col">
-                  <span className="text-[13px] font-semibold text-indigo-700">Уточнюємо маршрут</span>
-                  <span className="text-[11px] text-indigo-500">Аналізуємо пішохідні відстані через OpenStreetMap...</span>
-                </div>
+              <div className="mx-5 mb-2 flex items-center gap-2 rounded-xl bg-primary/10 px-3 py-2 text-[11px] font-semibold text-primary">
+                <span className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                <span>Уточнюємо пішохідні відстані по картах OpenStreetMap...</span>
               </div>
             )}
-            <div className="max-h-[55vh] overflow-y-auto">
-              <TripPlanSheet 
-                plans={tripPlans} 
-                selectedIndex={selectedPlanIndex} 
-                onSelect={handleSelectTripOption} 
-              />
+            <div className="max-h-[50vh] overflow-y-auto">
+              <TripPlanSheet plans={tripPlans} selectedIndex={selectedPlanIndex} onSelect={handleSelectTripOption} />
             </div>
           </div>
         )}
       </Sheet>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          8. STOP DETAIL MODAL
-          ═══════════════════════════════════════════════════════════════ */}
+
+      {/* 5. МОДАЛКА ЗУПИНКИ */}
       <StopDetailModal
         stop={selectedStop ?? null}
         arrivals={arrivals}
