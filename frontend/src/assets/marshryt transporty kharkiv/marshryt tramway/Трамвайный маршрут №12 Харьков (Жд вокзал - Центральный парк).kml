@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
-    <name>Трамвайный маршрут №12 Харьков (Ж/д вокзал - Центральный парк)</name>
-    <description>Подробно https://kharkiv.inform.city/-ru/-tr/tr_city/tr_city_tr/ </description>
+    <name>Трамвайний маршрут №12 Харків (Залізничний вокзал - Центральний парк)</name>
+    <description>Детально https://kharkiv.inform.city/-ru/-tr/tr_city/tr_city_tr/ </description>
     <Style id="icon-1499-000000-normal">
       <IconStyle>
         <color>ff000000</color>
@@ -332,9 +332,9 @@
       </Pair>
     </StyleMap>
     <Folder>
-      <name>Маршрут туда</name>
+      <name>Маршрут туди</name>
       <Placemark>
-        <name>Линия маршрута</name>
+        <name>Лінія маршруту</name>
         <styleUrl>#line-F57C00-3325-nodesc</styleUrl>
         <LineString>
           <tessellate>1</tessellate>
@@ -508,8 +508,7 @@
         </LineString>
       </Placemark>
       <Placemark>
-        <name>Остановка Южный Вокзал 
-</name>
+        <name>Зупинка Південний вокзал</name>
         <description>Трамвай-1, 7, 12, 20.</description>
         <styleUrl>#icon-1499-F57C00</styleUrl>
         <Point>
@@ -519,8 +518,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Привокзальная площадь
-</name>
+        <name>Зупинка Привокзальна площа</name>
         <description>Трамвай-1, 12, 20.</description>
         <styleUrl>#icon-1626-F57C00</styleUrl>
         <Point>
@@ -530,8 +528,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Чеботарская  
-</name>
+        <name>Зупинка вул. Чеботарська</name>
         <description>Трамвай-1, 12, 20.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -541,8 +538,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Малая Панасовская
-</name>
+        <name>Зупинка вул. Мала Панасівська</name>
         <description>Трамвай-1, 12, 20.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -552,8 +548,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка пер. Резниковский
-</name>
+        <name>Зупинка пров. Рєзніковський</name>
         <description>Трамвай-12, 20.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -563,8 +558,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка пер. Лосевский
-</name>
+        <name>Зупинка пров. Лосєвський</name>
         <description>Трамвай-12, 20.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -574,8 +568,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Станция метро Центральный рынок 
-</name>
+        <name>Станція метро Центральний ринок</name>
         <description>Трамвай-12, 20.</description>
         <styleUrl>#icon-1626-F57C00</styleUrl>
         <Point>
@@ -585,8 +578,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка проезд Рогатинский
-</name>
+        <name>Зупинка проїзд Рогатинський</name>
         <description>Трамвай-12, 20.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -596,8 +588,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Пантелеймоновский храм
-</name>
+        <name>Зупинка Пантелеймонівський храм</name>
         <description>Трамвай-12, 20.</description>
         <styleUrl>#icon-1670-F57C00</styleUrl>
         <Point>
@@ -607,8 +598,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка спуск Клочковский
-</name>
+        <name>Зупинка спуск Клочківський</name>
         <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -618,8 +608,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Госпром
-</name>
+        <name>Зупинка Держпром</name>
         <description>Трамвай-12.</description>
         <styleUrl>#icon-1626-F57C00</styleUrl>
         <Point>
@@ -629,8 +618,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Тринклера 
-</name>
+        <name>Зупинка вул. Трінклера</name>
         <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -640,8 +628,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Культуры
-</name>
+        <name>Зупинка вул. Культури</name>
         <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -651,8 +638,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Сумская
-</name>
+        <name>Зупинка вул. Сумська</name>
         <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -662,9 +648,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Олеся Гончара
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка вул. Олеся Гончара</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
           <coordinates>
@@ -673,8 +658,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Веснина
-</name>
+        <name>Зупинка вул. Весніна</name>
         <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -685,9 +669,9 @@
       </Placemark>
     </Folder>
     <Folder>
-      <name>Маршрут обратно</name>
+      <name>Маршрут назад</name>
       <Placemark>
-        <name>Линия маршрута</name>
+        <name>Лінія маршруту</name>
         <styleUrl>#line-000000-3519-nodesc</styleUrl>
         <LineString>
           <tessellate>1</tessellate>
@@ -866,8 +850,7 @@
         </LineString>
       </Placemark>
       <Placemark>
-        <name>Остановка Центральный парк 
-</name>
+        <name>Зупинка Центральний парк</name>
         <description>Трамвай-12, 26.</description>
         <styleUrl>#icon-1499-000000</styleUrl>
         <Point>
@@ -877,9 +860,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Веснина
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка вул. Весніна</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -888,9 +870,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Олеся Гончара
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка вул. Олеся Гончара</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -899,9 +880,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Сумская
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка вул. Сумська</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -910,9 +890,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Культуры
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка вул. Культури</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -921,9 +900,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Тринклера
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка вул. Трінклера</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -932,9 +910,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Госпром
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка Держпром</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1626-000000</styleUrl>
         <Point>
           <coordinates>
@@ -943,9 +920,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка спуск Клочковский
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка спуск Клочківський</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -954,9 +930,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Пантелеймоновский храм
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка Пантелеймонівський храм</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1670-000000</styleUrl>
         <Point>
           <coordinates>
@@ -965,9 +940,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Рогатинский проезд
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка Рогатинський проїзд</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -976,9 +950,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Центральный рынок
-</name>
-        <description>Трамвай - 12.</description>
+        <name>Зупинка Центральний ринок</name>
+        <description>Трамвай-12.</description>
         <styleUrl>#icon-1626-000000</styleUrl>
         <Point>
           <coordinates>
@@ -987,8 +960,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка пер. Резниковский
-</name>
+        <name>Зупинка пров. Рєзніковський</name>
         <description>Трамвай-12, 20.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
@@ -998,9 +970,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Малая Панасовская
-</name>
-        <description>Трамвай - 1, 12, 20.</description>
+        <name>Зупинка вул. Мала Панасівська</name>
+        <description>Трамвай-1, 12, 20.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -1009,8 +980,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Привокзальная площадь
-</name>
+        <name>Зупинка Привокзальна площа</name>
         <description>Трамвай-1, 12, 20.</description>
         <styleUrl>#icon-1626-000000</styleUrl>
         <Point>
