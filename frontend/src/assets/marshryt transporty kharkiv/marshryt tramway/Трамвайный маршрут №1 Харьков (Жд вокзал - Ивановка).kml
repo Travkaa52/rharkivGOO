@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
-    <name>Трамвайный маршрут №1 Харьков (Ж/д вокзал - Ивановка)</name>
+    <name>Трамвайний маршрут №1 Харків (Залізничний вокзал - Іванівка)</name>
     <description>https://kharkiv.inform.city/-ru/-tr/tr_city/tr_city_tr/</description>
     <Style id="icon-1499-000000-normal">
       <IconStyle>
@@ -264,9 +264,9 @@
       </Pair>
     </StyleMap>
     <Folder>
-      <name>Маршрут туда</name>
+      <name>Маршрут туди</name>
       <Placemark>
-        <name>Линия маршрута</name>
+        <name>Лінія маршруту</name>
         <styleUrl>#line-F57C00-3325-nodesc</styleUrl>
         <LineString>
           <tessellate>1</tessellate>
@@ -329,8 +329,7 @@
         </LineString>
       </Placemark>
       <Placemark>
-        <name>Остановка Южный вокзал 
-</name>
+        <name>Зупинка Південний вокзал</name>
         <description>Трамвай-1, 6, 7, 12, 20.</description>
         <styleUrl>#icon-1499-F57C00</styleUrl>
         <Point>
@@ -340,8 +339,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Привокзальная площадь
-</name>
+        <name>Зупинка Привокзальна площа</name>
         <description>Трамвай-1, 12, 20.</description>
         <styleUrl>#icon-1626-F57C00</styleUrl>
         <Point>
@@ -351,8 +349,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Чеботарская
-</name>
+        <name>Зупинка вул. Чеботарська</name>
         <description>Трамвай-1, 12, 20.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -362,8 +359,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Панасовка
-</name>
+        <name>Зупинка Панасівка</name>
         <description>Трамвай-1.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -373,8 +369,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка пер. Альбовский 
-</name>
+        <name>Зупинка пров. Альбовський</name>
         <description>Трамвай-1.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -384,8 +379,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Кокчетавская
-</name>
+        <name>Зупинка вул. Кокчетавська</name>
         <description>Трамвай-1.</description>
         <styleUrl>#icon-1718-F57C00</styleUrl>
         <Point>
@@ -396,9 +390,9 @@
       </Placemark>
     </Folder>
     <Folder>
-      <name>Маршрут обратно</name>
+      <name>Маршрут назад</name>
       <Placemark>
-        <name>Линия маршрута</name>
+        <name>Лінія маршруту</name>
         <styleUrl>#line-000000-3906-nodesc</styleUrl>
         <LineString>
           <tessellate>1</tessellate>
@@ -499,8 +493,7 @@
         </LineString>
       </Placemark>
       <Placemark>
-        <name>Остановка Ивановка
-</name>
+        <name>Зупинка Іванівка</name>
         <description>Трамвай-1.</description>
         <styleUrl>#icon-1499-000000</styleUrl>
         <Point>
@@ -510,9 +503,8 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка ул. Кокчетавская
-</name>
-        <description>Троллейбус-3, 6, 49, 58, 59.</description>
+        <name>Зупинка вул. Кокчетавська</name>
+        <description>Тролейбус-3, 6, 49, 58, 59.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
           <coordinates>
@@ -521,8 +513,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка пер. Альбовский
-</name>
+        <name>Зупинка пров. Альбовський</name>
         <description>Трамвай-1.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
@@ -532,8 +523,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка Панасовка
-</name>
+        <name>Зупинка Панасівка</name>
         <description>Трамвай-1.</description>
         <styleUrl>#icon-1718-000000</styleUrl>
         <Point>
@@ -543,8 +533,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>Остановка пл. Привокзальная
-</name>
+        <name>Зупинка пл. Привокзальна</name>
         <description>Трамвай-1, 12, 20.</description>
         <styleUrl>#icon-1626-000000</styleUrl>
         <Point>
