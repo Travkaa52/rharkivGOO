@@ -3,6 +3,11 @@ import { Bell, ExternalLink, Rss, AlertCircle } from 'lucide-react';
 import { Sheet } from '@/components/ui/Sheet';
 import { useNotificationsStore, type NotificationItem } from '@/store/useNotificationsStore';
 
+// Фолбек для типа, якщо NotificationItem не експортується явно зі store
+type ItemType = NotificationItem extends undefined
+  ? ReturnType<typeof useNotificationsStore.getState>['items'][number]
+  : NotificationItem;
+
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diffMs / 60000);
@@ -20,7 +25,7 @@ export function NotificationsBell() {
 
   const unseenCount = Math.max(0, items.length - lastSeenCount);
   const hasUnseenAlert = useMemo(() => {
-    return items.slice(0, unseenCount).some((n) => n.kind === 'alert');
+    return items.slice(0, unseenCount).some((n) => n?.kind === 'alert');
   }, [items, unseenCount]);
 
   useEffect(() => {
@@ -44,7 +49,7 @@ interface NotificationsBellButtonProps {
   hasUnseenAlert: boolean;
   isLoading: boolean;
   error: string | null;
-  items: NotificationItem[];
+  items: ItemType[];
   onOpen: () => void;
 }
 
@@ -89,7 +94,7 @@ function NotificationsBellButton({
 }
 
 interface NotificationsListProps {
-  items: NotificationItem[];
+  items: ItemType[];
   isLoading: boolean;
   error: string | null;
 }
@@ -97,8 +102,8 @@ interface NotificationsListProps {
 function NotificationsList({ items, isLoading, error }: NotificationsListProps) {
   const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => {
-      const aAlert = a.kind === 'alert' ? 1 : 0;
-      const bAlert = b.kind === 'alert' ? 1 : 0;
+      const aAlert = a?.kind === 'alert' ? 1 : 0;
+      const bAlert = b?.kind === 'alert' ? 1 : 0;
       if (aAlert !== bAlert) return bAlert - aAlert;
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     });
@@ -141,14 +146,14 @@ function NotificationsList({ items, isLoading, error }: NotificationsListProps) 
           target="_blank"
           rel="noopener noreferrer"
           className={`block rounded-2xl border p-3 transition-colors ${
-            n.kind === 'alert'
+            n?.kind === 'alert'
               ? 'border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/15'
               : 'border-border/40 bg-surface hover:bg-surface-soft'
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-1">
             <span className="flex items-center gap-1.5 min-w-0">
-              {n.kind === 'alert' && (
+              {n?.kind === 'alert' && (
                 <span className="shrink-0 rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white">
                   Терміново
                 </span>
