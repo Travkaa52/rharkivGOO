@@ -218,7 +218,8 @@ function LiveBadge({ text = 'LIVE', color = 'bg-emerald-500' }: { text?: string;
 }
 
 function QuickActionCard({
-  item
+  item,
+  index
 }: {
   item: {
     label: string;
@@ -230,6 +231,7 @@ function QuickActionCard({
     overflowVisible?: boolean;
     gradient?: string;
   };
+  index?: number; // ➕ Додайте цей рядок
 }) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
