@@ -6,6 +6,8 @@ export interface NotificationItem {
   date: string;
   link: string;
   hasMedia: boolean;
+  /** Тип сповіщення: 'alert' для термінових оголошень метро або 'info' (опціонально) */
+  kind?: 'alert' | 'info' | string;
 }
 
 interface NotificationsFeed {
