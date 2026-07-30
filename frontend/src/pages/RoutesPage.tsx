@@ -13,7 +13,7 @@ interface TabItem {
 
 const TABS: TabItem[] = [
   { kind: 'bus', label: 'Автобуси', icon: 'avtobusicono.png' },
-  { kind: 'trolleybus', label: 'Тролейбуси', icon: 'troleyicono.svg' },
+  { kind: 'trolleybus', label: 'Тролейбуси', icon: 'troleyicono.png' },
   { kind: 'tram', label: 'Трамваї', icon: 'tramwaiicono.png' },
   { kind: 'metro', label: 'Метро', icon: 'metroicono.png' }
 ];
