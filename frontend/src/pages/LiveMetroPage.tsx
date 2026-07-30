@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   X,
   Clock,
@@ -917,13 +918,44 @@ export const TRAIN_SPRITES: Record<string, string> = {
 
 export function LiveMetroPage() {
   const trains = useLiveMetroTrains();
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Дозволяє відкривати конкретну станцію (і одразу її розклад) прямим
+  // посиланням виду /metro/live?station=<id>&tab=timetable — саме так на
+  // цю сторінку веде "Найближча станція" з LiveMetroWidget та HomePage.
+  // Захоплюємо початкові значення query-параметрів один раз: нижче ми
+  // одразу прибираємо їх з URL, тому читати searchParams напряму в рендері
+  // після монтування вже не можна.
+  const initialDeepLinkRef = useRef({
+    stationId: searchParams.get('station'),
+    tab: searchParams.get('tab') as 'arrivals' | 'timetable' | 'info' | null
+  });
+  const deepLinkedStationId = searchParams.get('station');
   const [transform, setTransform] = useState<Transform>({ x: 60, y: 30, scale: 0.9 });
   const [selectedTrainId, setSelectedTrainId] = useState<string | null>(null);
-  const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
+  const [selectedStationId, setSelectedStationId] = useState<string | null>(initialDeepLinkRef.current.stationId);
   const [dayType, setDayType] = useState<LiveMetroDayType>(() => dayTypeOf(new Date()));
   const [nowSec, setNowSec] = useState<number>(() => secOfDay(new Date()));
   const [showLegend, setShowLegend] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Якщо параметри в URL змінюються (наприклад, повторний перехід з
+  // головної сторінки на іншу станцію), синхронізуємо вибір станції.
+  useEffect(() => {
+    if (deepLinkedStationId) setSelectedStationId(deepLinkedStationId);
+  }, [deepLinkedStationId]);
+
+  // Одразу після відкриття конкретної станції за deep-лінком прибираємо
+  // параметри з URL, щоб закриття картки (onClose) та подальша навігація
+  // по схемі поводились природно, без "залипання" на старій станції.
+  useEffect(() => {
+    if (deepLinkedStationId) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('station');
+      next.delete('tab');
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformRef = useRef(transform);
@@ -1315,11 +1347,17 @@ export function LiveMetroPage() {
         {selectedTrain && <TrainInfoCard train={selectedTrain} onClose={() => setSelectedTrainId(null)} />}
         {selectedStation && (
           <StationInfoCard
+            key={selectedStation.id}
             station={selectedStation}
             arrivals={stationArrivals}
             timetable={stationTimetable}
             dayType={dayType}
             nowSec={nowSec}
+            initialTab={
+              initialDeepLinkRef.current.stationId === selectedStation.id
+                ? initialDeepLinkRef.current.tab ?? undefined
+                : undefined
+            }
             onClose={() => setSelectedStationId(null)}
           />
         )}
@@ -1616,6 +1654,7 @@ function StationInfoCard({
   timetable,
   dayType,
   nowSec,
+  initialTab,
   onClose,
 }: {
   station: SchematicStation;
@@ -1623,11 +1662,12 @@ function StationInfoCard({
   timetable: StationDayTimetableEntry[];
   dayType: LiveMetroDayType;
   nowSec: number;
+  initialTab?: 'arrivals' | 'timetable' | 'info';
   onClose: () => void;
 }) {
   const photo = getStationPhoto(station.id);
-  const [showFullTimetable, setShowFullTimetable] = useState(false);
-  const [activeTab, setActiveTab] = useState<'arrivals' | 'timetable' | 'info'>('arrivals');
+  const [showFullTimetable, setShowFullTimetable] = useState(initialTab === 'timetable');
+  const [activeTab, setActiveTab] = useState<'arrivals' | 'timetable' | 'info'>(initialTab ?? 'arrivals');
 
   const line = BUILT_LINES.find((l) => l.line.id === station.lineId)?.line;
 

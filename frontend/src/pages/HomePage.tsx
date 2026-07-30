@@ -37,6 +37,7 @@ import {
   getUpcomingArrivalsForStation,
   formatEtaCountdown
 } from '@/liveMetro/liveMetroEngine';
+import { METRO_STATION_GEO } from '@/liveMetro/metroStationsGeo';
 import type { TransportKind, TransportRoute } from '@/types/transport';
 
 // metroicono.png ще не покладений у public/icons (див. README.txt там же) —
@@ -127,18 +128,13 @@ export function HomePage() {
 
     for (const { line } of BUILT_LINES) {
       for (const s of line.stations) {
-        const stop = localStops.getById(s.id);
-        if (!stop) continue;
+        const geo = METRO_STATION_GEO[s.id];
+        if (!geo) continue;
 
-        const distM = calculateDistanceMeters(
-          position.lat,
-          position.lng,
-          stop.position.lat,
-          stop.position.lng
-        );
+        const distM = calculateDistanceMeters(position.lat, position.lng, geo.lat, geo.lng);
 
         if (!best || distM < best.distM) {
-          best = { id: s.id, name: stop.name, distM, lineColor: line.color };
+          best = { id: s.id, name: s.name, distM, lineColor: line.color };
         }
       }
     }
@@ -152,8 +148,8 @@ export function HomePage() {
 
   const metroTrackArrivals = useMemo(() => {
     if (nearestMetroArrivals.length === 0) return { track1: null, track2: null };
-    const track1 = nearestMetroArrivals.find((a) => String(a.direction) === '0') ?? nearestMetroArrivals[0] ?? null;
-    const track2 = nearestMetroArrivals.find((a) => String(a.direction) === '1' && a !== track1) ?? null;
+    const track1 = nearestMetroArrivals.find((a) => a.direction === 'forward') ?? nearestMetroArrivals[0] ?? null;
+    const track2 = nearestMetroArrivals.find((a) => a.direction === 'backward' && a !== track1) ?? null;
     return { track1, track2 };
   }, [nearestMetroArrivals]);
 
@@ -483,7 +479,10 @@ export function HomePage() {
             </div>
           ) : nearestMetroStation ? (
             <div className="bg-white/10 backdrop-blur-sm rounded-[18px] p-3.5 border border-white/10 mb-4 space-y-2">
-              <div className="flex items-center justify-between">
+              <Link
+                to={`/metro/live?station=${nearestMetroStation.id}&tab=timetable`}
+                className="flex items-center justify-between hover:opacity-80 transition-opacity"
+              >
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white/25"
@@ -494,7 +493,7 @@ export function HomePage() {
                 <span className="shrink-0 text-[10px] font-semibold bg-white/15 px-2 py-0.5 rounded-full text-emerald-100">
                   {formatDistance(nearestMetroStation.distM)}
                 </span>
-              </div>
+              </Link>
 
               <MetroTrackRow label="Колія 1" arrival={metroTrackArrivals.track1} nowSec={metroNowSec} />
               <MetroTrackRow label="Колія 2" arrival={metroTrackArrivals.track2} nowSec={metroNowSec} />
@@ -506,11 +505,11 @@ export function HomePage() {
           )}
 
           <Link
-            to="/metro/live"
+            to={nearestMetroStation ? `/metro/live?station=${nearestMetroStation.id}&tab=timetable` : '/metro/live'}
             className="w-full py-3.5 px-4 bg-surface-raised text-primary rounded-[18px] font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg hover:bg-primary/10 active:scale-[0.98] transition-all duration-200"
           >
             <img src={metroIcon} alt="Метро" className="w-4 h-4 object-contain" />
-            <span>Відкрити карту метро</span>
+            <span>{nearestMetroStation ? 'Розклад найближчої станції' : 'Відкрити карту метро'}</span>
             <ArrowUpRight size={16} className="text-primary" />
           </Link>
         </section>

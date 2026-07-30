@@ -17,6 +17,7 @@ import {
   LocateFixed
 } from 'lucide-react';
 import { MapView } from '@/components/MapView';
+import { LiveMetroWidget } from '@/components/LiveMetroWidget';
 import { StopDetailModal } from '@/components/StopDetailModal';
 import { TripPlanSheet } from '@/components/TripPlanSheet';
 import { RouteSheet } from '@/components/RouteSheet';
@@ -600,6 +601,15 @@ export function MapPage() {
             );
           })}
         </div>
+
+        {/* Віджет "Найближча станція метро + розклад" — на живій карті,
+            коли ввімкнено шар метро і нічого іншого не перекриває екран
+            (немає активного поля пошуку/побудованого маршруту). */}
+        {activeFilterChips.metro && !activeField && !tripPlans && (
+          <div className="pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-200">
+            <LiveMetroWidget userPosition={position} />
+          </div>
+        )}
 
         {activeField && fieldSuggestions.length > 0 && (
           <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden glass-surface animate-in fade-in zoom-in-95 duration-150">
