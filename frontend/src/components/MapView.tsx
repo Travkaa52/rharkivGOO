@@ -264,16 +264,17 @@ async function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
   if (res && typeof (res as unknown as Promise<unknown>).then === 'function') {
     (res as unknown as Promise<{ data: HTMLImageElement | ImageBitmap }>)
       .then((response) => {
-        if (response?.data && !map.hasImage(METRO_ICON_IMAGE_ID)) {
-          map.addImage(METRO_ICON_IMAGE_ID, response.data);
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        buildLayer();
-      });
+        try {
+    const res = await map.loadImage(assetUrl('icons/kharkiv-metro-logo.png'));
+    if (res?.data && !map.hasImage(METRO_ICON_IMAGE_ID)) {
+      map.addImage(METRO_ICON_IMAGE_ID, res.data);
+    }
+  } catch (err) {
+    console.warn('Failed to load metro icon:', err);
+  } finally {
+    buildLayer();
   }
-}
+} // <--- ОЦЯ ДУЖКА МАЄ БУТИ ОСТАННІМ СИМВОЛОМ У ФАЙЛІ!
 
 function updateRouteStopHighlight(map: MapLibreMap, selectedRouteId?: string | null) {
   if (!map.getLayer(STOP_HIGHLIGHT_LAYER_ID)) return;
