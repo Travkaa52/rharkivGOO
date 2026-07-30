@@ -208,7 +208,7 @@ function StaggerItem({ children, index = 0 }: { children: React.ReactNode; index
 function LiveBadge({ text = 'LIVE', color = 'bg-emerald-500' }: { text?: string; color?: string }) {
   return (
     <span className="relative inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-md border border-white/10 text-[10px] font-black tracking-widest uppercase">
-      <span className={`relative flex h-1.5 w-1.5`}>
+      <span className="relative flex h-1.5 w-1.5">
         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${color} opacity-75`} />
         <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${color}`} />
       </span>
@@ -219,7 +219,7 @@ function LiveBadge({ text = 'LIVE', color = 'bg-emerald-500' }: { text?: string;
 
 function QuickActionCard({
   item,
-  index
+  index: _index
 }: {
   item: {
     label: string;
@@ -231,7 +231,7 @@ function QuickActionCard({
     overflowVisible?: boolean;
     gradient?: string;
   };
-  index?: number; // ➕ Додайте цей рядок
+  index?: number;
 }) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -298,8 +298,7 @@ function QuickActionCard({
 }
 
 function MetroTrainVisualizer({ arrivals, lineColor }: { arrivals: Array<{ direction: string; etaSec: number }>; lineColor?: string }) {
-  // ✅ Префікс "_" заспокоює tsc compiler
-  const _nowSec = useMemo(() => {
+  const nowSec = useMemo(() => {
     const d = new Date();
     return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
   }, []);
@@ -360,7 +359,7 @@ function FlipNumber({ value }: { value: number }) {
   );
 }
 
-function CountdownTimer({ etaSec, nowSec }: { etaSec: number; nowSec: number }) {
+function CountdownTimer({ etaSec }: { etaSec: number }) {
   const totalSec = Math.max(0, etaSec);
   const mins = Math.floor(totalSec / 60);
   const secs = totalSec % 60;
@@ -462,7 +461,7 @@ export function HomePage() {
     return { track1, track2 };
   }, [nearestMetroArrivals]);
 
-  const metroNowSec = currentTime.getHours() * 3600 + currentTime.getMinutes() * 60 + currentTime.getSeconds();
+  const _metroNowSec = currentTime.getHours() * 3600 + currentTime.getMinutes() * 60 + currentTime.getSeconds();
 
   /* ── Search ─────────────────────────────────────────────────── */
   const searchResults = useMemo(() => {
@@ -650,560 +649,387 @@ export function HomePage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="hidden xs:flex flex-col items-end text-right mr-1">
-                <span className="text-xs font-bold text-ink-text tabular-nums tracking-tight">{formattedTimeStr}</span>
-                <span className="text-[10px] font-medium text-ink-muted capitalize flex items-center gap-1">
-                  <ThemeIcon size={10} className="text-primary" />
-                  {formattedDate}
-                </span>
-              </div>
-              
               <NotificationsBell />
-
-              <Link 
-                to="/profile"
+              <Link
+                to="/settings"
+                className="w-10 h-10 rounded-2xl bg-surface-raised border border-border/40 flex items-center justify-center text-ink-muted hover:text-ink-text hover:border-border transition-all shadow-sm active:scale-95"
                 aria-label="Налаштування"
-                className="relative p-2.5 rounded-2xl bg-surface-raised border border-border/40 hover:bg-surface-soft hover:border-primary/30 hover:shadow-md hover:shadow-primary/10 transition-all active:scale-95 text-ink-text group overflow-hidden"
               >
-                <Settings size={18} className="relative z-10 transition-transform group-hover:rotate-90 duration-500" />
+                <Settings size={18} />
               </Link>
             </div>
           </header>
         </AnimatedSection>
 
-        {/* ═══ 2. ADVANCED SEARCH ═══ */}
+        {/* ═══ 2. TIME & WEATHER HEROBANNER ═══ */}
         <AnimatedSection delay={50}>
-          <div className="relative z-30">
-            <div className={`relative flex items-center bg-surface-raised rounded-[22px] border transition-all duration-300 shadow-sm ${
-              isSearchFocused ? 'border-primary/50 ring-[6px] ring-primary/10 shadow-xl scale-[1.02]' : 'border-border/40 hover:border-border/70 hover:shadow-md'
-            }`}>
-              <div className="pl-4 pr-2 text-ink-muted">
-                <SearchIcon size={18} className={`transition-colors duration-300 ${isSearchFocused ? 'text-primary' : ''}`} />
+          <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${theme.accent} p-4 text-white shadow-xl shadow-primary/10 border border-white/20`}>
+            <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20">
+                  <ThemeIcon size={22} className="text-white animate-pulse" />
+                </div>
+                <div>
+                  <div className="text-2xl font-black tracking-tight tabular-nums flex items-baseline gap-2">
+                    {formattedTimeStr}
+                    <span className="text-xs font-semibold opacity-80 uppercase tracking-widest">{formattedDate}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-medium opacity-90 mt-0.5">
+                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span>Транспорт працює за розкладом</span>
+                  </div>
+                </div>
               </div>
+              <LiveBadge text="ХАРКІВ" color="bg-white" />
+            </div>
+          </div>
+        </AnimatedSection>
+
+        {/* ═══ 3. SEARCH BAR ═══ */}
+        <AnimatedSection delay={100}>
+          <div className="relative z-30" onKeyDown={handleKeyDown}>
+            <div className={`relative flex items-center rounded-2xl bg-surface-raised border transition-all duration-300 shadow-sm ${isSearchFocused ? 'border-primary ring-4 ring-primary/15 shadow-lg scale-[1.01]' : 'border-border/40 hover:border-border'}`}>
+              <SearchIcon size={18} className="absolute left-3.5 text-ink-muted pointer-events-none" />
               <input
                 ref={searchInputRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
-                onKeyDown={handleKeyDown}
-                placeholder="Пошук маршруту, зупинки, метро..."
-                className="w-full py-3.5 pr-4 text-xs font-semibold text-ink-text bg-transparent outline-none placeholder:text-ink-muted placeholder:font-medium"
+                onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                placeholder="Пошук зупинки або маршруту..."
+                className="w-full bg-transparent py-3.5 pl-10 pr-10 text-sm font-semibold text-ink-text placeholder:text-ink-muted/70 focus:outline-none"
               />
               {searchQuery && (
                 <button
-                  onClick={() => { setSearchQuery(''); searchInputRef.current?.focus(); }}
-                  className="p-2 mr-2 text-ink-muted hover:text-ink-text hover:bg-surface-soft rounded-full transition-all active:scale-90"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 p-1 rounded-full text-ink-muted hover:text-ink-text hover:bg-surface-soft transition-colors"
                 >
                   <X size={16} />
                 </button>
               )}
-              {isSearchFocused && !searchQuery && (
-                <div className="pr-3 text-[10px] font-bold text-ink-muted bg-surface-soft px-2 py-1 rounded-lg mr-2 hidden sm:block">
-                  ESC
-                </div>
-              )}
             </div>
 
-            {/* Search Dropdown */}
-            {isSearchFocused && searchQuery.trim().length > 0 && (
-              <>
-                <div 
-                  className="fixed inset-0 z-20 bg-ink-text/20 backdrop-blur-sm transition-opacity"
-                  onClick={() => setIsSearchFocused(false)}
-                />
-                
-                <div 
-                  ref={searchResultsRef}
-                  className="absolute left-0 right-0 top-14 z-30 bg-surface-raised/95 backdrop-blur-xl rounded-[22px] border border-border/40 shadow-2xl p-3 max-h-[420px] overflow-y-auto"
-                  style={{
-                    animation: 'fadeInUp 0.2s ease-out',
-                  }}
-                >
-                  {!hasSearchResults ? (
-                    <div className="py-10 text-center">
-                      <div className="w-12 h-12 rounded-full bg-surface-soft flex items-center justify-center mx-auto mb-3">
-                        <SearchIcon size={20} className="text-ink-muted" />
-                      </div>
-                      <p className="text-xs font-bold text-ink-text mb-1">Нічого не знайдено</p>
-                      <p className="text-[11px] text-ink-muted">Спробуйте інший запит</p>
+            {/* Dropdown Results */}
+            {isSearchFocused && (searchQuery.trim() || historyEntries.length > 0) && (
+              <div
+                ref={searchResultsRef}
+                className="absolute left-0 right-0 top-full mt-2 rounded-2xl bg-surface-raised border border-border/50 shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-200"
+              >
+                {searchQuery.trim() ? (
+                  hasSearchResults ? (
+                    <div className="p-2 space-y-1">
+                      {searchResults.metro.map((m, idx) => (
+                        <Link
+                          key={`metro-${m.id}`}
+                          to="/metro/live"
+                          onClick={() => addHistoryEntry({ query: m.name, type: 'route' })}
+                          className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${searchIndex === idx ? 'bg-primary/10 text-primary' : 'hover:bg-surface-soft'}`}
+                        >
+                          <span className="text-lg">🚇</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-bold truncate">
+                              <Highlight text={m.name} query={searchQuery} />
+                            </div>
+                            <div className="text-[10px] text-ink-muted">Метрополітен • {m.lineName || 'Лінія'}</div>
+                          </div>
+                          <ChevronRight size={14} className="text-ink-muted" />
+                        </Link>
+                      ))}
+
+                      {searchResults.routes.map((r, idx) => {
+                        const globalIdx = searchResults.metro.length + idx;
+                        return (
+                          <button
+                            key={`route-${r.id}`}
+                            onClick={() => {
+                              addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
+                              setActiveRoute(r);
+                            }}
+                            className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-colors ${searchIndex === globalIdx ? 'bg-primary/10 text-primary' : 'hover:bg-surface-soft'}`}
+                          >
+                            <span className="text-lg">{KIND_ICON[r.kind] || '🚌'}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-bold truncate">
+                                Маршрут <Highlight text={r.number} query={searchQuery} />
+                              </div>
+                              <div className="text-[10px] text-ink-muted truncate">{r.name}</div>
+                            </div>
+                            <ChevronRight size={14} className="text-ink-muted" />
+                          </button>
+                        );
+                      })}
+
+                      {searchResults.stops.map((s, idx) => {
+                        const globalIdx = searchResults.metro.length + searchResults.routes.length + idx;
+                        return (
+                          <Link
+                            key={`stop-${s.id}`}
+                            to={`/map?q=${encodeURIComponent(s.name)}`}
+                            onClick={() => addHistoryEntry({ query: s.name, type: 'stop' })}
+                            className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${searchIndex === globalIdx ? 'bg-primary/10 text-primary' : 'hover:bg-surface-soft'}`}
+                          >
+                            <MapPin size={16} className="text-primary shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-bold truncate">
+                                <Highlight text={s.name} query={searchQuery} />
+                              </div>
+                              <div className="text-[10px] text-ink-muted truncate">Зупинка транспорту</div>
+                            </div>
+                            <ChevronRight size={14} className="text-ink-muted" />
+                          </Link>
+                        );
+                      })}
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      {/* Routes */}
-                      {searchResults.routes.length > 0 && (
-                        <div>
-                          <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted px-2 mb-1.5 flex items-center gap-1">
-                            <Navigation size={10} /> Маршрути
-                          </div>
-                          <div className="space-y-0.5">
-                            {searchResults.routes.map((r, idx) => {
-                              const globalIdx = idx;
-                              return (
-                                <button
-                                  key={r.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setIsSearchFocused(false);
-                                    addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
-                                    setActiveRoute(r);
-                                  }}
-                                  className={`flex w-full items-center justify-between p-2.5 rounded-xl transition-all duration-150 group ${
-                                    searchIndex === globalIdx 
-                                      ? 'bg-primary/15 border border-primary/20 shadow-sm' 
-                                      : 'hover:bg-primary/10 border border-transparent'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2.5 min-w-0">
-                                    <span className={`w-8 h-8 rounded-lg bg-gradient-to-br ${KIND_GRADIENT[r.kind]} flex items-center justify-center text-white text-xs shadow-sm`}>
-                                      {KIND_ICON[r.kind]}
-                                    </span>
-                                    <span className="font-bold text-xs text-ink-text group-hover:text-primary truncate">
-                                      <Highlight text={`${r.number} — ${r.name}`} query={searchQuery} />
-                                    </span>
-                                  </div>
-                                  <ChevronRight size={14} className="text-ink-muted shrink-0" />
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Stops */}
-                      {searchResults.stops.length > 0 && (
-                        <div>
-                          <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted px-2 mb-1.5 flex items-center gap-1">
-                            <MapPin size={10} /> Зупинки
-                          </div>
-                          <div className="space-y-0.5">
-                            {searchResults.stops.map((s, idx) => {
-                              const globalIdx = searchResults.routes.length + idx;
-                              return (
-                                <Link
-                                  key={s.id}
-                                  to={`/map?q=${encodeURIComponent(s.name)}`}
-                                  onClick={() => {
-                                    setIsSearchFocused(false);
-                                    addHistoryEntry({ query: s.name, type: 'stop' });
-                                  }}
-                                  className={`flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 group ${
-                                    searchIndex === globalIdx 
-                                      ? 'bg-primary/15 border border-primary/20 shadow-sm' 
-                                      : 'hover:bg-primary/10 border border-transparent'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2.5">
-                                    <span className="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center text-xs">🚏</span>
-                                    <span className="font-bold text-xs text-ink-text group-hover:text-primary truncate">
-                                      <Highlight text={s.name} query={searchQuery} />
-                                    </span>
-                                  </div>
-                                  <ChevronRight size={14} className="text-ink-muted" />
-                                </Link>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Metro */}
-                      {searchResults.metro.length > 0 && (
-                        <div>
-                          <div className="text-[10px] font-black uppercase tracking-wider text-ink-muted px-2 mb-1.5 flex items-center gap-1">
-                            <TrainTrack size={10} /> Метро
-                          </div>
-                          <div className="space-y-0.5">
-                            {searchResults.metro.map((m, idx) => {
-                              const globalIdx = searchResults.routes.length + searchResults.stops.length + idx;
-                              return (
-                                <Link
-                                  key={m.id}
-                                  to={`/metro/live`}
-                                  onClick={() => {
-                                    setIsSearchFocused(false);
-                                    addHistoryEntry({ query: m.name, type: 'route' });
-                                  }}
-                                  className={`flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 group ${
-                                    searchIndex === globalIdx 
-                                      ? 'bg-primary/15 border border-primary/20 shadow-sm' 
-                                      : 'hover:bg-primary/10 border border-transparent'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2.5">
-                                    <img src={metroIcon} alt="Метро" className="w-8 h-8 rounded-lg object-contain bg-gold/15 p-1" />
-                                    <div>
-                                      <span className="font-bold text-xs text-ink-text group-hover:text-primary block truncate">
-                                        <Highlight text={m.name} query={searchQuery} />
-                                      </span>
-                                      {m.lineName && <span className="text-[10px] text-ink-muted">{m.lineName}</span>}
-                                    </div>
-                                  </div>
-                                  <ChevronRight size={14} className="text-ink-muted" />
-                                </Link>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="pt-1 text-center">
-                        <span className="text-[10px] text-ink-muted font-medium">
-                          ↑↓ навігація • Enter вибір • Esc закрити
-                        </span>
-                      </div>
+                    <div className="p-6 text-center text-ink-muted text-xs font-medium">
+                      Нічого не знайдено за запитом "{searchQuery}"
                     </div>
-                  )}
-                </div>
-              </>
+                  )
+                ) : (
+                  <div className="p-3">
+                    <div className="flex items-center justify-between px-2 pb-2 text-[10px] font-extrabold uppercase tracking-wider text-ink-muted border-b border-border/30">
+                      <span>Історія пошуку</span>
+                      <History size={12} />
+                    </div>
+                    <div className="mt-1 space-y-0.5">
+                      {historyEntries.slice(0, 5).map((entry, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setSearchQuery(entry.query)}
+                          className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-medium text-ink-text hover:bg-surface-soft transition-colors text-left"
+                        >
+                          <span className="truncate">{entry.query}</span>
+                          <Clock size={12} className="text-ink-muted opacity-60 shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </AnimatedSection>
 
-        {/* ═══ 2.5. TRAIN WISH SPRITE ═══ */}
-        <TrainWishSprite />
-
-        {/* ═══ 3. QUICK ACTIONS (3D Tilt) ═══ */}
-        <AnimatedSection delay={100}>
-          <section className="grid grid-cols-2 gap-2.5">
-            {[
-              { label: 'Маршрути', icon: Navigation, image: routesIcon, to: '/routes', imageScale: 'scale-125', gradient: 'from-blue-500/10 to-blue-600/5' },
-              { label: 'Карта', icon: MapIcon, image: mapIcon, to: '/map', imageScale: 'scale-125', gradient: 'from-emerald-500/10 to-emerald-600/5' },
-              { label: 'Метро', icon: TrainTrack, image: metroIconPrimary, imageFallback: metroIconFallback, to: '/metro/live', imageScale: 'scale-150', overflowVisible: true, gradient: 'from-gold/10 to-amber-500/5' },
-              { label: 'Обране', icon: Star, image: favoritesIcon, to: '/favorites', imageScale: 'scale-125', gradient: 'from-rose-500/10 to-rose-600/5' },
-            ].map((item, index) => (
-              <QuickActionCard key={index} item={item} index={index} />
-            ))}
-          </section>
-        </AnimatedSection>
-
-        {/* ═══ 4. LIVE METRO CARD (Ultra) ═══ */}
+        {/* ═══ 4. QUICK ACTIONS GRID ═══ */}
         <AnimatedSection delay={150}>
-          <section className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white p-5 shadow-2xl shadow-emerald-900/20 border border-emerald-400/20">
-            {/* Animated background mesh */}
-            <div className="absolute inset-0 opacity-30">
-              <div className="absolute -right-10 -top-10 w-40 h-40 bg-emerald-400 rounded-full blur-[60px] animate-pulse" style={{ animationDuration: '4s' }} />
-              <div className="absolute -left-10 bottom-0 w-32 h-32 bg-teal-400 rounded-full blur-[50px] animate-pulse" style={{ animationDuration: '6s' }} />
-            </div>
-
-            {/* Header */}
-            <div className="relative flex items-center justify-between mb-4">
-              <LiveBadge text="Метро онлайн" color="bg-emerald-300" />
-              <div className="flex items-center gap-1.5 text-[11px] font-bold bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                <CheckCircle2 size={13} className="text-emerald-300" />
-                <span>Працює штатно</span>
-              </div>
-            </div>
-
-            {!isMetroServiceRunning ? (
-              <div className="relative bg-white/10 backdrop-blur-md rounded-[20px] p-4 border border-white/10 mb-4 text-center space-y-1">
-                <div className="text-xs font-bold text-emerald-100 flex items-center justify-center gap-2">
-                  <Moon size={14} /> Нічна перерва
-                </div>
-                <div className="text-[11px] text-emerald-100/70">Перші потяги о 05:30</div>
-                <div className="w-full h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
-                  <div className="h-full bg-emerald-300/50 rounded-full animate-shimmer" style={{ width: '30%' }} />
-                </div>
-              </div>
-            ) : !position ? (
-              <div className="relative bg-white/10 backdrop-blur-md rounded-[20px] p-4 border border-white/10 mb-4 flex items-center justify-between gap-3">
-                <span className="text-[11px] font-medium text-emerald-100 flex items-center gap-2">
-                  <MapPin size={14} className="text-emerald-200 shrink-0" />
-                  Увімкніть геопозицію для рейсів з найближчої станції
-                </span>
-                <button
-                  onClick={() => locate()}
-                  className="shrink-0 text-[11px] font-bold text-white bg-white/20 px-3 py-1.5 rounded-full hover:bg-white/30 active:scale-95 transition-all border border-white/10"
-                >
-                  Дозволити
-                </button>
-              </div>
-            ) : nearestMetroStation ? (
-              <div className="relative bg-white/10 backdrop-blur-md rounded-[20px] p-4 border border-white/10 mb-4 space-y-3">
-                <Link
-                  to={`/metro/live?station=${nearestMetroStation.id}&tab=timetable`}
-                  className="flex items-center justify-between group/station"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span
-                      className="h-3 w-3 shrink-0 rounded-full ring-2 ring-white/30 shadow-lg shadow-current/30"
-                      style={{ backgroundColor: nearestMetroStation.lineColor ?? '#ffffff' }}
-                    />
-                    <span className="truncate text-xs font-bold text-white group-hover/station:text-emerald-200 transition-colors">ст. {nearestMetroStation.name}</span>
-                  </div>
-                  <span className="shrink-0 text-[10px] font-bold bg-white/15 px-2.5 py-1 rounded-full text-emerald-100 border border-white/10">
-                    {formatDistance(nearestMetroStation.distM)}
-                  </span>
-                </Link>
-
-                {/* Train track visualization */}
-                <MetroTrainVisualizer 
-                  arrivals={nearestMetroArrivals} 
-                  lineColor={nearestMetroStation.lineColor} 
-                />
-
-                <div className="space-y-2 pt-1">
-                  <MetroTrackRowUltra label="Колія 1" arrival={metroTrackArrivals.track1} nowSec={metroNowSec} />
-                  <MetroTrackRowUltra label="Колія 2" arrival={metroTrackArrivals.track2} nowSec={metroNowSec} />
-                </div>
-              </div>
-            ) : (
-              <div className="relative bg-white/10 backdrop-blur-md rounded-[20px] p-4 border border-white/10 mb-4 text-center">
-                <div className="text-[11px] text-emerald-100">Не вдалось визначити найближчу станцію</div>
-              </div>
-            )}
-
-            <Link
-              to={nearestMetroStation ? `/metro/live?station=${nearestMetroStation.id}&tab=timetable` : '/metro/live'}
-              className="relative w-full py-3.5 px-4 bg-white text-emerald-700 rounded-[18px] font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shine-effect overflow-hidden group"
-            >
-              <img src={metroIcon} alt="Метро" className="w-4 h-4 object-contain group-hover:scale-110 transition-transform" />
-              <span>{nearestMetroStation ? 'Розклад найближчої станції' : 'Відкрити карту метро'}</span>
-              <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
-          </section>
+          <div className="grid grid-cols-2 gap-2.5">
+            <QuickActionCard
+              item={{
+                label: 'Живе Метро',
+                icon: TrainTrack,
+                image: metroIcon,
+                imageFallback: metroIconFallback,
+                to: '/metro/live',
+                gradient: 'bg-gradient-to-br from-blue-500/10 to-indigo-500/10'
+              }}
+            />
+            <QuickActionCard
+              item={{
+                label: 'Всі Маршрути',
+                icon: Navigation,
+                image: routesIcon,
+                to: '/routes',
+                gradient: 'bg-gradient-to-br from-emerald-500/10 to-teal-500/10'
+              }}
+            />
+            <QuickActionCard
+              item={{
+                label: 'Карта Онлайн',
+                icon: MapIcon,
+                image: mapIcon,
+                to: '/map',
+                gradient: 'bg-gradient-to-br from-amber-500/10 to-orange-500/10'
+              }}
+            />
+            <QuickActionCard
+              item={{
+                label: 'Обране',
+                icon: Star,
+                image: favoritesIcon,
+                to: '/favorites',
+                gradient: 'bg-gradient-to-br from-rose-500/10 to-purple-500/10'
+              }}
+            />
+          </div>
         </AnimatedSection>
 
-        <NotificationsSection />
-
-        {/* ═══ 5. NEAREST STOPS ═══ */}
-        <AnimatedSection delay={200}>
-          <section className="bg-surface-raised rounded-[24px] p-4 border border-border/40 shadow-sm backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-primary/10 text-primary rounded-xl">
-                  <Navigation size={16} />
+        {/* ═══ 5. NEAREST METRO WIDGET ═══ */}
+        {nearestMetroStation && (
+          <AnimatedSection delay={200}>
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 p-4 text-white shadow-xl border border-white/10">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🚇</span>
+                  <div>
+                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Ближча станція</div>
+                    <h3 className="text-sm font-black text-white tracking-tight">{nearestMetroStation.name}</h3>
+                  </div>
                 </div>
-                <h2 className="font-extrabold text-ink-text text-xs">Найближчі зупинки</h2>
-              </div>
-              <Link 
-                to="/map"
-                className="text-xs font-bold text-primary hover:text-primary flex items-center gap-0.5 active:scale-95 transition-transform group"
-              >
-                <span>На карті</span>
-                <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
-
-            {!position ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center bg-surface-soft rounded-[20px] border border-dashed border-border/60 px-4 relative overflow-hidden">
-                <div className="absolute inset-0 animate-shimmer opacity-30" />
-                <div className="w-12 h-12 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-3 relative">
-                  <Compass size={24} className="animate-spin" style={{ animationDuration: '3s' }} />
-                </div>
-                <p className="text-xs font-bold text-ink-text mb-1">Геолокація вимкнена</p>
-                <p className="text-[11px] text-ink-muted mb-4 max-w-[240px]">Увімкніть GPS, щоб бачити зупинки поруч</p>
-                <button
-                  onClick={() => locate()}
-                  className="px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 hover:brightness-110 hover:shadow-xl hover:shadow-primary/30 active:scale-95 transition-all inline-flex items-center gap-2 relative overflow-hidden"
+                <Link
+                  to="/metro/live"
+                  className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-[10px] font-bold tracking-wide transition-colors flex items-center gap-1"
                 >
-                  <MapPin size={14} />
-                  <span>Увімкнути геолокацію</span>
+                  Табло <ArrowUpRight size={10} />
+                </Link>
+              </div>
+
+              {isMetroServiceRunning ? (
+                <>
+                  <MetroTrainVisualizer arrivals={nearestMetroArrivals} lineColor={nearestMetroStation.lineColor} />
+
+                  <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/10">
+                    <div className="bg-white/5 rounded-2xl p-2.5 border border-white/5">
+                      <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Напрямок 1</div>
+                      {metroTrackArrivals.track1 ? (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold truncate max-w-[80px]">Потяг</span>
+                          <CountdownTimer etaSec={metroTrackArrivals.track1.etaSec} />
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400">Немає даних</span>
+                      )}
+                    </div>
+
+                    <div className="bg-white/5 rounded-2xl p-2.5 border border-white/5">
+                      <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Напрямок 2</div>
+                      {metroTrackArrivals.track2 ? (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold truncate max-w-[80px]">Потяг</span>
+                          <CountdownTimer etaSec={metroTrackArrivals.track2.etaSec} />
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400">Немає даних</span>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="p-3 rounded-2xl bg-white/5 text-center text-xs font-medium text-slate-300">
+                  Метрополітен зачинено на нічний перерву
+                </div>
+              )}
+            </div>
+          </AnimatedSection>
+        )}
+
+        {/* ═══ 6. NOTIFICATIONS SECTION ═══ */}
+        <AnimatedSection delay={250}>
+          <NotificationsSection />
+        </AnimatedSection>
+
+        {/* ═══ 7. NEARBY STOPS ═══ */}
+        {nearbyStopsWithDistance.length > 0 && (
+          <AnimatedSection delay={300}>
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <Compass size={16} className="text-primary animate-spin" style={{ animationDuration: '8s' }} />
+                  <h2 className="text-xs font-extrabold uppercase tracking-wider text-ink-muted">Зупинки поруч</h2>
+                </div>
+                <button
+                  onClick={locate}
+                  className="text-[10px] font-extrabold text-primary hover:underline flex items-center gap-1"
+                >
+                  Оновити <Navigation size={10} />
                 </button>
               </div>
-            ) : nearbyStopsWithDistance.length === 0 ? (
-              <div className="py-6 text-center bg-surface-soft rounded-[20px] border border-border/40">
-                <p className="text-xs font-medium text-ink-muted">Поблизу зупинок не знайдено</p>
-                <p className="text-[10px] text-ink-muted mt-1">Спробуйте пізніше або змініть локацію</p>
-              </div>
-            ) : (
+
               <StaggerContainer>
                 {nearbyStopsWithDistance.map((stop, idx) => (
                   <StaggerItem key={stop.id} index={idx}>
                     <Link
                       to={`/map?q=${encodeURIComponent(stop.name)}`}
-                      onClick={() => addHistoryEntry({ query: stop.name, type: 'stop' })}
-                      className="flex items-center justify-between p-3.5 rounded-[18px] bg-surface-soft hover:bg-primary/10 transition-all duration-300 border border-transparent hover:border-primary/15 group relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                      <div className="flex items-center gap-3 min-w-0 relative">
-                        <div className="w-10 h-10 rounded-xl bg-surface-raised shadow-sm flex items-center justify-center text-primary font-bold text-sm shrink-0 border border-border/40 group-hover:scale-110 group-hover:shadow-md transition-all">
-                          🚏
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-bold text-ink-text text-xs truncate group-hover:text-primary transition-colors">{stop.name}</div>
-                          <div className="text-[10px] text-ink-muted font-medium flex items-center gap-1">
-                            <MapPin size={9} /> Зупинка громадського транспорту
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-xs font-extrabold text-primary bg-primary/15 px-3 py-1.5 rounded-full shrink-0 border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all">
-                        {formatDistance(animatedDistances[idx] || stop.distance)}
-                      </span>
-                    </Link>
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            )}
-          </section>
-        </AnimatedSection>
-
-        {/* ═══ 6. FAVORITES ═══ */}
-        <AnimatedSection delay={250}>
-          <section className="bg-surface-raised rounded-[24px] p-4 border border-border/40 shadow-sm backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-gold/10 text-gold rounded-xl">
-                  <Star size={16} className="fill-gold text-gold" />
-                </div>
-                <h2 className="font-extrabold text-ink-text text-xs">Обране</h2>
-              </div>
-              {(favoriteRouteDetails.length > 0 || favoriteStopDetails.length > 0) && (
-                <Link to="/favorites" className="text-xs font-bold text-gold hover:brightness-110 flex items-center gap-0.5 group">
-                  <span>Усі ({favoriteRouteDetails.length + favoriteStopDetails.length})</span>
-                  <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              )}
-            </div>
-
-            {favoriteRouteDetails.length === 0 && favoriteStopDetails.length === 0 ? (
-              <div className="text-center py-8 px-4 bg-surface-soft rounded-[20px] border border-dashed border-border/60 relative overflow-hidden">
-                <div className="absolute inset-0 animate-shimmer opacity-20" />
-                <div className="text-3xl mb-2 animate-bounce" style={{ animationDuration: '3s' }}>⭐</div>
-                <p className="text-xs font-extrabold text-ink-text mb-1">У вас ще немає обраного</p>
-                <p className="text-[11px] text-ink-muted mb-4 max-w-[220px] mx-auto">Закріплюйте маршрути та зупинки для швидкого доступу</p>
-                <Link 
-                  to="/routes"
-                  className="px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 hover:brightness-110 hover:shadow-xl active:scale-95 transition-all inline-flex items-center gap-2"
-                >
-                  <Plus size={14} />
-                  <span>Додати маршрути</span>
-                </Link>
-              </div>
-            ) : (
-              <StaggerContainer>
-                {favoriteRouteDetails.slice(0, 3).map((r, idx) => (
-                  <StaggerItem key={r.id} index={idx}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        addHistoryEntry({ query: `Маршрут ${r.number}`, type: 'route' });
-                        setActiveRoute(r);
-                      }}
-                      className="flex w-full items-center justify-between p-3.5 rounded-[18px] bg-surface-soft hover:bg-surface transition-all duration-300 border border-border/40 hover:border-primary/20 hover:shadow-sm group relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                      <div className="flex items-center gap-3 min-w-0 relative">
-                        {r.kind === 'metro' ? (
-                          <img src={metroIcon} alt="Метро" className="w-6 h-6 object-contain group-hover:scale-110 transition-transform" />
-                        ) : (
-                          <span className={`w-8 h-8 rounded-lg bg-gradient-to-br ${KIND_GRADIENT[r.kind]} flex items-center justify-center text-white text-xs shadow-sm`}>
-                            {KIND_ICON[r.kind]}
-                          </span>
-                        )}
-                        <div className="truncate text-left">
-                          <span className="font-extrabold text-ink-text text-xs truncate block group-hover:text-primary transition-colors">{r.number} — {r.name}</span>
-                          <span className="text-[10px] text-ink-muted font-medium capitalize">{r.kind}</span>
-                        </div>
-                      </div>
-                      <ChevronRight size={14} className="text-ink-muted shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
-                  </StaggerItem>
-                ))}
-
-                {favoriteStopDetails.slice(0, 2).map((s, idx) => (
-                  <StaggerItem key={s.id} index={idx + favoriteRouteDetails.length}>
-                    <Link
-                      to={`/map?q=${encodeURIComponent(s.name)}`}
-                      onClick={() => addHistoryEntry({ query: s.name, type: 'stop' })}
-                      className="flex items-center justify-between p-3.5 rounded-[18px] bg-surface-soft hover:bg-surface transition-all duration-300 border border-border/40 hover:border-primary/20 hover:shadow-sm group"
+                      className="group flex items-center justify-between p-3 rounded-2xl bg-surface-raised border border-border/40 hover:border-border shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center text-sm group-hover:scale-110 transition-transform">🚏</span>
-                        <span className="font-extrabold text-ink-text text-xs truncate group-hover:text-primary transition-colors">{s.name}</span>
+                        <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <MapPin size={18} />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-xs font-bold text-ink-text truncate">{stop.name}</h4>
+                          <span className="text-[10px] text-ink-muted font-medium">~{animatedDistances[idx]} м від вас</span>
+                        </div>
                       </div>
-                      <ChevronRight size={14} className="text-ink-muted shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight size={14} className="text-ink-muted group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                   </StaggerItem>
                 ))}
               </StaggerContainer>
-            )}
-          </section>
-        </AnimatedSection>
-
-        {/* ═══ 7. RECENT HISTORY ═══ */}
-        {historyEntries.length > 0 && (
-          <AnimatedSection delay={300}>
-            <section className="bg-surface-raised rounded-[24px] p-4 border border-border/40 shadow-sm backdrop-blur-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-surface text-ink-text rounded-xl">
-                    <History size={16} />
-                  </div>
-                  <h2 className="font-extrabold text-ink-text text-xs">Останні переглянуті</h2>
-                </div>
-              </div>
-
-              <StaggerContainer>
-                {historyEntries.slice(0, 5).map((entry, idx) => (
-                  <StaggerItem key={idx} index={idx}>
-                    <div className="flex items-center justify-between p-3 rounded-[16px] bg-surface-soft hover:bg-surface transition-all duration-200 group cursor-pointer border border-transparent hover:border-border/40">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <Clock size={12} className="text-primary" />
-                        </div>
-                        <span className="font-bold text-xs text-ink-text truncate group-hover:text-primary transition-colors">{entry.query}</span>
-                      </div>
-                      <span className="text-[10px] text-ink-muted font-medium tabular-nums">{timeAgo(new Date(entry.searchedAt || Date.now()))}</span>
-                    </div>
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            </section>
+            </div>
           </AnimatedSection>
         )}
 
-        {/* ═══ 8. TRANSPORT NEWS ═══ */}
-        <AnimatedSection delay={350}>
-          <section className="bg-surface-raised rounded-[24px] p-4 border border-border/40 shadow-sm backdrop-blur-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-surface-soft text-ink-muted rounded-xl">
-                <AlertCircle size={16} />
+        {/* ═══ 8. FAVORITES QUICK BAR ═══ */}
+        {(favoriteRouteDetails.length > 0 || favoriteStopDetails.length > 0) && (
+          <AnimatedSection delay={350}>
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <Star size={16} className="text-amber-500 fill-amber-500" />
+                  <h2 className="text-xs font-extrabold uppercase tracking-wider text-ink-muted">Ваше обране</h2>
+                </div>
+                <Link to="/favorites" className="text-[10px] font-extrabold text-primary hover:underline">
+                  Усі ({favoriteRouteDetails.length + favoriteStopDetails.length})
+                </Link>
               </div>
-              <h2 className="font-extrabold text-ink-text text-xs">Новини транспорту</h2>
-              <span className="ml-auto flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-red-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-              </span>
-            </div>
 
-            <div className="p-4 bg-surface-soft rounded-[20px] border border-border/40 space-y-3 relative overflow-hidden group hover:border-primary/20 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
-              
-              <div className="flex items-center justify-between relative">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-surface-raised text-ink-text border border-border/40 flex items-center gap-1">
-                  <TrendingUp size={10} className="text-primary" /> Офіційно
-                </span>
-                <span className="text-[10px] font-semibold text-ink-muted tabular-nums">Сьогодні, 08:00</span>
-              </div>
-              <h3 className="font-extrabold text-ink-text text-xs leading-snug group-hover:text-primary transition-colors">Зміни в розкладі рухів тролейбусів у місті</h3>
-              <p className="text-[11px] text-ink-muted leading-relaxed">
-                Інформація щодо оновлення маршрутів громадського транспорту Харкова в умовах воєнного стану.
-              </p>
-              <div className="pt-1">
-                <button 
-                  onClick={() => showToast('Детальна інформація доступна в офіційному Telegram каналі Kharkiv GO.')}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:brightness-110 active:scale-95 transition-all group/btn"
-                >
-                  <span>Детальніше</span>
-                  <ExternalLink size={13} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                </button>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 no-scrollbar">
+                {favoriteRouteDetails.map((r) => (
+                  <button
+                    key={r.id}
+                    onClick={() => setActiveRoute(r)}
+                    className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-raised border border-border/40 hover:border-primary/50 shadow-sm text-xs font-bold text-ink-text transition-all active:scale-95"
+                  >
+                    <span>{KIND_ICON[r.kind]}</span>
+                    <span>№{r.number}</span>
+                  </button>
+                ))}
+                {favoriteStopDetails.map((s) => (
+                  <Link
+                    key={s.id}
+                    to={`/map?q=${encodeURIComponent(s.name)}`}
+                    className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-raised border border-border/40 hover:border-primary/50 shadow-sm text-xs font-bold text-ink-text transition-all active:scale-95"
+                  >
+                    <MapPin size={12} className="text-primary" />
+                    <span className="truncate max-w-[100px]">{s.name}</span>
+                  </Link>
+                ))}
               </div>
             </div>
-          </section>
-        </AnimatedSection>
+          </AnimatedSection>
+        )}
 
-        {/* ═══ 9. REPORT DELAY CTA ═══ */}
+        {/* ═══ 9. REPORT DELAY CALLOUT ═══ */}
         <AnimatedSection delay={400}>
           <button
             onClick={() => setIsReportDelayOpen(true)}
-            className="group relative flex w-full items-center justify-center gap-2.5 rounded-[22px] border border-gold/30 bg-gradient-to-r from-gold/10 via-amber-500/10 to-gold/10 py-4 text-xs font-extrabold text-gold shadow-lg shadow-gold/10 transition-all active:scale-[0.97] hover:shadow-xl hover:shadow-gold/20 hover:border-gold/50 overflow-hidden shine-effect"
+            className="w-full shine-effect group relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 p-4 text-white shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all text-left"
           >
-            <AlertTriangle size={18} className="group-hover:animate-bounce" style={{ animationDuration: '2s' }} />
-            <span className="relative z-10">Повідомити про затримку</span>
-            <Zap size={14} className="relative z-10 opacity-60 group-hover:opacity-100 transition-opacity" />
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-white/20 backdrop-blur-md border border-white/20 group-hover:rotate-12 transition-transform">
+                  <AlertTriangle size={20} className="text-white" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black tracking-tight">Повідомити про затримку</h4>
+                  <p className="text-[10px] font-medium opacity-90 mt-0.5">Допоможіть іншим пасажирам актуальною інформацією</p>
+                </div>
+              </div>
+              <Plus size={18} className="text-white/80 group-hover:scale-125 transition-transform" />
+            </div>
           </button>
         </AnimatedSection>
+
+      </div>
+
+      {/* Modals */}
+      <ReportDelayModal isOpen={isReportDelayOpen} onClose={() => setIsReportDelayOpen(false)} />
+      {activeRoute && <RouteDetailModal route={activeRoute} onClose={() => setActiveRoute(null)} />}
+    </div>
+  );
+}
 
         {/* ═══ 10. FOOTER ═══ */}
         <AnimatedSection delay={450}>
