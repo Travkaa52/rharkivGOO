@@ -205,6 +205,9 @@ function addStaticTransitLayers(
 /**
  * Додає значок станції метро як MapLibre-зображення.
  */
+/**
+ * Додає значок станції метро як MapLibre-зображення.
+ */
 function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
   const buildLayer = () => {
     if (map.getLayer(METRO_STOPS_LAYER_ID) || !map.getSource(STOPS_SOURCE_ID)) return;
@@ -241,13 +244,27 @@ function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
     return;
   }
 
-  // Явно типизированы аргументы callback-функции error и image (решает TS2554, TS7006)
-  map.loadImage(assetUrl('icons/kharkiv-metro-logo.png'), (error?: Error | null, image?: HTMLImageElement | ImageBitmap) => {
+  const url = assetUrl('icons/kharkiv-metro-logo.png');
+  const res = map.loadImage(url, ((error, image) => {
     if (!error && image && !map.hasImage(METRO_ICON_IMAGE_ID)) {
       map.addImage(METRO_ICON_IMAGE_ID, image);
     }
     buildLayer();
-  });
+  }) as maplibregl.GetImageCallback);
+
+  // Для MapLibre v3+ (якщо loadImage повертає Promise)
+  if (res && typeof (res as unknown as Promise<unknown>).then === 'function') {
+    (res as unknown as Promise<{ data: HTMLImageElement | ImageBitmap }>)
+      .then((response) => {
+        if (response?.data && !map.hasImage(METRO_ICON_IMAGE_ID)) {
+          map.addImage(METRO_ICON_IMAGE_ID, response.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        buildLayer();
+      });
+  }
 }
 
 function updateRouteStopHighlight(map: MapLibreMap, selectedRouteId?: string | null) {
