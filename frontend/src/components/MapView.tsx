@@ -208,7 +208,7 @@ function addStaticTransitLayers(
 /**
  * Додає значок станції метро як MapLibre-зображення.
  */
-function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
+async function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
   const buildLayer = () => {
     if (map.getLayer(METRO_STOPS_LAYER_ID) || !map.getSource(STOPS_SOURCE_ID)) return;
     map.addLayer({
@@ -244,6 +244,17 @@ function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
     return;
   }
 
+  try {
+    const res = await map.loadImage(assetUrl('icons/kharkiv-metro-logo.png'));
+    if (res?.data && !map.hasImage(METRO_ICON_IMAGE_ID)) {
+      map.addImage(METRO_ICON_IMAGE_ID, res.data);
+    }
+  } catch (err) {
+    console.warn('Failed to load metro icon:', err);
+  } finally {
+    buildLayer();
+  }
+}
   const url = assetUrl('icons/kharkiv-metro-logo.png');
   const res = map.loadImage(url, ((error, image) => {
     if (!error && image && !map.hasImage(METRO_ICON_IMAGE_ID)) {
