@@ -29,6 +29,7 @@ import {
   SupportModal,
   SupportProjectModal
 } from '@/components/ProfileModals';
+import { HomeScreenShortcutCard } from '@/components/HomeScreenShortcutCard';
 
 export function ProfilePage() {
   const profile = useAuthStore((s) => s.profile);
@@ -281,6 +282,8 @@ export function ProfilePage() {
               <ChevronRight className="h-4 w-4 text-ink-muted" />
             </Link>
           </div>
+
+          <HomeScreenShortcutCard />
         </div>
 
         <div className="space-y-3">
