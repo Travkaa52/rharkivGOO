@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { fetchNotifications, type NotificationItem } from '@/api/notifications';
+export type { NotificationItem };
 
 interface NotificationsState {
   items: NotificationItem[];
