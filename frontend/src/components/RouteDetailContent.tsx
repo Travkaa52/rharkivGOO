@@ -4,6 +4,8 @@ import { localStops } from '@/data/localData';
 import { TransportKindIcon, KIND_LABELS_UK } from '@/components/TransportKindIcon';
 import { getStationPhoto } from '@/data/stationPhotos';
 import { trolleyTimetables } from '@/data/trolleyTimetables';
+import { tramTimetables } from '@/data/tramTimetables';
+import { busTimetables } from '@/data/busTimetables';
 import { RouteTimetable } from '@/components/RouteTimetable';
 import type { TransportRoute } from '@/types/transport';
 
@@ -33,8 +35,10 @@ export function RouteDetailContent({ route, onNavigate }: { route: TransportRout
     onNavigate?.();
     navigate(`/map?route=${route.id}&stop=${stopId}`);
   };
-  const timetable = route.kind === 'trolleybus' ? trolleyTimetables.getByRouteNumber(route.number) : null;
-  const timetableInfo = route.kind === 'trolleybus' ? trolleyTimetables.getInfoByRouteNumber(route.number) : undefined;
+  const timetableSource =
+    route.kind === 'trolleybus' ? trolleyTimetables : route.kind === 'tram' ? tramTimetables : route.kind === 'bus' ? busTimetables : null;
+  const timetable = timetableSource?.getByRouteNumber(route.number) ?? null;
+  const timetableInfo = timetableSource?.getInfoByRouteNumber(route.number);
   const hasTimetable = !!timetable && timetable.stations.length > 0;
 
   return (
