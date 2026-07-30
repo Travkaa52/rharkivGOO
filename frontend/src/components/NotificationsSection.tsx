@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Bell, ExternalLink, Rss, AlertCircle } from 'lucide-react';
 import { Sheet } from '@/components/ui/Sheet';
-import { useNotificationsStore } from '@/store/useNotificationsStore';
+import { useNotificationsStore, type NotificationItem } from '@/store/useNotificationsStore';
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -17,10 +17,11 @@ function timeAgo(iso: string): string {
 /** Дзвіночок у шапці головної сторінки: відкриває шторку зі сповіщеннями з Telegram-каналів. */
 export function NotificationsBell() {
   const { items, isLoading, error, fetchNotifications, markAllSeen, lastSeenCount } = useNotificationsStore();
+
   const unseenCount = Math.max(0, items.length - lastSeenCount);
-  // items приходять від парсера відсортованими від найновіших — перші
-  // unseenCount записів і є тими, що користувач ще не бачив.
-  const hasUnseenAlert = items.slice(0, unseenCount).some((n) => n.kind === 'alert');
+  const hasUnseenAlert = useMemo(() => {
+    return items.slice(0, unseenCount).some((n) => n.kind === 'alert');
+  }, [items, unseenCount]);
 
   useEffect(() => {
     fetchNotifications();
@@ -38,6 +39,15 @@ export function NotificationsBell() {
   );
 }
 
+interface NotificationsBellButtonProps {
+  unseenCount: number;
+  hasUnseenAlert: boolean;
+  isLoading: boolean;
+  error: string | null;
+  items: NotificationItem[];
+  onOpen: () => void;
+}
+
 function NotificationsBellButton({
   unseenCount,
   hasUnseenAlert,
@@ -45,24 +55,19 @@ function NotificationsBellButton({
   error,
   items,
   onOpen
-}: {
-  unseenCount: number;
-  hasUnseenAlert: boolean;
-  isLoading: boolean;
-  error: string | null;
-  items: ReturnType<typeof useNotificationsStore.getState>['items'];
-  onOpen: () => void;
-}) {
+}: NotificationsBellButtonProps) {
   const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+    onOpen();
+  };
 
   return (
     <>
       <button
         type="button"
-        onClick={() => {
-          setOpen(true);
-          onOpen();
-        }}
+        onClick={handleOpen}
         aria-label="Сповіщення"
         className={`relative p-2.5 rounded-2xl bg-surface-raised border transition-all active:scale-95 text-ink-text shadow-xs ${
           hasUnseenAlert ? 'border-rose-500/50 animate-pulse' : 'border-border/40 hover:bg-surface-soft'
@@ -83,15 +88,22 @@ function NotificationsBellButton({
   );
 }
 
-function NotificationsList({
-  items,
-  isLoading,
-  error
-}: {
-  items: ReturnType<typeof useNotificationsStore.getState>['items'];
+interface NotificationsListProps {
+  items: NotificationItem[];
   isLoading: boolean;
   error: string | null;
-}) {
+}
+
+function NotificationsList({ items, isLoading, error }: NotificationsListProps) {
+  const sortedItems = useMemo(() => {
+    return [...items].sort((a, b) => {
+      const aAlert = a.kind === 'alert' ? 1 : 0;
+      const bAlert = b.kind === 'alert' ? 1 : 0;
+      if (aAlert !== bAlert) return bAlert - aAlert;
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+  }, [items]);
+
   if (isLoading && items.length === 0) {
     return (
       <div className="space-y-3 py-2">
@@ -120,19 +132,9 @@ function NotificationsList({
     );
   }
 
-  // Термінові оголошення метрополітену (закриття/зупинка руху, повітряна
-  // тривога тощо) піднімаємо над рештою стрічки — саме заради цього парсер
-  // взагалі класифікує повідомлення @kh_metro.
-  const sorted = [...items].sort((a, b) => {
-    const aAlert = a.kind === 'alert' ? 1 : 0;
-    const bAlert = b.kind === 'alert' ? 1 : 0;
-    if (aAlert !== bAlert) return bAlert - aAlert;
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
-
   return (
     <div className="max-h-[55vh] space-y-2 overflow-y-auto -mx-1 px-1 py-1">
-      {sorted.map((n) => (
+      {sortedItems.map((n) => (
         <a
           key={n.id}
           href={n.link}
