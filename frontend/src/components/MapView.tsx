@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import maplibregl, { Map as MapLibreMap } from 'maplibre-gl';
+import { Navigation } from 'lucide-react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { DEFAULT_ZOOM, KHARKIV_CENTER, MAP_STYLES, MAX_ZOOM, MIN_ZOOM, TRANSPORT_COLORS } from '@/config/map';
@@ -23,6 +24,11 @@ const STOPS_SOURCE_ID = 'khgo-stops';
 const STOPS_LAYER_ID = 'khgo-stops-circles';
 const STOPS_HALO_LAYER_ID = 'khgo-stops-halo';
 const STOP_HIGHLIGHT_LAYER_ID = 'khgo-stops-highlight';
+// Метро — окремий шар без minzoom-обмеження: станції метро мають лишатись
+// видимими на будь-якому масштабі карти, на відміну від трамвайних/тролейбусних/
+// автобусних зупинок, яких на віддаленому зумі забагато й вони заховані навмисно.
+// Рендериться значком метрополітену (public/icons/kharkiv-metro-logo.png) з
+// назвою станції збоку, а не звичайним кольоровим кружечком.
 const METRO_STOPS_LAYER_ID = 'khgo-stops-metro-icons';
 const METRO_ICON_IMAGE_ID = 'khgo-metro-station-icon';
 
@@ -79,6 +85,11 @@ function addStaticTransitLayers(
       }
     });
 
+    // Невидимий, але значно ширший шар-"мішень" під видимою лінією маршруту.
+    // Раніше клікабельним був лише сам ROUTES_LAYER_ID шириною 1.4–6.5px —
+    // на телефоні потрапити пальцем у тонку лінію тролейбуса/трамвая було
+    // практично неможливо, тому побудова маршруту на карті "не працювала".
+    // Цей шар нічого не малює (line-opacity: 0), лише розширює ділянку кліку.
     map.addLayer({
       id: ROUTES_HITBOX_LAYER_ID,
       type: 'line',
@@ -92,6 +103,9 @@ function addStaticTransitLayers(
     }, ROUTES_LAYER_ID);
   }
 
+  // Шар намальованого шляху обраного варіанту поїздки (Звідки -> Куди):
+  // пунктирна пішохідна ділянка + суцільна лінія кольору виду транспорту
+  // для кожного legу (з пересадкою — кілька кольорових відрізків підряд).
   if (!map.getSource(TRIP_PATH_SOURCE_ID)) {
     map.addSource(TRIP_PATH_SOURCE_ID, {
       type: 'geojson',
@@ -198,14 +212,20 @@ function addStaticTransitLayers(
       }
     });
 
+    // Метро — без minzoom, завжди видимі, поки showStops увімкнено.
+    // Значок станції (лого метрополітену) + назва станції збоку.
     addMetroIconLayer(map, showStops);
   }
 }
 
 /**
- * Додає значок станції метро як MapLibre-зображення.
+ * Додає значок станції метро (public/icons/kharkiv-metro-logo.png) як
+ * MapLibre-зображення та символьний шар поверх нього з назвою станції
+ * збоку. Зображення потрібно вантажити асинхронно й наново після кожної
+ * зміни стилю карти (map.setStyle скидає всі раніше додані зображення),
+ * тому виклик безпечний для повторного виконання.
  */
-async function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
+function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
   const buildLayer = () => {
     if (map.getLayer(METRO_STOPS_LAYER_ID) || !map.getSource(STOPS_SOURCE_ID)) return;
     map.addLayer({
@@ -241,17 +261,23 @@ async function addMetroIconLayer(map: MapLibreMap, showStops: boolean) {
     return;
   }
 
-  try {
-    const res = await map.loadImage(assetUrl('icons/kharkiv-metro-logo.png'));
-    if (res?.data && !map.hasImage(METRO_ICON_IMAGE_ID)) {
-      map.addImage(METRO_ICON_IMAGE_ID, res.data);
-    }
-  } catch (err) {
-    console.warn('Failed to load metro icon:', err);
-  } finally {
-    buildLayer();
-  }
+  map
+    .loadImage(assetUrl('icons/kharkiv-metro-logo.png'))
+    .then((result) => {
+      if (result?.data && !map.hasImage(METRO_ICON_IMAGE_ID)) {
+        map.addImage(METRO_ICON_IMAGE_ID, result.data);
+      }
+    })
+    .catch(() => {
+      // Якщо картинку не вдалось завантажити, шар все одно додаємо —
+      // тоді станції метро лишаться підписаними назвою (без іконки), а не
+      // зникнуть з карти повністю.
+    })
+    .finally(() => {
+      buildLayer();
+    });
 }
+
 function updateRouteStopHighlight(map: MapLibreMap, selectedRouteId?: string | null) {
   if (!map.getLayer(STOP_HIGHLIGHT_LAYER_ID)) return;
   const route = selectedRouteId ? localRoutes.getById(selectedRouteId) : undefined;
@@ -307,9 +333,13 @@ interface MapViewProps {
   visibleKinds?: TransportKind[];
   showStops?: boolean;
   onMapReady?: (map: MapLibreMap | null) => void;
+  /** Викликається, якщо стиль карти не вдалось завантажити (мережа/CORS/недоступний тайл-сервер). */
   onMapError?: (message: string) => void;
+  /** Точка "Звідки" для побудови маршруту — позначається зеленим піном. */
   fromPoint?: { lat: number; lng: number } | null;
+  /** Точка "Куди" для побудови маршруту — позначається червоним піном. */
   toPoint?: { lat: number; lng: number } | null;
+  /** Обраний варіант поїздки — малюється кольоровим шляхом по видах транспорту. */
   tripPlan?: TripPlan | null;
 }
 
@@ -348,6 +378,7 @@ export function MapView({
   const onMapErrorRef = useRef(onMapError);
   onMapErrorRef.current = onMapError;
 
+  // Ініціалізація карти
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -365,6 +396,11 @@ export function MapView({
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
 
+    // Карта лишається інтерактивною (панорамування/зум) навіть до фінального 'load' —
+    // раніше повноекранний оверлей завантаження блокував кліки по канвасу карти,
+    // і якщо стиль не завантажувався (нестабільна мережа, заблокований тайл-сервер),
+    // користувач взагалі не міг користуватись картою. Тепер помилку стилю ловимо
+    // явно і повідомляємо викликача замість вічного спінера.
     map.on('error', (e) => {
       const message = e?.error?.message || 'Не вдалося завантажити стиль карти';
       onMapErrorRef.current?.(message);
@@ -412,6 +448,7 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Зміна стилю карти (день/ніч)
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -427,6 +464,7 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapStyle]);
 
+  // Живе перемикання 2D/3D
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -437,6 +475,7 @@ export function MapView({
     }
   }, [show3DBuildings, mapReady]);
 
+  // Перефільтрація видів транспорту та зупинок
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -444,6 +483,7 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleKinds, showStops, mapReady]);
 
+  // Підсвічування обраного маршруту
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -453,6 +493,7 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRouteId, mapReady]);
 
+  // Маркер користувача
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !userPosition) return;
@@ -475,6 +516,7 @@ export function MapView({
     }
   }, [userPosition]);
 
+  // Перемикання станів та орієнтації маркера
   useEffect(() => {
     const el = userMarkerRef.current?.getElement();
     if (!el) return;
@@ -496,6 +538,7 @@ export function MapView({
     }
   }, [userIsMoving, userHeading]);
 
+  // Малювання шляху обраного варіанту поїздки кольором транспорту
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -506,6 +549,7 @@ export function MapView({
     );
   }, [tripPlan, fromPoint, toPoint, mapReady]);
 
+  // Маркери "Звідки" / "Куди" для побудови маршруту
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -544,9 +588,38 @@ export function MapView({
     }
   }, [toPoint]);
 
+  function flyToUser() {
+    if (mapRef.current && userPosition) {
+      mapRef.current.flyTo({ center: [userPosition.lng, userPosition.lat], zoom: 16, essential: true });
+    }
+  }
+
   return (
     <div className="relative h-full w-full overflow-hidden">
+      {/* КРИТИЧНО: position/inset заданий інлайн-стилем, а НЕ класами Tailwind
+          (absolute inset-0). Бібліотека maplibre-gl.css сама додає на цей
+          контейнер клас .maplibregl-map з правилом `position: relative` —
+          та сама специфічність (один клас), тож перемагає той, чий CSS
+          підключений пізніше в зібраному бандлі. Раніше це призводило до
+          того, що контейнер лишався position:relative без заданої висоти,
+          inset-0 переставав щось важити, висота схлопувалась у 0px — і
+          карта була невидимою (canvas 0×0), хоча жодної JS-помилки не було.
+          Інлайн-стиль має найвищий пріоритет і завжди перемагає будь-який
+          зовнішній клас, тож карта відображається незалежно від порядку
+          CSS-чанків у білді. */}
       <div ref={containerRef} className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} />
+
+      {/* Плаваюча кнопка «Моє місцезнаходження» (FAB) */}
+      {userPosition && (
+        <button
+          type="button"
+          onClick={flyToUser}
+          aria-label="Показати моє місцезнаходження"
+          className="absolute bottom-20 right-4 z-20 flex h-12 w-12 items-center justify-center rounded-2xl border border-border/40 bg-surface/85 text-primary shadow-2xl backdrop-blur-xl transition-all duration-200 hover:scale-105 hover:bg-surface active:scale-95 mb-safe"
+        >
+          <Navigation className="h-5 w-5 fill-primary/20 stroke-[2.25]" />
+        </button>
+      )}
     </div>
   );
 }
