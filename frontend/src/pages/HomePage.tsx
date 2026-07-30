@@ -5,7 +5,6 @@ import {
   ChevronRight, 
   Map as MapIcon, 
   Navigation, 
-  Bell, 
   Settings, 
   Plus, 
   ArrowUpRight, 
@@ -24,6 +23,7 @@ import {
 import { ReportDelayModal } from '@/components/ReportDelayModal';
 import { RouteDetailModal } from '@/components/RouteDetailModal';
 import { TrainWishSprite } from '@/components/TrainWishSprite';
+import { NotificationsBell, NotificationsSection } from '@/components/NotificationsSection';
 import { localRoutes, localStops } from '@/data/localData';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
@@ -249,15 +249,7 @@ export function HomePage() {
               <span className="text-[10px] font-medium text-ink-muted capitalize">{formattedDate}</span>
             </div>
             
-            <button
-              type="button"
-              onClick={() => showToast('Нових сповіщень немає')}
-              aria-label="Сповіщення"
-              className="relative p-2.5 rounded-2xl bg-surface-raised border border-border/40 hover:bg-surface-soft transition-all active:scale-95 text-ink-text shadow-xs"
-            >
-              <Bell size={18} />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            </button>
+            <NotificationsBell />
 
             <Link 
               to="/profile"
@@ -522,6 +514,8 @@ export function HomePage() {
             <ArrowUpRight size={16} className="text-primary" />
           </Link>
         </section>
+
+        <NotificationsSection />
 
         {/* 5. NEAREST STOPS WITH GEO PERMISSION/STATE */}
         <section className="bg-surface-raised rounded-[22px] p-4 border border-border/40 shadow-sm">
