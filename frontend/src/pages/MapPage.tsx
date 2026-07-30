@@ -17,7 +17,6 @@ import {
   LocateFixed
 } from 'lucide-react';
 import { MapView } from '@/components/MapView';
-import { LiveMetroWidget } from '@/components/LiveMetroWidget';
 import { StopDetailModal } from '@/components/StopDetailModal';
 import { TripPlanSheet } from '@/components/TripPlanSheet';
 import { RouteSheet } from '@/components/RouteSheet';
@@ -54,10 +53,6 @@ export function MapPage() {
   const toggleStopsOnMap = useSettingsStore((s) => s.toggleStopsOnMap);
 
   const [map, setMap] = useState<MapLibreMap | null>(null);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [mapError, setMapError] = useState<string | null>(null);
-  const [mapKey, setMapKey] = useState(0);
-  const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
@@ -358,86 +353,21 @@ export function MapPage() {
     if (initialQuery) setToQuery(initialQuery);
   }, [initialQuery]);
 
+  // Карта доступна одразу, без екрана завантаження — <MapView> рендериться
+  // і стає інтерактивною відразу після переходу на розділ "Карта", а не
+  // після події 'load' від MapLibre (стиль/тайли/зупинки доопрацьовуються
+  // самі, поки користувач вже може панорамувати й тапати по карті).
   const handleMapReady = useCallback((mapInstance: MapLibreMap | null) => {
     if (!mapInstance) return;
     setMap(mapInstance);
-    setMapError(null);
-    if (mapInstance.isStyleLoaded()) {
-      setIsMapLoaded(true);
-    } else {
-      mapInstance.on('load', () => setIsMapLoaded(true));
-    }
   }, []);
-
-  const handleMapError = useCallback((message: string) => {
-    // Помилка стилю карти (мережа/CORS/недоступний тайл-сервер) — раніше в цьому
-    // випадку спінер "Завантаження карти..." лишався назавжди і поверх нього
-    // висів непрозорий блокуючий шар, який не давав користуватись картою.
-    setMapError(message);
-  }, []);
-
-  const handleRetryMap = useCallback(() => {
-    setMapError(null);
-    setIsMapLoaded(false);
-    setMap(null);
-    // Перемонтовуємо <MapView> заново — інакше застряглий екземпляр MapLibre
-    // (наприклад, після обірваного запиту стилю) не зробить повторну спробу сам.
-    setMapKey((k) => k + 1);
-  }, []);
-
-  // Запобіжник: якщо подія 'load' від MapLibre з якоїсь причини не настає
-  // (повільна мережа, застряглий запит спрайту/шрифтів тощо), не тримаємо
-  // користувача вічно за блокуючим екраном завантаження — знімаємо його через
-  // 3 секунди (максимально допустимий час очікування) і даємо картою
-  // користуватись; шари та зупинки доопрацюються самі, коли/якщо стиль усе ж
-  // довантажиться.
-  useEffect(() => {
-    if (isMapLoaded || mapError) {
-      if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
-      return;
-    }
-    loadTimeoutRef.current = setTimeout(() => {
-      setIsMapLoaded(true);
-    }, 3000);
-    return () => {
-      if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
-    };
-  }, [isMapLoaded, mapError, mapKey]);
 
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-bg text-ink-text font-sans antialiased selection:bg-primary selection:text-white">
       
-      {/* 1. КАРТА ТА СКЕЛЕТОН */}
+      {/* 1. КАРТА — рендериться і стає доступною одразу, без екрана завантаження */}
       <div className="absolute inset-0 z-0">
-        {!isMapLoaded && !mapError && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center bg-bg/90 backdrop-blur-md animate-pulse">
-            <div className="flex flex-col items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-primary/20 border border-primary/40 flex items-center justify-center">
-                <span className="text-xl">🗺️</span>
-              </div>
-              <span className="text-xs font-bold tracking-wider uppercase text-ink-muted">Завантаження карти Харкова...</span>
-            </div>
-          </div>
-        )}
-
-        {mapError && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-bg/95 px-6 text-center backdrop-blur-md">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-500/40 bg-rose-500/20">
-              <span className="text-xl">⚠️</span>
-            </div>
-            <p className="text-xs font-bold tracking-wide text-ink-muted">Не вдалося завантажити карту</p>
-            <p className="max-w-xs text-[11px] text-ink-muted">Перевірте з’єднання з інтернетом і спробуйте ще раз.</p>
-            <button
-              onClick={handleRetryMap}
-              className="mt-1 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-primary active:scale-95"
-            >
-              Спробувати знову
-            </button>
-          </div>
-        )}
-
         <MapView
-          key={mapKey}
           userPosition={position}
           userHeading={heading}
           userIsMoving={isMoving}
@@ -447,7 +377,6 @@ export function MapPage() {
           visibleKinds={visibleKinds}
           showStops={showStops}
           onMapReady={handleMapReady}
-          onMapError={handleMapError}
           fromPoint={fromPoint}
           toPoint={toPoint}
           tripPlan={selectedTripPlan}
@@ -601,15 +530,6 @@ export function MapPage() {
             );
           })}
         </div>
-
-        {/* Віджет "Найближча станція метро + розклад" — на живій карті,
-            коли ввімкнено шар метро і нічого іншого не перекриває екран
-            (немає активного поля пошуку/побудованого маршруту). */}
-        {activeFilterChips.metro && !activeField && !tripPlans && (
-          <div className="pointer-events-auto animate-in fade-in slide-in-from-top-2 duration-200">
-            <LiveMetroWidget userPosition={position} />
-          </div>
-        )}
 
         {activeField && fieldSuggestions.length > 0 && (
           <div className="pointer-events-auto shadow-2xl rounded-[24px] overflow-hidden glass-surface animate-in fade-in zoom-in-95 duration-150">
