@@ -1144,7 +1144,7 @@ export function HomePage() {
                         </div>
                         <span className="font-bold text-xs text-ink-text truncate group-hover:text-primary transition-colors">{entry.query}</span>
                       </div>
-                      <span className="text-[10px] text-ink-muted font-medium tabular-nums">{timeAgo(new Date(entry.timestamp || Date.now()))}</span>
+                      <span className="text-[10px] text-ink-muted font-medium tabular-nums">{timeAgo(new Date(entry.searchedAt || Date.now()))}</span>
                     </div>
                   </StaggerItem>
                 ))}

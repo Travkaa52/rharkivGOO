@@ -10,8 +10,14 @@ export interface UserProfile {
   displayName: string;
   username?: string;
   avatarUrl?: string;
+  /** Емодзі-аватар, використовується як запасний варіант, якщо немає avatarUrl. */
+  avatarEmoji?: string;
   languageCode?: string;
   createdAt: string;
+  /** true, якщо профіль створено локально (поза Telegram Mini App). */
+  isLocal?: boolean;
+  /** Контактні дані для локального профілю (телефон/email тощо). */
+  contact?: string;
 }
 
 export interface AppSettings {

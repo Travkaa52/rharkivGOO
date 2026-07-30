@@ -510,7 +510,7 @@ export function TransportKindPage({ kind }: { kind: TransportKind }) {
                 transition: SMOOTH_TRANSITION 
               }}
             >
-              <RouteCard route={route} accentColor={meta.accentColor} />
+              <RouteCard route={route} />
             </div>
           ))}
         </div>
