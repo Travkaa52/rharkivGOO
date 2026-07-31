@@ -7,6 +7,7 @@ import { trolleyTimetables } from '@/data/trolleyTimetables';
 import { tramTimetables } from '@/data/tramTimetables';
 import { busTimetables } from '@/data/busTimetables';
 import { RouteTimetable } from '@/components/RouteTimetable';
+import { RouteAlertBanner } from '@/components/RouteAlertBanner';
 import type { TransportRoute } from '@/types/transport';
 
 /**
@@ -43,6 +44,8 @@ export function RouteDetailContent({ route, onNavigate }: { route: TransportRout
 
   return (
     <div className="space-y-5">
+      <RouteAlertBanner routeNumber={route.number} kind={route.kind} />
+
       {/* Main Hero Card */}
       <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface/60 p-4 backdrop-blur-xl shadow-sm">
         <div

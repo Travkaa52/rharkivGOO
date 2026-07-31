@@ -45,26 +45,21 @@ export function ReportDelayModal({ open, onClose }: ReportDelayModalProps) {
 
   const isValid = routeNumber.trim().length > 0;
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!isValid || isSubmitting) return;
 
     setIsSubmitting(true);
-    const result = await sendDelayReport({ kind, routeNumber, stopName, comment });
+    const result = sendDelayReport({ kind, routeNumber, stopName, comment });
     setIsSubmitting(false);
 
     if (result.ok) {
-      showToast('Дякуємо! Повідомлення про затримку надіслано.', 'success');
+      showToast('Відкрили чат з ботом — натисніть "Надіслати", щоб підтвердити.', 'success');
       resetForm();
       onClose();
       return;
     }
 
-    if (result.reason === 'not-configured') {
-      showToast('Функція ще не налаштована адміністратором. Спробуйте пізніше.', 'error');
-      return;
-    }
-
-    showToast('Не вдалося надіслати повідомлення. Перевірте з’єднання та спробуйте ще раз.', 'error');
+    showToast('Функція ще не налаштована адміністратором. Спробуйте пізніше.', 'error');
   };
 
   return (
@@ -73,8 +68,8 @@ export function ReportDelayModal({ open, onClose }: ReportDelayModalProps) {
         <div className="flex items-start gap-2.5 rounded-2xl border border-gold/25 bg-gold/10 p-3 text-[11px] leading-relaxed text-ink-text">
           <AlertTriangle size={16} className="mt-0.5 shrink-0 text-gold" />
           <span>
-            Розкажіть, який транспорт затримується — повідомлення одразу піде адміністратору Kharkiv GO в
-            особисті повідомлення в Telegram.
+            Розкажіть, який транспорт затримується — відкриється чат із ботом Kharkiv GO в
+            Telegram із заповненим повідомленням, залишиться тільки натиснути «Надіслати».
           </span>
         </div>
 
@@ -156,7 +151,7 @@ export function ReportDelayModal({ open, onClose }: ReportDelayModalProps) {
           disabled={!isValid}
           onClick={handleSubmit}
         >
-          Надіслати повідомлення
+          Відкрити чат з ботом
         </Button>
       </div>
     </Sheet>

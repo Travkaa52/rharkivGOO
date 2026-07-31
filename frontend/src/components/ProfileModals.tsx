@@ -13,49 +13,21 @@ import {
 } from 'lucide-react';
 import { Modal } from '@/components/Modal';
 import { useToastStore } from '@/store/useToastStore';
+import { openSupportChat } from '@/lib/support';
 
 /**
  * НАЛАШТУВАННЯ, ЯКІ ТРЕБА ЗАМІНИТИ НА СВОЇ:
- * - SUPPORT_API_ENDPOINT — адреса свого бекенду, який відправляє
- *   повідомлення адміну через бота (sendMessage у Telegram Bot API).
- *   Приклад бекенду (Node/Express і Python/FastAPI) — в окремому
- *   файлі support-backend-example.md, який я віддав поруч.
- * - TELEGRAM_BOT_URL — юзернейм свого бота.
+ * - TELEGRAM_BOT_URL — юзернейм свого бота (для кнопки-посилання нижче).
+ *   Саму відправку повідомлення реалізує lib/support.ts через
+ *   VITE_TELEGRAM_BOT_USERNAME (.env) — немає бекенду (GitHub Pages),
+ *   тож повідомлення йде як deep link у чат з ботом, див. server-less
+ *   обробку в scripts/process-telegram-bot.mjs.
  * - DONATION_CARD_NUMBER / DONATION_JAR_URL — реквізити для донатів.
  */
-const SUPPORT_API_ENDPOINT = '/api/support';
 const TELEGRAM_BOT_URL = 'https://t.me/your_bot_username';
 const DONATION_CARD_NUMBER = '0000 0000 0000 0000';
 const DONATION_JAR_URL = 'https://send.monobank.ua/jar/6S34HzcLMS';
 
-interface SendSupportPayload {
-  message: string;
-  contact?: string;
-}
-
-async function sendSupportMessage(payload: SendSupportPayload) {
-  // Якщо застосунок відкритий у Telegram Mini App — беремо initData,
-  // щоб бекенд міг перевірити підпис і дістати user id/username без
-  // додаткових полів у формі.
-  const tg = (window as unknown as { Telegram?: { WebApp?: { initData?: string } } }).Telegram?.WebApp;
-  const initData = tg?.initData ?? '';
-
-  const res = await fetch(SUPPORT_API_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      message: payload.message,
-      contact: payload.contact || null,
-      initData
-    })
-  });
-
-  if (!res.ok) {
-    throw new Error(`Support request failed: ${res.status}`);
-  }
-
-  return res.json().catch(() => ({}));
-}
 
 interface SimpleModalProps {
   open: boolean;
@@ -238,9 +210,9 @@ export function PrivacyPolicyModal({ open, onClose }: SimpleModalProps) {
 /* ---------------------------------------------------------------------- */
 /* Зв'язок з підтримкою — надсилає повідомлення адміну через бота         */
 /* ---------------------------------------------------------------------- */
+
 export function SupportModal({ open, onClose }: SimpleModalProps) {
   const [message, setMessage] = useState('');
-  const [contact, setContact] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const showToast = useToastStore((s) => s.show);
 
@@ -248,24 +220,24 @@ export function SupportModal({ open, onClose }: SimpleModalProps) {
     onClose();
     window.setTimeout(() => {
       setMessage('');
-      setContact('');
       setStatus('idle');
     }, 200);
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim() || status === 'sending') return;
 
     setStatus('sending');
-    try {
-      await sendSupportMessage({ message: message.trim(), contact: contact.trim() });
+    const result = openSupportChat(message);
+
+    if (result.ok) {
       setStatus('sent');
-      showToast('Повідомлення надіслано! Ми відповімо найближчим часом.', 'success');
-      window.setTimeout(resetAndClose, 1200);
-    } catch {
+      showToast('Відкрили чат з ботом — натисніть "Надіслати", щоб підтвердити.', 'success');
+      window.setTimeout(resetAndClose, 900);
+    } else {
       setStatus('error');
-      showToast('Не вдалося надіслати. Спробуйте ще раз трохи пізніше.', 'error');
+      showToast('Функція ще не налаштована адміністратором. Спробуйте пізніше.', 'error');
     }
   };
 
@@ -273,8 +245,9 @@ export function SupportModal({ open, onClose }: SimpleModalProps) {
     <Modal open={open} onClose={resetAndClose} title="Зв'язок з підтримкою" icon={<LifeBuoy className="h-4 w-4" />}>
       <form onSubmit={handleSubmit} className="space-y-3">
         <p className="text-xs leading-relaxed text-ink-muted">
-          Опишіть проблему, ідею чи запитання — повідомлення одразу піде адміну в особисті через
-          бота.
+          Опишіть проблему, ідею чи запитання — відкриється чат із ботом Kharkiv GO в Telegram із
+          готовим текстом, залишиться тільки натиснути "Надіслати". Відповідь адміністратора
+          прийде вам особистим повідомленням від бота.
         </p>
 
         <textarea
@@ -287,13 +260,6 @@ export function SupportModal({ open, onClose }: SimpleModalProps) {
           className="w-full resize-none rounded-2xl border border-border/60 bg-surface-muted/40 p-3 text-xs font-medium text-ink-text outline-none transition-all placeholder:text-ink-muted/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/10"
         />
 
-        <input
-          value={contact}
-          onChange={(e) => setContact(e.target.value)}
-          placeholder="Контакт для відповіді (необов'язково)"
-          className="w-full rounded-2xl border border-border/60 bg-surface-muted/40 p-3 text-xs font-medium text-ink-text outline-none transition-all placeholder:text-ink-muted/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/10"
-        />
-
         <button
           type="submit"
           disabled={!message.trim() || status === 'sending'}
@@ -302,17 +268,17 @@ export function SupportModal({ open, onClose }: SimpleModalProps) {
           {status === 'sending' ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Надсилаємо...</span>
+              <span>Відкриваємо чат...</span>
             </>
           ) : status === 'sent' ? (
             <>
               <Check className="h-4 w-4" />
-              <span>Надіслано</span>
+              <span>Чат відкрито</span>
             </>
           ) : (
             <>
               <Send className="h-4 w-4" />
-              <span>Надіслати повідомлення</span>
+              <span>Написати в підтримку</span>
             </>
           )}
         </button>
