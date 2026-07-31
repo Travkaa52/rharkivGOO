@@ -10,7 +10,6 @@ interface RouteAlertsState {
 }
 
 const POLL_INTERVAL_MS = 60_000;
-let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 /**
  * Спільний стор активних оголошень про затримку — щоб не робити окремий
@@ -30,7 +29,7 @@ export const useRouteAlertsStore = create<RouteAlertsState>((set, get) => ({
     if (get().isPolling) return;
     set({ isPolling: true });
     void get().refresh();
-    pollTimer = setInterval(() => {
+    setInterval(() => {
       void get().refresh();
     }, POLL_INTERVAL_MS);
   }
