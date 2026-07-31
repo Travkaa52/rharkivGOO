@@ -10,17 +10,21 @@ Telegram.
 ```
 kharkiv-go/
 ├── frontend/           # React 19 + TypeScript + Vite + Tailwind + MapLibre GL
-│   └── src/data/        # зупинки/маршрути Харкова — статичний JSON, без БД
-├── backend-optional/    # НЕ використовується зараз, лишено про запас (див. його README)
-├── .github/workflows/   # автодеплой на GitHub Pages
-└── BOT_SETUP.md          # як підключити Telegram-бота і Mini App
+│   ├── src/data/         # зупинки/маршрути Харкова — статичний JSON, без БД
+│   ├── scripts/          # process-telegram-bot.mjs, parse-telegram-channels.mjs
+│   ├── data-runtime/     # технічний стан бота (не публічний)
+│   └── public/data/      # route-alerts.json, notifications.json — публічні фіди
+├── bot/                 # опційний Python-бот (постійний процес замість Actions-cron)
+├── .github/workflows/   # автодеплой на GitHub Pages + обробка Telegram-апдейтів
+├── BOT_SETUP.md          # як підключити Telegram-бота і Mini App
+└── INTEGRATION_NOTES_UK.md  # повна схема бота підтримки й оголошень про затримки
 ```
 
-Чому без бекенду — детальніше в `backend-optional/README.md`. Коротко:
-Харків не публікує відкритий GTFS-realtime фід транспорту, тож "живих"
-координат все одно поки нема — тримати заради цього постійний сервер
-немає сенсу. Все інше (зупинки, маршрути, пошук, обране, історія, профіль)
-чудово працює локально.
+Немає постійного сервера для самого застосунку (карта, маршрути, зупинки,
+пошук, обране, історія, профіль — усе статично на GitHub Pages, дані
+Харкова без відкритого GTFS-realtime фіда однаково не дали б "живих"
+координат). Підтримка й оголошення про затримки транспорту працюють через
+Telegram-бота — детально в `INTEGRATION_NOTES_UK.md`.
 
 ## Запуск локально
 
