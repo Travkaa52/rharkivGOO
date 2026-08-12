@@ -1,6 +1,19 @@
 {
-  "updatedAt": "2026-08-12T05:11:33.430Z",
+  "updatedAt": "2026-08-12T06:42:46.063Z",
   "items": [
+    {
+      "id": "kh_metro:2842",
+      "channel": "kh_metro",
+      "channelTitle": "Харківський метрополітен 🚇",
+      "text": "❌ На станції «Тракторний завод» тимчасово зачинено пішохідний вихід №3\n\nВихід №3 (у бік Харківського тракторного заводу) з підвуличного пішохідного переходу на станції «Тракторний завод» тимчасово зачинено для користування пасажирів у звʼязку з проведенням ремонтних робіт.\n\nПро відновлення роботи виходу №3 буде повідомлено додатково.\n\nПриносимо вибачення за тимчасові незручності&#33;\n\nОфіційний сайт | Facebook |  Instagram",
+      "date": "2026-08-12T06:11:13.000Z",
+      "link": "https://t.me/kh_metro/2842",
+      "hasMedia": true,
+      "isForwarded": false,
+      "views": "847",
+      "kind": "info",
+      "lineIds": []
+    },
     {
       "id": "kh_metro:2841",
       "channel": "kh_metro",
@@ -10,7 +23,7 @@
       "link": "https://t.me/kh_metro/2841",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "3.17K",
+      "views": "3.49K",
       "kind": "info",
       "lineIds": [
         "route-metro-2"
@@ -25,7 +38,7 @@
       "link": "https://t.me/kh_metro/2840",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "3.49K",
+      "views": "3.71K",
       "kind": "info",
       "lineIds": [
         "route-metro-3"
@@ -40,7 +53,7 @@
       "link": "https://t.me/kh_metro/2839",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "4.61K",
+      "views": "4.72K",
       "kind": "info",
       "lineIds": []
     },
@@ -53,7 +66,7 @@
       "link": "https://t.me/kh_metro/2838",
       "hasMedia": false,
       "isForwarded": false,
-      "views": "4.99K",
+      "views": "5.04K",
       "kind": "info",
       "lineIds": []
     },
@@ -66,7 +79,7 @@
       "link": "https://t.me/kh_metro/2837",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "7.54K",
+      "views": "7.63K",
       "kind": "info",
       "lineIds": []
     },
@@ -92,7 +105,7 @@
       "link": "https://t.me/kh_metro/2835",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "19K",
+      "views": "19.1K",
       "kind": "info",
       "lineIds": []
     },
