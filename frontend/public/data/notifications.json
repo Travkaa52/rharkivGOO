@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-12T21:57:06.772Z",
+  "updatedAt": "2026-08-12T22:33:40.547Z",
   "items": [
     {
       "id": "kh_metro:2843",
@@ -10,7 +10,7 @@
       "link": "https://t.me/kh_metro/2843",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "2.47K",
+      "views": "2.48K",
       "kind": "alert",
       "lineIds": []
     },
@@ -23,7 +23,7 @@
       "link": "https://t.me/kh_metro/2842",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "3.38K",
+      "views": "3.39K",
       "kind": "info",
       "lineIds": []
     },
