@@ -1,6 +1,19 @@
 {
-  "updatedAt": "2026-08-15T05:55:09.118Z",
+  "updatedAt": "2026-08-15T06:18:57.676Z",
   "items": [
+    {
+      "id": "kh_metro:2845",
+      "channel": "kh_metro",
+      "channelTitle": "Харківський метрополітен 🚇",
+      "text": "Працівники Харківського метрополітену вкотре організовано здали кров для тих, хто її потребує. \n\nДонорство для колективу є системною практикою, а цього разу працівники долучилися до всеукраїнської акції «Я — серпневий донор».",
+      "date": "2026-08-15T06:18:45.000Z",
+      "link": "https://t.me/kh_metro/2845",
+      "hasMedia": false,
+      "isForwarded": false,
+      "views": "27",
+      "kind": "info",
+      "lineIds": []
+    },
     {
       "id": "kh_metro:2843",
       "channel": "kh_metro",
@@ -10,7 +23,7 @@
       "link": "https://t.me/kh_metro/2843",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "3.21K",
+      "views": "3.23K",
       "kind": "alert",
       "lineIds": []
     },
@@ -23,7 +36,7 @@
       "link": "https://t.me/kh_metro/2842",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "4.26K",
+      "views": "4.28K",
       "kind": "info",
       "lineIds": []
     },
@@ -36,7 +49,7 @@
       "link": "https://t.me/kh_metro/2841",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "4.78K",
+      "views": "4.79K",
       "kind": "info",
       "lineIds": [
         "route-metro-2"
@@ -51,7 +64,7 @@
       "link": "https://t.me/kh_metro/2840",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "4.72K",
+      "views": "4.73K",
       "kind": "info",
       "lineIds": [
         "route-metro-3"
@@ -79,7 +92,7 @@
       "link": "https://t.me/kh_metro/2838",
       "hasMedia": false,
       "isForwarded": false,
-      "views": "5.55K",
+      "views": "5.56K",
       "kind": "info",
       "lineIds": []
     },
@@ -105,7 +118,7 @@
       "link": "https://t.me/kh_metro/2836",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "21.5K",
+      "views": "21.6K",
       "kind": "info",
       "lineIds": []
     },
@@ -132,19 +145,6 @@
       "hasMedia": true,
       "isForwarded": false,
       "views": "13.6K",
-      "kind": "info",
-      "lineIds": []
-    },
-    {
-      "id": "kh_metro:2825",
-      "channel": "kh_metro",
-      "channelTitle": "Харківський метрополітен 🚇",
-      "text": "❌На станції «Палац Спорту» тимчасово зачинено пішохідний вихід №3\n\nСьогодні, 31 липня, вихід №3 (у бік пр. Петра Григоренка) з підвуличного пішохідного переходу на станції «Палац Спорту» тимчасово зачинено до 15:00 для користування пасажирів у звʼязку з проведенням ремонтних робіт.\n\nПриносимо вибачення за тимчасові незручності&#33;\n\nОфіційний сайт | Facebook |  Instagram",
-      "date": "2026-07-31T07:04:09.000Z",
-      "link": "https://t.me/kh_metro/2825",
-      "hasMedia": true,
-      "isForwarded": false,
-      "views": "17.8K",
       "kind": "info",
       "lineIds": []
     }
