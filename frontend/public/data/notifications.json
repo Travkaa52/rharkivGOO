@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-15T21:57:31.437Z",
+  "updatedAt": "2026-08-15T22:15:50.790Z",
   "items": [
     {
       "id": "kh_metro:2845",
@@ -10,7 +10,7 @@
       "link": "https://t.me/kh_metro/2845",
       "hasMedia": false,
       "isForwarded": false,
-      "views": "3.18K",
+      "views": "3.19K",
       "kind": "info",
       "lineIds": []
     },
@@ -64,7 +64,7 @@
       "link": "https://t.me/kh_metro/2840",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "5.04K",
+      "views": "5.05K",
       "kind": "info",
       "lineIds": [
         "route-metro-3"
