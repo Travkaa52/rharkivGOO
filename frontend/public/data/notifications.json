@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-18T18:03:36.736Z",
+  "updatedAt": "2026-08-18T18:51:39.694Z",
   "items": [
     {
       "id": "kh_metro:2846",
@@ -10,7 +10,7 @@
       "link": "https://t.me/kh_metro/2846",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "1.85K",
+      "views": "2.05K",
       "kind": "info",
       "lineIds": [
         "route-metro-2"
@@ -25,7 +25,7 @@
       "link": "https://t.me/kh_metro/2845",
       "hasMedia": false,
       "isForwarded": false,
-      "views": "5.66K",
+      "views": "5.78K",
       "kind": "info",
       "lineIds": []
     },
@@ -38,7 +38,7 @@
       "link": "https://t.me/kh_metro/2843",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "6.1K",
+      "views": "6.17K",
       "kind": "alert",
       "lineIds": []
     },
@@ -51,7 +51,7 @@
       "link": "https://t.me/kh_metro/2842",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "5.84K",
+      "views": "5.85K",
       "kind": "info",
       "lineIds": []
     },
@@ -64,7 +64,7 @@
       "link": "https://t.me/kh_metro/2841",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "6.28K",
+      "views": "6.29K",
       "kind": "info",
       "lineIds": [
         "route-metro-2"
@@ -94,7 +94,7 @@
       "link": "https://t.me/kh_metro/2839",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "6.59K",
+      "views": "6.67K",
       "kind": "info",
       "lineIds": []
     },
@@ -107,7 +107,7 @@
       "link": "https://t.me/kh_metro/2838",
       "hasMedia": false,
       "isForwarded": false,
-      "views": "7.06K",
+      "views": "7.07K",
       "kind": "info",
       "lineIds": []
     },
@@ -120,7 +120,7 @@
       "link": "https://t.me/kh_metro/2837",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "9.44K",
+      "views": "9.45K",
       "kind": "info",
       "lineIds": []
     },
