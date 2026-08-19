@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-19T19:53:38.531Z",
+  "updatedAt": "2026-08-19T20:14:09.909Z",
   "items": [
     {
       "id": "kh_metro:2846",
@@ -10,7 +10,7 @@
       "link": "https://t.me/kh_metro/2846",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "3.18K",
+      "views": "3.19K",
       "kind": "info",
       "lineIds": [
         "route-metro-2"
@@ -38,7 +38,7 @@
       "link": "https://t.me/kh_metro/2843",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "6.67K",
+      "views": "6.68K",
       "kind": "alert",
       "lineIds": []
     },
