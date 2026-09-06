@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-06T11:45:29.476Z",
+  "updatedAt": "2026-09-06T14:25:03.470Z",
   "items": [
     {
       "id": "kh_metro:2908",
@@ -23,7 +23,7 @@
       "link": "https://t.me/kh_metro/2907",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "29.1K",
+      "views": "29.2K",
       "kind": "alert",
       "lineIds": [
         "route-metro-3"
@@ -38,7 +38,7 @@
       "link": "https://t.me/kh_metro/2897",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "5.38K",
+      "views": "5.39K",
       "kind": "info",
       "lineIds": []
     },
@@ -51,7 +51,7 @@
       "link": "https://t.me/kh_metro/2890",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "5.76K",
+      "views": "5.77K",
       "kind": "info",
       "lineIds": []
     },
