@@ -1,6 +1,19 @@
 {
-  "updatedAt": "2026-09-18T01:34:07.035Z",
+  "updatedAt": "2026-09-18T06:34:17.106Z",
   "items": [
+    {
+      "id": "kh_metro:2936",
+      "channel": "kh_metro",
+      "channelTitle": "Харківський метрополітен 🚇",
+      "text": "❌ На станції «Ярослава Мудрого» тимчасово зачинено пішохідний вихід №2\n\nСьогодні, 18 вересня, вихід №2 (у бік вул. Ярослава Мудрого) з підвуличного пішохідного переходу на станції «Ярослава Мудрого» тимчасово зачинено для користування пасажирів до 11:00 у звʼязку з проведенням ремонтних робіт.\n\nПро відновлення роботи виходу буде повідомлено додатково\n\nПриносимо вибачення за тимчасові незручності&#33;\n\nОфіційний сайт | Facebook |  Instagram",
+      "date": "2026-09-18T06:06:17.000Z",
+      "link": "https://t.me/kh_metro/2936",
+      "hasMedia": true,
+      "isForwarded": false,
+      "views": "876",
+      "kind": "info",
+      "lineIds": []
+    },
     {
       "id": "kh_metro:2935",
       "channel": "kh_metro",
@@ -10,7 +23,7 @@
       "link": "https://t.me/kh_metro/2935",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "12.3K",
+      "views": "12.7K",
       "kind": "info",
       "lineIds": []
     },
@@ -23,7 +36,7 @@
       "link": "https://t.me/kh_metro/2927",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "5.27K",
+      "views": "5.55K",
       "kind": "info",
       "lineIds": []
     },
@@ -36,7 +49,7 @@
       "link": "https://t.me/kh_metro/2926",
       "hasMedia": true,
       "isForwarded": false,
-      "views": "29.1K",
+      "views": "29.2K",
       "kind": "info",
       "lineIds": []
     },
@@ -49,7 +62,7 @@
       "link": "https://t.me/kh_metro/2918",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "7.58K",
+      "views": "7.77K",
       "kind": "info",
       "lineIds": []
     },
@@ -62,7 +75,7 @@
       "link": "https://t.me/kh_metro/2910",
       "hasMedia": true,
       "isForwarded": true,
-      "views": "8.95K",
+      "views": "8.99K",
       "kind": "info",
       "lineIds": [
         "route-metro-2"
